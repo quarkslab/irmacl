@@ -36,7 +36,7 @@ if config_file is None:
 config = ConfigParser()
 config.read(config_file)
 address = config.get("Server", "address")
-API_ENDPOINT = "http://{0}/api/v1".format(address)
+API_ENDPOINT = "http://{0}/api/v1.1".format(address)
 
 # =========
 #  Helpers
@@ -91,7 +91,8 @@ def scan_add(scan_id, filelist, verbose=False):
     return scan
 
 
-def scan_launch(scan_id, force, probe=None, verbose=False):
+def scan_launch(scan_id, force, probe=None,
+                mimetype_filtering=None, resubmit_files=None, verbose=False):
     """Launch an existing scan
 
     :param scan_id: the scan id
@@ -102,6 +103,12 @@ def scan_launch(scan_id, force, probe=None, verbose=False):
     :param probe: probe list to use
         (optional default None means all)
     :type probe: list
+    :param mimetype_filtering: enable probe selection based on mimetype
+        (optional default:True)
+    :type mimetype_filtering: bool
+    :param resubmit_files: reanalyze files produced by probes
+        (optional default:True)
+    :type resubmit_files: bool
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -110,11 +117,15 @@ def scan_launch(scan_id, force, probe=None, verbose=False):
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.launch(scan_id, force, probe)
+    scan = scanapi.launch(scan_id, force, probe=probe,
+                          mimetype_filtering=mimetype_filtering,
+                          resubmit_files=resubmit_files)
     return scan
 
 
-def scan_files(filelist, force, probe=None, verbose=False):
+def scan_files(filelist, force, probe=None,
+               mimetype_filtering=None, resubmit_files=None,
+               verbose=False):
     """Wrapper around scan_new / scan_add / scan_launch
 
     :param filelist: list of full path qualified files
@@ -125,6 +136,12 @@ def scan_files(filelist, force, probe=None, verbose=False):
     :param probe: probe list to use
         (optional default: None means all)
     :type probe: list
+    :param mimetype_filtering: enable probe selection based on mimetype
+        (optional default:True)
+    :type mimetype_filtering: bool
+    :param resubmit_files: reanalyze files produced by probes
+        (optional default:True)
+    :type resubmit_files: bool
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -133,7 +150,9 @@ def scan_files(filelist, force, probe=None, verbose=False):
     """
     scan = scan_new(verbose)
     scan = scan_add(scan.id, filelist, verbose)
-    scan = scan_launch(scan.id, force, probe, verbose)
+    scan = scan_launch(scan.id, force, probe=probe,
+                       mimetype_filtering=mimetype_filtering,
+                       resubmit_files=resubmit_files)
     return scan
 
 
@@ -171,7 +190,7 @@ def scan_get(scan_id, verbose=False):
     return scan
 
 
-def file_results(scan_id, result_idx, formatted=True, verbose=False):
+def file_results(result_idx, formatted=True, verbose=False):
     """Fetch a file results
 
     :param scan_id: the scan id
@@ -189,7 +208,7 @@ def file_results(scan_id, result_idx, formatted=True, verbose=False):
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    file_results = scanapi.file_results(scan_id, result_idx,
+    file_results = scanapi.file_results(result_idx,
                                         formatted=formatted)
     return file_results
 

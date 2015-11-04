@@ -246,7 +246,9 @@ class EicarTestCase(unittest.TestCase):
     def _test_scan_file(self,
                         filelist,
                         probelist,
-                        force=False,
+                        force=True,
+                        mimetype_filtering=None,
+                        resubmit_files=None,
                         timeout=SCAN_TIMEOUT_SEC):
         nb_probes = len(probelist)
         nb_files = len(filelist)
@@ -262,7 +264,10 @@ class EicarTestCase(unittest.TestCase):
         self._check_results(scan.results, scanid, filenames, [0], [0],
                             True, True)
 
-        scan = scan_launch(scan.id, force, probelist, verbose=DEBUG)
+        scan = scan_launch(scan.id, force=force, probe=probelist,
+                           mimetype_filtering=mimetype_filtering,
+                           resubmit_files=resubmit_files,
+                           verbose=DEBUG)
         start = time.time()
         while True:
             scan = scan_get(scan.id)
@@ -278,15 +283,17 @@ class EicarTestCase(unittest.TestCase):
 
         # Scan finished
         self._check_results(scan.results, scanid, filenames,
-                            [nb_probes], [nb_probes], True, True)
+                            [scan.probes_total], [scan.probes_total],
+                            True, True)
         res = {}
         for result in scan.results:
-            file_result = file_results(scanid, result.result_id,
+            file_result = file_results(result.result_id,
                                        formatted=True, verbose=DEBUG)
             self.assertIn(file_result.status, [-1, 0, 1])
-            self.assertEqual(file_result.probes_finished, nb_probes)
-            self.assertEqual(file_result.probes_total, nb_probes)
-            self.assertEqual(len(file_result.probe_results), nb_probes)
+            self.assertEqual(file_result.probes_finished,
+                             file_result.probes_total)
+            self.assertEqual(len(file_result.probe_results),
+                             file_result.probes_total)
             res[result.name] = {}
             for pr in file_result.probe_results:
                 res[result.name][pr.name] = pr
@@ -408,7 +415,8 @@ class IrmaEicarTest(EicarTestCase):
             raise unittest.SkipTest("Skipping %s not present" % probe)
         probelist = [probe]
         filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
+        res = self._test_scan_file(filelist, probelist, force=True,
+                                   mimetype_filtering=False)
         self.check_eicar_results(res[self.filename])
 
     def test_scan_trid(self):

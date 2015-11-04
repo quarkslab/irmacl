@@ -28,7 +28,7 @@ class TestCornerCase(unittest.TestCase):
     def test_utf8(self):
         scan = self._make_scan(UTF8_PATHS)
         for result in scan.results:
-            res = file_results(scan.id, result.result_id)
+            res = file_results(result.result_id)
             self.assertIn(res.name, UTF8_SAMPLES)
         for filename in UTF8_SAMPLES:
             res = file_search(filename, limit=1)

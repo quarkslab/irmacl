@@ -94,13 +94,12 @@ class IrmaActionTests(unittest.TestCase):
     def test_scan_get(self):
         force = True
         probes = probe_list()
-        nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_files(FILEPATHS, force, probes)
         while scan.pstatus != "finished":
             time.sleep(1)
             scan = scan_get(scan.id)
         self._check_scan(scan, scan.id, ["finished"],
-                         FILENAMES, [nb_jobs], [nb_jobs],
+                         FILENAMES, [scan.probes_total], [scan.probes_total],
                          scan.date)
 
     def test_file_results_formatted(self):
@@ -111,13 +110,12 @@ class IrmaActionTests(unittest.TestCase):
             time.sleep(1)
             scan = scan_get(scan.id)
         for result in scan.results:
-            self.assertTrue(self._validate_uuid(str(result.result_id)) or
-                            result.result_id in range(len(FILENAMES)))
-            res = file_results(scan.id, result.result_id)
+            self.assertTrue(self._validate_uuid(str(result.result_id)))
+            res = file_results(result.result_id)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), list)
             self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
-            self.assertEqual(len(res.probe_results), len(probes))
+            self.assertEqual(len(res.probe_results), res.probes_finished)
 
     def test_file_results_not_formatted(self):
         force = True
@@ -127,13 +125,12 @@ class IrmaActionTests(unittest.TestCase):
             time.sleep(1)
             scan = scan_get(scan.id)
         for result in scan.results:
-            self.assertTrue(self._validate_uuid(str(result.result_id)) or
-                            result.result_id in range(len(FILENAMES)))
-            res = file_results(scan.id, result.result_id, formatted=False)
+            self.assertTrue(self._validate_uuid(str(result.result_id)))
+            res = file_results(result.result_id, formatted=False)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), list)
             self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
-            self.assertEqual(len(res.probe_results), len(probes))
+            self.assertEqual(len(res.probe_results), res.probes_finished)
 
     def test_file_search_name(self):
         force = False

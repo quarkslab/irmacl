@@ -202,7 +202,7 @@ Objects (apiclient.py)
       * **probe_results** -- list of IrmaProbeResults objects
 
 
-Functions (irma.py)
+Functions (command_line.py)
 ---------
 
 **probe_list(verbose=False)**

@@ -7,8 +7,8 @@ from irma.apiclient import IrmaProbeResult, IrmaResults
 pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
 pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
 sys.path.append(os.path.dirname(pardir))
-from irma.irma import probe_list, scan_new, scan_add, scan_files, scan_get, \
-    scan_launch, file_results, file_search, scan_cancel
+from irma.command_line import probe_list, scan_new, scan_add, scan_files, \
+    scan_get, scan_launch, file_results, file_search, scan_cancel
 
 
 cwd = os.path.dirname(__file__)
@@ -33,13 +33,13 @@ class IrmaActionTests(unittest.TestCase):
     def _check_scan(self, scan, scanid, range_status, filelist,
                     range_finished, range_total, date):
         nb_files = len(filelist)
-        self.assertEquals(scan.id, scanid)
+        self.assertEqual(scan.id, scanid)
         self.assertIn(scan.pstatus, range_status)
-        self.assertEquals(type(scan.results), list)
-        self.assertEquals(len(scan.results), nb_files)
+        self.assertEqual(type(scan.results), list)
+        self.assertEqual(len(scan.results), nb_files)
         self.assertIn(scan.probes_finished, range_finished)
         self.assertIn(scan.probes_total, range_total)
-        self.assertEquals(scan.date, date)
+        self.assertEqual(scan.date, date)
 
     def test_probe_list(self):
         probelist = probe_list()

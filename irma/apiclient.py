@@ -66,7 +66,13 @@ class IrmaApiClient(object):
         while nb_try < self.max_tries:
             nb_try += 1
             try:
-                args = urllib.urlencode(extra_args)
+                dec_extra_args = {}
+                for (k, v) in extra_args.items():
+                    if type(v) == unicode or type(v) == str:
+                        dec_extra_args[k] = v.encode("utf8")
+                    else:
+                        dec_extra_args[k] = v
+                args = urllib.urlencode(dec_extra_args)
                 resp = requests.get(self.url + route + "?" + args)
                 return self._handle_resp(resp)
             except IrmaError as e:

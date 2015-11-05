@@ -6,7 +6,7 @@ import time
 pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
 pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
 sys.path.append(os.path.dirname(pardir))
-from irma.command_line import scan_files, scan_get, \
+from irma.helpers import scan_files, scan_get, \
     file_results, file_search
 
 cwd = os.path.dirname(__file__)

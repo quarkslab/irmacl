@@ -41,7 +41,7 @@ Usage
 
 .. code-block:: python
 
-   >>> from irma.irma import *
+   >>> from irma.helpers import *
    >>> probe_list()
    [u'AVGAntiVirusFree', u'AvastCoreSecurity', u'BitdefenderForUnices', u'ClamAV', u'ComodoCAVL', u'DrWeb', u'EScan', u'FSecure', u'GData', u'McAfee-Daemon', u'PEiD', u'Sophos', u'StaticAnalyzer', u'TrID', u'VirusBlokAda', u'VirusTotal', u'Zoner']
 

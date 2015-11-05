@@ -17,7 +17,7 @@
 
 import argparse
 from irma.apiclient import IrmaError
-from irma.command_line import probe_list, scan_files, scan_cancel, \
+from irma.helpers import probe_list, scan_files, scan_cancel, \
     scan_get, file_results
 
 

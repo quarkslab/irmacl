@@ -1,12 +1,8 @@
 import unittest
 import os
-import sys
 import re
 import time
 from irma.apiclient import IrmaProbeResult, IrmaResults
-pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
-pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
-sys.path.append(os.path.dirname(pardir))
 from irma.helpers import probe_list, scan_new, scan_add, scan_files, \
     scan_get, scan_launch, file_results, file_search, scan_cancel
 
@@ -59,7 +55,8 @@ class IrmaActionTests(unittest.TestCase):
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date)
         scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0], date)
+        self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
+                         date)
 
     def test_scan_launch(self):
         scan = scan_new()

@@ -27,7 +27,8 @@ class IrmaActionTests(unittest.TestCase):
         return regex.match(uuid) is not None
 
     def _check_scan(self, scan, scanid, range_status, filelist,
-                    range_finished, range_total, date):
+                    range_finished, range_total, date,
+                    force, mimetype_filtering, resubmit_files):
         nb_files = len(filelist)
         self.assertEqual(scan.id, scanid)
         self.assertIn(scan.pstatus, range_status)
@@ -36,6 +37,9 @@ class IrmaActionTests(unittest.TestCase):
         self.assertIn(scan.probes_finished, range_finished)
         self.assertIn(scan.probes_total, range_total)
         self.assertEqual(scan.date, date)
+        self.assertEqual(scan.force, force)
+        self.assertEqual(scan.mimetype_filtering, mimetype_filtering)
+        self.assertEqual(scan.resubmit_files, resubmit_files)
 
     def test_probe_list(self):
         probelist = probe_list()
@@ -45,7 +49,8 @@ class IrmaActionTests(unittest.TestCase):
     def test_scan_new(self):
         scan = scan_new()
         self.assertTrue(self._validate_uuid(scan.id))
-        self._check_scan(scan, scan.id, ["empty"], [], [0], [0], scan.date)
+        self._check_scan(scan, scan.id, ["empty"], [], [0], [0], scan.date,
+                         False, False, False)
 
     def test_scan_add(self):
         scan = scan_new()
@@ -53,10 +58,11 @@ class IrmaActionTests(unittest.TestCase):
         scanid = scan.id
         scan = scan_add(scan.id, FILEPATHS)
         self.assertEqual(scan.pstatus, "ready")
-        self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date)
+        self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date,
+                         False, False, False)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
-                         date)
+                         date, False, False, False)
 
     def test_scan_launch(self):
         scan = scan_new()
@@ -66,27 +72,80 @@ class IrmaActionTests(unittest.TestCase):
         force = True
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan_launch(scan.id, force, probes)
+        scan = scan_launch(scan.id, force, probes)
         self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
-                         date)
+                         date, force, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
-                         date)
+                         date, force, True, True)
+
+    def test_scan_force(self):
+        scan = scan_new()
+        date = scan.date
+        scanid = scan.id
+        scan = scan_add(scan.id, FILEPATHS)
+        force = False
+        probes = probe_list()
+        nb_jobs = len(FILENAMES) * len(probes)
+        scan = scan_launch(scan.id, force, probe=probes)
+        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, True, True)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scanid, ["cancelled"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, True, True)
+
+    def test_mimetype_filtering(self):
+        scan = scan_new()
+        date = scan.date
+        scanid = scan.id
+        scan = scan_add(scan.id, FILEPATHS)
+        force = True
+        mimetype_filtering = False
+        probes = probe_list()
+        nb_jobs = len(FILENAMES) * len(probes)
+        scan = scan_launch(scan.id, force, probes, mimetype_filtering=mimetype_filtering)
+        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, mimetype_filtering, True)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scanid, ["cancelled"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, mimetype_filtering, True)
+
+    def test_resubmit_files(self):
+        scan = scan_new()
+        date = scan.date
+        scanid = scan.id
+        scan = scan_add(scan.id, FILEPATHS)
+        force = True
+        resubmit_files = False
+        probes = probe_list()
+        nb_jobs = len(FILENAMES) * len(probes)
+        scan = scan_launch(scan.id, force, probe=probes, resubmit_files=resubmit_files)
+        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, True, resubmit_files)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scanid, ["cancelled"],
+                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         date, force, True, resubmit_files)
 
     def test_scan_files(self):
         force = True
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan = scan_files(FILEPATHS, force, probes)
+        scan = scan_files(FILEPATHS, force, probe=probes)
         self._check_scan(scan, scan.id, ["ready", "uploaded", "launched"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
-                         scan.date)
+                         scan.date, True, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scan.id, ["cancelled"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
-                         scan.date)
+                         scan.date, True, True, True)
 
     def test_scan_get(self):
         force = True
@@ -97,7 +156,7 @@ class IrmaActionTests(unittest.TestCase):
             scan = scan_get(scan.id)
         self._check_scan(scan, scan.id, ["finished"],
                          FILENAMES, [scan.probes_total], [scan.probes_total],
-                         scan.date)
+                         scan.date, True, True, True)
 
     def test_file_results_formatted(self):
         force = True

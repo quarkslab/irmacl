@@ -43,74 +43,90 @@ Usage
 
    >>> from irma.helpers import *
    >>> probe_list()
-   [u'AVGAntiVirusFree', u'AvastCoreSecurity', u'BitdefenderForUnices', u'ClamAV', u'ComodoCAVL', u'DrWeb', u'EScan', u'FSecure', u'GData', u'McAfee-Daemon', u'PEiD', u'Sophos', u'StaticAnalyzer', u'TrID', u'VirusBlokAda', u'VirusTotal', u'Zoner']
+   [u'StaticAnalyzer', u'Unarchive', u'VirusBlokAda', u'VirusTotal']
 
    >>> scan = scan_new()
-   >>> print scan
-   Scanid: 0b7e7f96-00a3-4a4c-aa4d-91a73d7c1867
+   >>> scan
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
    Status: empty
+   Options: Force [False] Mimetype [False] Resubmit [False]
    Probes finished: 0
    Probes Total: 0
-   Date: 1446633817
+   Date: 1446711412
    Results: []
 
    >>> scan_add(scan.id, ["./irma/tests/samples/eicar.com"])
-   Scanid: 0b7e7f96-00a3-4a4c-aa4d-91a73d7c1867
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
    Status: ready
+   Options: Force [False] Mimetype [False] Resubmit [False]
    Probes finished: 0
    Probes Total: 0
-   Date: 1446633817
-   Results: [<irma.apiclient.IrmaResults object at 0x7fcea1ec3850>]
-   
-   >>> scan_launch(scan.id, True)
-   Scanid: 0b7e7f96-00a3-4a4c-aa4d-91a73d7c1867
+   Date: 1446711412
+   Results: [<irma.apiclient.IrmaResults object at 0x7f572aab53d0>]
+
+   >>> scan_launch(scan.id, probe=None, force=True, mimetype_filtering=True, resubmit_files=True)
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
    Status: ready
+   Options: Force [True] Mimetype [True] Resubmit [True]
    Probes finished: 0
-   Probes Total: 17
-   Date: 1446633817
-   Results: [<irma.apiclient.IrmaResults object at 0x7fcea165c410>]
-   
-   >>> scan = scan_get(scan.id)
+   Probes Total: 0
+   Date: 1446711412
+   Results: [<irma.apiclient.IrmaResults object at 0x7f572aa62790>]
+
+   >>> scan  = scan_get(scan.id)
+   >>> scan
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
+   Status: finished
+   Options: Force [True] Mimetype [True] Resubmit [True]
+   Probes finished: 2
+   Probes Total: 2
+   Date: 1446711412
+   Results: [<irma.apiclient.IrmaResults object at 0x7f572aa62f90>]
+
    >>> scan.pstatus
    'finished'
-   
+
    >>> print scan.results[0]
    Status: 1
-   Probes finished: 17
-   Probes Total: 17
-   Scanid: 0b7e7f96-00a3-4a4c-aa4d-91a73d7c1867
+   Probes finished: 2
+   Probes Total: 2
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
    Filename: eicar.com
-   Resultid: 0
+   ParentFile SHA256: None
+   Resultid: 633beafb-358f-40c3-a969-4c78e39adc15
    FileInfo: 
    None
    Results: None
-   
-   >>> res = file_results(scan.id, 0)
+
+   >>> res = file_results("633beafb-358f-40c3-a969-4c78e39adc15")
    >>> print res
    Status: 1
-   Probes finished: 17
-   Probes Total: 17
-   Scanid: 0b7e7f96-00a3-4a4c-aa4d-91a73d7c1867
+   Probes finished: 2
+   Probes Total: 2
+   Scanid: 83e8a0a0-9669-45c3-bfa8-ffbcaa3f0aa7
    Filename: eicar.com
-   Resultid: 0
+   ParentFile SHA256: None
+   Resultid: 633beafb-358f-40c3-a969-4c78e39adc15
    FileInfo: 
    Size: 68
    Sha1: 3395856ce81f2b7382dee72602f798b642f14140
    Sha256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
    Md5: 44d88612fea8a8f36de82e1278abb02fs
-   First Scan: 1441961885.24
-   Last Scan: 1446633967.67
-   Id: 2482
-   
-   Results: [<irma.apiclient.IrmaProbeResult object at 0x7fcea166be90>,...]
+   First Scan: 1446474373.06
+   Last Scan: 1446711485.82
+   Id: 46
+   Mimetype: EICAR virus test files
+   Tags: []
+
+   Results: [<irma.apiclient.IrmaProbeResult object at 0x7f572aab5d10>, <irma.apiclient.IrmaProbeResult object at 0x7f572aab5f90>]
    
    >>> print res.probe_results[0]
    Status: 1
-   Name: Comodo Antivirus for Linux
+   Name: VirusBlokAda (Console Scanner)
    Category: antivirus
-   Version: 1.1.268025.1
-   Duration: 1.23s
-   Results: Malware
+   Version: 3.12.26.4
+   Duration: 1.88s
+   Results: EICAR-Test-File
 
 
 Objects (apiclient.py)
@@ -202,8 +218,8 @@ Objects (apiclient.py)
       * **probe_results** -- list of IrmaProbeResults objects
 
 
-Functions (command_line.py)
----------
+Helpers (helpers.py)
+-------
 
 **probe_list(verbose=False)**
 

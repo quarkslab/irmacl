@@ -76,9 +76,10 @@ class IrmaApiClient(object):
                 resp = requests.get(self.url + route + "?" + args)
                 return self._handle_resp(resp)
             except IrmaError as e:
-                print "Try {0} Max {1}".format(nb_try, self.max_tries)
                 if nb_try < self.max_tries:
-                    print "Exception Raised {0} retry #{1}".format(e, nb_try)
+                    if self.verbose:
+                        print "Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -93,7 +94,9 @@ class IrmaApiClient(object):
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:
-                    print "Exception Raised {0} retry #{1}".format(e, nb_try)
+                    if self.verbose:
+                        print "Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -105,7 +108,10 @@ class IrmaApiClient(object):
             print "http code : {0}".format(resp.status_code)
             print "content : {0}".format(resp.content)
         if resp.status_code == 200:
-            return json.loads(resp.content)
+            if len(resp.content) > 0:
+                return json.loads(resp.content)
+            else:
+                return
         else:
             reason = "Error {0}".format(resp.status_code)
             try:
@@ -129,6 +135,36 @@ class IrmaProbesApi(object):
         route = '/probes'
         res = self._apiclient.get_call(route)
         return res['data']
+
+
+class IrmaTagsApi(object):
+    """ Tags Api
+    """
+
+    def __init__(self, apiclient):
+        self._apiclient = apiclient
+        self._tags_schema = IrmaTagSchema()
+        return
+
+    def list(self):
+        route = '/tags'
+        data = self._apiclient.get_call(route)
+        res_list = []
+        items = data.get('items', list())
+        for res in items:
+            res_obj = self._tags_schema.make_object(res)
+            res_list.append(res_obj)
+        return res_list
+
+    def file_tag_add(self, sha256, tagid):
+        route = '/files/{0}/tags/{1}/add'.format(sha256, tagid)
+        self._apiclient.get_call(route)
+        return
+
+    def file_tag_remove(self, sha256, tagid):
+        route = '/files/{0}/tags/{1}/remove'.format(sha256, tagid)
+        self._apiclient.get_call(route)
+        return
 
 
 class IrmaScansApi(object):
@@ -205,7 +241,7 @@ class IrmaFilesApi(object):
         self._results_schema = IrmaResultsSchema()
         return
 
-    def search(self, name=None, hash=None, offset=None, limit=None):
+    def search(self, name=None, hash=None, tags=None, offset=None, limit=None):
         extra_args = {}
         if name is not None:
             extra_args['name'] = name
@@ -215,6 +251,9 @@ class IrmaFilesApi(object):
             extra_args['offset'] = offset
         if limit is not None:
             extra_args['limit'] = limit
+        if tags is not None:
+            tags = map(lambda x: str(x), tags)
+            extra_args['tags'] = ",".join(tags)
         route = '/search/files'
         data = self._apiclient.get_call(route, **extra_args)
         res_list = []
@@ -229,10 +268,38 @@ class IrmaFilesApi(object):
 # =============
 
 
+class IrmaTag(object):
+    """ IrmaTag
+    Description for class
+
+    :ivar id: id of the tag
+    :ivar text: tag label
+    """
+    def __init__(self, id, text):
+        self.id = id
+        self.text = text
+
+    def __repr__(self):
+        ret = "Tag {0} [{1}]\n".format(self.text, self.id)
+        return ret
+
+
+class IrmaTagSchema(Schema):
+
+    class Meta:
+        fields = ('text', 'id')
+
+    def make_object(self, data):
+        return IrmaTag(**data)
+
+
 class IrmaFileInfoSchema(Schema):
+    tags = fields.Nested(IrmaTagSchema, many=True)
+
     class Meta:
         fields = ('size', 'sha1', 'timestamp_first_scan',
-                  'timestamp_last_scan', 'sha256', 'id', 'md5', 'mimetype')
+                  'timestamp_last_scan', 'sha256', 'id', 'md5', 'mimetype'
+                  'tags')
 
     def make_object(self, data):
         return IrmaFileInfo(**data)
@@ -263,7 +330,10 @@ class IrmaFileInfo(object):
         self.id = id
         self.md5 = md5
         self.mimetype = mimetype
-        self.tags = tags
+        self.tags = []
+        for t in tags:
+            obj = IrmaTagSchema().make_object(t)
+            self.tags.append(obj)
 
     def __repr__(self):
         ret = "Size: {0}\n".format(self.size)

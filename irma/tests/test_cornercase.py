@@ -15,10 +15,7 @@ UTF8_PATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), UTF8_SAMPLES)
 class TestCornerCase(unittest.TestCase):
     def _make_scan(self, filelist):
         force = True
-        scan = scan_files(filelist, force)
-        while scan.pstatus != "finished":
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan = scan_files(filelist, force, blocking=True)
         return scan
 
     def test_utf8(self):

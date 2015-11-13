@@ -1,4 +1,3 @@
-#
 # Copyright (c) 2013-2015 QuarksLab.
 # This file is part of IRMA project.
 #
@@ -15,8 +14,9 @@
 
 import os
 from apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
-    IrmaFilesApi, IrmaError
+    IrmaFilesApi, IrmaError, IrmaTagsApi
 from ConfigParser import ConfigParser
+import time
 
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),
@@ -125,7 +125,7 @@ def scan_launch(scan_id, force, probe=None,
 
 def scan_files(filelist, force, probe=None,
                mimetype_filtering=None, resubmit_files=None,
-               verbose=False):
+               blocking=False, verbose=False):
     """Wrapper around scan_new / scan_add / scan_launch
 
     :param filelist: list of full path qualified files
@@ -142,6 +142,9 @@ def scan_files(filelist, force, probe=None,
     :param resubmit_files: reanalyze files produced by probes
         (optional default:True)
     :type resubmit_files: bool
+    :param blocking: wether or not the function call should block until
+        scan ended
+    :type blocking: bool
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -153,6 +156,10 @@ def scan_files(filelist, force, probe=None,
     scan = scan_launch(scan.id, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files)
+    if blocking:
+        while not scan.is_finished():
+            time.sleep(1)
+            scan = scan_get(scan.id)
     return scan
 
 
@@ -213,13 +220,16 @@ def file_results(result_idx, formatted=True, verbose=False):
     return file_results
 
 
-def file_search(name=None, hash=None, limit=None, offset=None, verbose=False):
+def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
+                verbose=False):
     """Search a file by name or hash value
 
     :param name: name of the file ('*name*' will be searched)
     :type name: str
     :param hash: one of sha1, md5 or sha256 full hash value
     :type hash: str of (64, 40 or 32 chars)
+    :param tags: list of tagid
+    :type list of int
     :param limit: max number of files to receive
         (optional default:25)
     :type limit: bool
@@ -231,5 +241,48 @@ def file_search(name=None, hash=None, limit=None, offset=None, verbose=False):
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
-    files = fileapi.search(name=name, hash=hash, limit=limit, offset=offset)
+    files = fileapi.search(name=name, hash=hash, tags=tags,
+                           limit=limit, offset=offset)
     return files
+
+
+def tag_list(verbose=False):
+    """List all available tags
+
+    :return: list of existing tags
+    :rtype: list of IrmaTag
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    tagapi = IrmaTagsApi(cli)
+    taglist = tagapi.list()
+    return taglist
+
+
+def file_tag_add(sha256, tagid, verbose=False):
+    """Add a tag to a File
+
+    :param sha256: file sha256 hash
+    :type hash: str of (64 chars)
+    :param tagid: tag id
+    :type int
+    :return: No return
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    tagapi = IrmaTagsApi(cli)
+    tagapi.file_tag_add(sha256, tagid)
+    return
+
+
+def file_tag_remove(sha256, tagid, verbose=False):
+    """Remove a tag to a File
+
+    :param sha256: file sha256 hash
+    :type hash: str of (64 chars)
+    :param tagid: tag id
+    :type int
+    :return: No return
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    tagapi = IrmaTagsApi(cli)
+    tagapi.file_tag_remove(sha256, tagid)
+    return

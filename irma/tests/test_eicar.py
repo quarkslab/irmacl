@@ -265,17 +265,14 @@ class EicarTestCase(unittest.TestCase):
                            resubmit_files=resubmit_files,
                            verbose=DEBUG)
         start = time.time()
-        while True:
-            scan = scan_get(scan.id)
-            if scan.pstatus == "finished":
-                break
-
+        while not scan.is_finished():
             self._check_results(scan.results, scanid, filenames,
                                 range(nb_probes + 1), range(nb_jobs + 1),
                                 True, True)
             time.sleep(BEFORE_NEXT_PROGRESS)
             now = time.time()
             self.assertLessEqual(now, start + timeout, "Results Timeout")
+            scan = scan_get(scan.id)
 
         # Scan finished
         self._check_results(scan.results, scanid, filenames,

@@ -3,6 +3,13 @@ import json
 from marshmallow import fields, Schema
 import time
 import urllib
+import datetime
+
+
+def timestamp_to_date(timestamp):
+    date = datetime.datetime.fromtimestamp(int(timestamp))
+    return date.strftime('%Y-%m-%d %H:%M:%S')
+
 
 # Warning this is a copy of IrmaScanStatus lib.irma.common.utils
 # in order to get rid of this dependency
@@ -335,13 +342,21 @@ class IrmaFileInfo(object):
             obj = IrmaTagSchema().make_object(t)
             self.tags.append(obj)
 
+    @property
+    def pdate_first_scan(self):
+        return timestamp_to_date(self.timestamp_first_scan)
+
+    @property
+    def pdate_last_scan(self):
+        return timestamp_to_date(self.timestamp_last_scan)
+
     def __repr__(self):
         ret = "Size: {0}\n".format(self.size)
         ret += "Sha1: {0}\n".format(self.sha1)
         ret += "Sha256: {0}\n".format(self.sha256)
         ret += "Md5: {0}s\n".format(self.md5)
-        ret += "First Scan: {0}\n".format(self.timestamp_first_scan)
-        ret += "Last Scan: {0}\n".format(self.timestamp_last_scan)
+        ret += "First Scan: {0}\n".format(self.pdate_first_scan)
+        ret += "Last Scan: {0}\n".format(self.pdate_last_scan)
         ret += "Id: {0}\n".format(self.id)
         ret += "Mimetype: {0}\n".format(self.mimetype)
         ret += "Tags: {0}\n".format(self.tags)
@@ -528,6 +543,10 @@ class IrmaScan(object):
     def pstatus(self):
         return IrmaScanStatus.label[self.status]
 
+    @property
+    def pdate(self):
+        return timestamp_to_date(self.date)
+
     def __repr__(self):
         ret = "Scanid: {0}\n".format(self.id)
         ret += "Status: {0}\n".format(self.pstatus)
@@ -536,7 +555,7 @@ class IrmaScan(object):
         ret += "Resubmit [{0}]\n".format(self.resubmit_files)
         ret += "Probes finished: {0}\n".format(self.probes_finished)
         ret += "Probes Total: {0}\n".format(self.probes_total)
-        ret += "Date: {0}\n".format(self.date)
+        ret += "Date: {0}\n".format(self.pdate)
         ret += "Results: {0}\n".format(self.results)
         return ret
 

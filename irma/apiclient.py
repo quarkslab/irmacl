@@ -194,6 +194,22 @@ class IrmaScansApi(object):
         data = self._apiclient.get_call(route)
         return self._scan_schema.make_object(data)
 
+    def list(self, limit=None, offset=None):
+        route = '/scans'
+        extra_args = {}
+        if offset is not None:
+            extra_args['offset'] = offset
+        if limit is not None:
+            extra_args['limit'] = limit
+        data = self._apiclient.get_call(route, **extra_args)
+        items = data.get('data', list())
+        total = data.get('total', None)
+        res_list = []
+        for res in items:
+            res_obj = self._scan_schema.make_object(res)
+            res_list.append(res_obj)
+        return (total, res_list)
+
     def add(self, scan_id, filelist):
         route = '/scans/{0}/files'.format(scan_id)
         data = None

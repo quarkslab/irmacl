@@ -197,6 +197,13 @@ def scan_get(scan_id, verbose=False):
     return scan
 
 
+def scan_list(limit=None, offset=None, verbose=False):
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan_list = scanapi.list(limit=limit, offset=offset)
+    return scan_list
+
+
 def file_results(result_idx, formatted=True, verbose=False):
     """Fetch a file results
 

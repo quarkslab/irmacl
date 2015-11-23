@@ -268,7 +268,7 @@ class IrmaFilesApi(object):
         extra_args = {}
         if name is not None:
             extra_args['name'] = name
-        elif hash is not None:
+        if hash is not None:
             extra_args['hash'] = hash
         if offset is not None:
             extra_args['offset'] = offset
@@ -281,10 +281,11 @@ class IrmaFilesApi(object):
         data = self._apiclient.get_call(route, **extra_args)
         res_list = []
         items = data.get('items', list())
+        total = data.get('total', None)
         for res in items:
             res_obj = self._results_schema.make_object(res)
             res_list.append(res_obj)
-        return res_list
+        return (total, res_list)
 
 # =============
 #  Deserialize

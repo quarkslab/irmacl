@@ -24,7 +24,7 @@ class TestCornerCase(unittest.TestCase):
             res = file_results(result.result_id)
             self.assertIn(res.name, UTF8_SAMPLES)
         for filename in UTF8_SAMPLES:
-            res = file_search(filename, limit=1)
+            (_, res) = file_search(filename, limit=1)
             self.assertEqual(type(res), list)
             self.assertEqual(len(res), 1)
             self.assertEqual(res[0].name, filename)

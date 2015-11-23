@@ -199,23 +199,22 @@ class IrmaAPIFileTests(IrmaAPITests):
         probes = probe_list()
         scan_files(FILEPATHS, force, probes, blocking=True)
         for name in FILENAMES:
-            res = file_search(name=name)
+            data = file_search(name=name)
+            self.assertEqual(type(data), tuple)
+            (total, res) = file_search(name, limit=1)
             self.assertEqual(type(res), list)
-            self.assertTrue(len(res) > 0)
             self.assertEqual(type(res[0]), IrmaResults)
-            res = file_search(name, limit=1)
-            self.assertEqual(type(res), list)
             self.assertEqual(len(res), 1)
+            self.assertEqual(type(total), int)
 
     def test_file_search_limit(self):
-        res = file_search(limit=50)
-        total = len(res)
-        res = file_search(limit=total)
+        (total, _) = file_search()
+        (total, res) = file_search(limit=total)
         self.assertEqual(type(res), list)
         self.assertEqual(len(res), total)
         offset = total - total / 2
         limit = total / 2
-        res = file_search(offset=offset, limit=limit)
+        (_, res) = file_search(offset=offset, limit=limit)
         self.assertEqual(type(res), list)
         self.assertEqual(len(res), limit)
 
@@ -224,10 +223,13 @@ class IrmaAPIFileTests(IrmaAPITests):
         probes = probe_list()
         scan_files(FILEPATHS, force, probes, blocking=True)
         for hash in HASHES:
-            res = file_search(hash=hash)
-            self.assertEqual(type(res), list)
+            (_, res) = file_search(hash=hash)
             self.assertTrue(len(res) > 0)
             self.assertEqual(type(res[0]), IrmaResults)
+
+    def test_file_search_hash_name(self):
+        with self.assertRaises(IrmaError):
+            file_search(name="name", hash="hash")
 
 
 class IrmaAPITagTests(IrmaAPITests):
@@ -285,23 +287,23 @@ class IrmaAPITagTests(IrmaAPITests):
         for tag in self.taglist:
             file_tag_add(self.file_sha256, tag.id)
             tagged.append(tag.id)
-            found = file_search(name=self.file_name, tags=tagged)
-            self.assertNotEqual(len(found), 0)
+            (total, found) = file_search(name=self.file_name, tags=tagged)
+            self.assertGreater(total, 0)
             self.assertIn(self.file_name, [x.name for x in found])
 
     def test_file_search_not_existing_tag(self):
         invalid_tagid = max([x.id for x in self.taglist])
-        found = file_search(tags=[invalid_tagid])
-        self.assertEqual(len(found), 0)
-        found = file_search(name=self.file_name, tags=[invalid_tagid])
-        self.assertEqual(len(found), 0)
+        (total, _) = file_search(tags=[invalid_tagid])
+        self.assertEqual(total, 0)
+        (total, _) = file_search(name=self.file_name, tags=[invalid_tagid])
+        self.assertEqual(total, 0)
 
     def test_file_tag_twice(self):
         found = file_search(hash=self.file_sha256)
         self.assertNotEqual(len(found), 0)
         file_tag_add(self.file_sha256, self.taglist[0].id)
-        found = file_search(hash=self.file_sha256)
-        self.assertEqual(len(found[0].file_infos.tags), 1)
+        (total, found) = file_search(hash=self.file_sha256)
+        self.assertGreaterEqual(total, 1)
         with self.assertRaises(IrmaError):
             file_tag_add(self.file_sha256, self.taglist[0].id)
 

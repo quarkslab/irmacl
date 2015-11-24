@@ -14,6 +14,7 @@
 # terms contained in the LICENSE file.
 
 import os
+import time
 from apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
     IrmaFilesApi, IrmaError
 from ConfigParser import ConfigParser
@@ -41,134 +42,6 @@ API_ENDPOINT = "http://{0}/api/v1".format(address)
 # =========
 #  Helpers
 # =========
-
-
-def probe_list(verbose=False):
-    """List availables probes
-
-    :param verbose: enable verbose requests (optional default:False)
-    :type verbose: bool
-    :return: return probe list
-    :rtype: list
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    probesapi = IrmaProbesApi(cli)
-    probelist = probesapi.list()
-    return probelist
-
-
-def scan_new(verbose=False):
-    """Create a new scan
-
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the new generated scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.new()
-    return scan
-
-
-def scan_add(scan_id, filelist, verbose=False):
-    """Add files to an existing scan
-
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param filelist: list of full path qualified files
-    :type filelist: list
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the updated scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.add(scan_id, filelist)
-    return scan
-
-
-def scan_launch(scan_id, force, probe=None, verbose=False):
-    """Launch an existing scan
-
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param force: if True force a new analysis of files
-        if False use existing results
-    :type force: bool
-    :param probe: probe list to use
-        (optional default None means all)
-    :type probe: list
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the updated scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.launch(scan_id, force, probe)
-    return scan
-
-
-def scan_files(filelist, force, probe=None, verbose=False):
-    """Wrapper around scan_new / scan_add / scan_launch
-
-    :param filelist: list of full path qualified files
-    :type filelist: list
-    :param force: if True force a new analysis of files
-        if False use existing results
-    :type force: bool
-    :param probe: probe list to use
-        (optional default: None means all)
-    :type probe: list
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the scan object
-    :rtype: IrmaScan
-    """
-    scan = scan_new(verbose)
-    scan = scan_add(scan.id, filelist, verbose)
-    scan = scan_launch(scan.id, force, probe, verbose)
-    return scan
-
-
-def scan_cancel(scan_id, verbose=False):
-    """Cancel a scan
-
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.cancel(scan_id)
-    return scan
-
-
-def scan_get(scan_id, verbose=False):
-    """Fetch a scan (useful to track scan progress with scan.pstatus)
-
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.get(scan_id)
-    return scan
 
 
 def file_results(scan_id, result_idx, formatted=True, verbose=False):
@@ -203,14 +76,172 @@ def file_search(name=None, hash=None, limit=None, offset=None, verbose=False):
     :type hash: str of (64, 40 or 32 chars)
     :param limit: max number of files to receive
         (optional default:25)
-    :type limit: bool
+    :type limit: int
     :param offset: index of first result
         (optional default:0)
-    :type offset: bool
-    :return: return matching files already scanned
-    :rtype: list of IrmaResults
+    :type offset: int
+    :return: return tuple of total files and list of matching files already
+        scanned
+    :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
-    files = fileapi.search(name=name, hash=hash, limit=limit, offset=offset)
-    return files
+    (total, files_list) = fileapi.search(name=name, hash=hash, limit=limit,
+                                         offset=offset)
+    return (total, files_list)
+
+
+def probe_list(verbose=False):
+    """List availables probes
+
+    :param verbose: enable verbose requests (optional default:False)
+    :type verbose: bool
+    :return: return probe list
+    :rtype: list
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    probesapi = IrmaProbesApi(cli)
+    probelist = probesapi.list()
+    return probelist
+
+
+def scan_add(scan_id, filelist, verbose=False):
+    """Add files to an existing scan
+
+    :param scan_id: the scan id
+    :type scan_id: str
+    :param filelist: list of full path qualified files
+    :type filelist: list
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the updated scan object
+    :rtype: IrmaScan
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.add(scan_id, filelist)
+    return scan
+
+
+def scan_cancel(scan_id, verbose=False):
+    """Cancel a scan
+
+    :param scan_id: the scan id
+    :type scan_id: str
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the scan object
+    :rtype: IrmaScan
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.cancel(scan_id)
+    return scan
+
+
+def scan_files(filelist, force, probe=None, blocking=False, verbose=False):
+    """Wrapper around scan_new / scan_add / scan_launch
+
+    :param filelist: list of full path qualified files
+    :type filelist: list
+    :param force: if True force a new analysis of files
+        if False use existing results
+    :type force: bool
+    :param probe: probe list to use
+        (optional default: None means all)
+    :type probe: list
+    :param blocking: wether or not the function call should block until
+        scan ended
+    :type blocking: bool
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the scan object
+    :rtype: IrmaScan
+    """
+    scan = scan_new(verbose=verbose)
+    scan = scan_add(scan.id, filelist, verbose=verbose)
+    scan = scan_launch(scan.id, force, probe=probe, verbose=verbose)
+    if blocking:
+        while not scan.is_finished():
+            time.sleep(1)
+            scan = scan_get(scan.id, verbose=verbose)
+    return scan
+
+
+def scan_get(scan_id, verbose=False):
+    """Fetch a scan (useful to track scan progress with scan.pstatus)
+
+    :param scan_id: the scan id
+    :type scan_id: str
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the scan object
+    :rtype: IrmaScan
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.get(scan_id)
+    return scan
+
+
+def scan_launch(scan_id, force, probe=None, verbose=False):
+    """Launch an existing scan
+
+    :param scan_id: the scan id
+    :type scan_id: str
+    :param force: if True force a new analysis of files
+        if False use existing results
+    :type force: bool
+    :param probe: probe list to use
+        (optional default None means all)
+    :type probe: list
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the updated scan object
+    :rtype: IrmaScan
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.launch(scan_id, force, probe)
+    return scan
+
+
+def scan_list(limit=None, offset=None, verbose=False):
+    """List all scans
+
+    :param limit: max number of files to receive
+        (optional default:25)
+    :type limit: int
+    :param offset: index of first result
+        (optional default:0)
+    :type offset: int
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return tuple of total scans and list of scans
+    :rtype: tuple(int, list of IrmaScan)
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    (total, scan_list) = scanapi.list(limit=limit, offset=offset)
+    return (total, scan_list)
+
+
+def scan_new(verbose=False):
+    """Create a new scan
+
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the new generated scan object
+    :rtype: IrmaScan
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.new()
+    return scan

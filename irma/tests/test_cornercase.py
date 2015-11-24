@@ -6,7 +6,7 @@ import time
 pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
 pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
 sys.path.append(os.path.dirname(pardir))
-from irma.command_line import scan_files, scan_get, \
+from irma.helpers import scan_files, scan_get, \
     file_results, file_search
 
 cwd = os.path.dirname(__file__)
@@ -31,7 +31,7 @@ class TestCornerCase(unittest.TestCase):
             res = file_results(scan.id, result.result_id)
             self.assertIn(res.name, UTF8_SAMPLES)
         for filename in UTF8_SAMPLES:
-            res = file_search(filename, limit=1)
+            (_, res) = file_search(filename, limit=1)
             self.assertEqual(type(res), list)
             self.assertEqual(len(res), 1)
             self.assertEqual(res[0].name, filename)

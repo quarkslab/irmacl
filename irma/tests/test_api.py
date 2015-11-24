@@ -1,13 +1,9 @@
 import unittest
 import os
-import sys
 import re
 import time
-from irma.apiclient import IrmaProbeResult, IrmaResults
-pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
-pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
-sys.path.append(os.path.dirname(pardir))
-from irma.command_line import probe_list, scan_new, scan_add, scan_files, \
+from irma.apiclient import IrmaProbeResult, IrmaResults, IrmaError
+from irma.helpers import probe_list, scan_new, scan_add, scan_files, \
     scan_get, scan_launch, file_results, file_search, scan_cancel
 
 
@@ -23,7 +19,7 @@ HASHES = ["7cddf3fa0f8563d49d0e272208290fe8fdc627e5cae0083d4b7ecf901b2ab6c8",
 FILEPATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), FILENAMES)
 
 
-class IrmaActionTests(unittest.TestCase):
+class IrmaAPITests(unittest.TestCase):
 
     def _validate_uuid(self, uuid):
         regex = re.compile(r'[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}',
@@ -40,6 +36,9 @@ class IrmaActionTests(unittest.TestCase):
         self.assertIn(scan.probes_finished, range_finished)
         self.assertIn(scan.probes_total, range_total)
         self.assertEqual(scan.date, date)
+
+
+class IrmaAPIScanTests(IrmaAPITests):
 
     def test_probe_list(self):
         probelist = probe_list()
@@ -59,7 +58,8 @@ class IrmaActionTests(unittest.TestCase):
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date)
         scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0], date)
+        self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
+                         date)
 
     def test_scan_launch(self):
         scan = scan_new()
@@ -82,7 +82,7 @@ class IrmaActionTests(unittest.TestCase):
         force = True
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan = scan_files(FILEPATHS, force, probes)
+        scan = scan_files(FILEPATHS, force, probe=probes)
         self._check_scan(scan, scan.id, ["ready", "uploaded", "launched"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
                          scan.date)
@@ -94,20 +94,19 @@ class IrmaActionTests(unittest.TestCase):
     def test_scan_get(self):
         force = True
         probes = probe_list()
-        nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_files(FILEPATHS, force, probes)
-        while scan.pstatus != "finished":
+        while not scan.is_finished():
             time.sleep(1)
             scan = scan_get(scan.id)
         self._check_scan(scan, scan.id, ["finished"],
-                         FILENAMES, [nb_jobs], [nb_jobs],
+                         FILENAMES, [scan.probes_total], [scan.probes_total],
                          scan.date)
 
     def test_file_results_formatted(self):
         force = True
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
-        while scan.pstatus != "finished":
+        scan = scan_files(FILEPATHS, force, probe=probes)
+        while not scan.is_finished():
             time.sleep(1)
             scan = scan_get(scan.id)
         for result in scan.results:
@@ -122,10 +121,7 @@ class IrmaActionTests(unittest.TestCase):
     def test_file_results_not_formatted(self):
         force = True
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
-        while scan.pstatus != "finished":
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for result in scan.results:
             self.assertTrue(self._validate_uuid(str(result.result_id)) or
                             result.result_id in range(len(FILENAMES)))
@@ -135,46 +131,46 @@ class IrmaActionTests(unittest.TestCase):
             self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
             self.assertEqual(len(res.probe_results), len(probes))
 
+
+class IrmaAPIFileTests(IrmaAPITests):
+
     def test_file_search_name(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
-        while scan.pstatus != "finished":
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for name in FILENAMES:
-            res = file_search(name=name)
+            data = file_search(name=name)
+            self.assertEqual(type(data), tuple)
+            (total, res) = file_search(name, limit=1)
             self.assertEqual(type(res), list)
-            self.assertTrue(len(res) > 0)
             self.assertEqual(type(res[0]), IrmaResults)
-            res = file_search(name, limit=1)
-            self.assertEqual(type(res), list)
             self.assertEqual(len(res), 1)
+            self.assertEqual(type(total), int)
 
     def test_file_search_limit(self):
-        res = file_search(limit=50)
-        total = len(res)
-        res = file_search(limit=total)
+        (total, _) = file_search()
+        (total, res) = file_search(limit=total)
         self.assertEqual(type(res), list)
         self.assertEqual(len(res), total)
         offset = total - total / 2
         limit = total / 2
-        res = file_search(offset=offset, limit=limit)
+        (_, res) = file_search(offset=offset, limit=limit)
         self.assertEqual(type(res), list)
         self.assertEqual(len(res), limit)
 
     def test_file_search_hash(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
-        while scan.pstatus != "finished":
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for hash in HASHES:
-            res = file_search(hash=hash)
-            self.assertEqual(type(res), list)
+            (_, res) = file_search(hash=hash)
             self.assertTrue(len(res) > 0)
             self.assertEqual(type(res[0]), IrmaResults)
+
+    def test_file_search_hash_name(self):
+        with self.assertRaises(IrmaError):
+            file_search(name="name", hash="hash")
+
 
 if __name__ == "__main__":
     unittest.main()

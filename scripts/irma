@@ -17,7 +17,7 @@
 
 import argparse
 from irma.apiclient import IrmaError
-from irma.command_line import probe_list, scan_files, scan_cancel, \
+from irma.helpers import probe_list, scan_files, scan_cancel, \
     scan_get, file_results
 
 
@@ -80,15 +80,15 @@ def cmd_scan_results(scan_id, verbose=False):
     scan = scan_get(scan_id, verbose)
     for result in scan.results:
         file_result = file_results(scan_id, result.result_id)
-        print "[{0} (sha256: {1})]".format(file_result.name,
-                                           file_result.file_infos.sha256)
+        print u"[{0} (sha256: {1})]".format(file_result.name,
+                                            file_result.file_infos.sha256)
         for pr in file_result.probe_results:
             print_probe_result(pr)
     return
 
 
 def cmd_scan(filename=None, force=None, probe=None, verbose=False):
-    scan = scan_files(filename, force, probe, verbose)
+    scan = scan_files(filename, force, probe=probe, verbose=verbose)
     print "scan_id {0} launched".format(scan.id)
     return
 
@@ -143,6 +143,7 @@ if __name__ == "__main__":
     # with 'func' removed, args is now a kwargs with only
     # the specific arguments for each subfunction
     # useful for interactive mode.
+    # Now handle terminal encoding
     try:
         func(**args)
     except IrmaError, e:

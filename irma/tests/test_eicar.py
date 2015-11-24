@@ -19,7 +19,7 @@ import re
 pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
 pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
 sys.path.append(os.path.dirname(pardir))
-from irma.command_line import probe_list, scan_new, scan_add, scan_get, scan_launch, \
+from irma.helpers import probe_list, scan_new, scan_add, scan_get, scan_launch, \
     file_results
 import time
 import logging

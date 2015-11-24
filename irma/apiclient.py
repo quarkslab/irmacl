@@ -3,6 +3,13 @@ import json
 from marshmallow import fields, Schema
 import time
 import urllib
+import datetime
+
+
+def timestamp_to_date(timestamp):
+    date = datetime.datetime.fromtimestamp(int(timestamp))
+    return date.strftime('%Y-%m-%d %H:%M:%S')
+
 
 # Warning this is a copy of IrmaScanStatus lib.irma.common.utils
 # in order to get rid of this dependency
@@ -76,9 +83,10 @@ class IrmaApiClient(object):
                 resp = requests.get(self.url + route + "?" + args)
                 return self._handle_resp(resp)
             except IrmaError as e:
-                print "Try {0} Max {1}".format(nb_try, self.max_tries)
                 if nb_try < self.max_tries:
-                    print "Exception Raised {0} retry #{1}".format(e, nb_try)
+                    if self.verbose:
+                        print "Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -93,7 +101,9 @@ class IrmaApiClient(object):
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:
-                    print "Exception Raised {0} retry #{1}".format(e, nb_try)
+                    if self.verbose:
+                        print "Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -105,7 +115,10 @@ class IrmaApiClient(object):
             print "http code : {0}".format(resp.status_code)
             print "content : {0}".format(resp.content)
         if resp.status_code == 200:
-            return json.loads(resp.content)
+            if len(resp.content) > 0:
+                return json.loads(resp.content)
+            else:
+                return
         else:
             reason = "Error {0}".format(resp.status_code)
             try:
@@ -151,13 +164,32 @@ class IrmaScansApi(object):
         data = self._apiclient.get_call(route)
         return self._scan_schema.make_object(data)
 
+    def list(self, limit=None, offset=None):
+        route = '/scans'
+        extra_args = {}
+        if offset is not None:
+            extra_args['offset'] = offset
+        if limit is not None:
+            extra_args['limit'] = limit
+        data = self._apiclient.get_call(route, **extra_args)
+        items = data.get('data', list())
+        total = data.get('total', None)
+        res_list = []
+        for res in items:
+            res_obj = self._scan_schema.make_object(res)
+            res_list.append(res_obj)
+        return (total, res_list)
+
     def add(self, scan_id, filelist):
         route = '/scans/{0}/files'.format(scan_id)
         data = None
         for filepath in filelist:
             postfile = dict()
             with open(filepath, 'rb') as f:
-                postfile[filepath] = f.read()
+                if type(filepath) is unicode:
+                    filepath = filepath.encode("utf8")
+                dec_filepath = urllib.quote(filepath)
+                postfile[dec_filepath] = f.read()
             data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(data)
 
@@ -204,7 +236,7 @@ class IrmaFilesApi(object):
         extra_args = {}
         if name is not None:
             extra_args['name'] = name
-        elif hash is not None:
+        if hash is not None:
             extra_args['hash'] = hash
         if offset is not None:
             extra_args['offset'] = offset
@@ -214,10 +246,11 @@ class IrmaFilesApi(object):
         data = self._apiclient.get_call(route, **extra_args)
         res_list = []
         items = data.get('items', list())
+        total = data.get('total', None)
         for res in items:
             res_obj = self._results_schema.make_object(res)
             res_list.append(res_obj)
-        return res_list
+        return (total, res_list)
 
 # =============
 #  Deserialize
@@ -256,13 +289,21 @@ class IrmaFileInfo(object):
         self.id = id
         self.md5 = md5
 
+    @property
+    def pdate_first_scan(self):
+        return timestamp_to_date(self.timestamp_first_scan)
+
+    @property
+    def pdate_last_scan(self):
+        return timestamp_to_date(self.timestamp_last_scan)
+
     def __repr__(self):
         ret = "Size: {0}\n".format(self.size)
         ret += "Sha1: {0}\n".format(self.sha1)
         ret += "Sha256: {0}\n".format(self.sha256)
         ret += "Md5: {0}s\n".format(self.md5)
-        ret += "First Scan: {0}\n".format(self.timestamp_first_scan)
-        ret += "Last Scan: {0}\n".format(self.timestamp_last_scan)
+        ret += "First Scan: {0}\n".format(self.pdate_first_scan)
+        ret += "Last Scan: {0}\n".format(self.pdate_last_scan)
         ret += "Id: {0}\n".format(self.id)
         return ret
 
@@ -342,7 +383,7 @@ class IrmaResults(object):
     :ivar probes_finished: number of finished probes analysis for current file
     :ivar probes_total: number of total probes analysis for current file
     :ivar scan_id: id of the scan
-    :ivar name: filename
+    :ivar name: file name
     :ivar result_id: id of specific results for this file and this scan
      used to fetch probe_results through file_results helper function
     :ivar file_infos: IrmaFileInfo object
@@ -431,12 +472,16 @@ class IrmaScan(object):
     def pstatus(self):
         return IrmaScanStatus.label[self.status]
 
+    @property
+    def pdate(self):
+        return timestamp_to_date(self.date)
+
     def __repr__(self):
         ret = "Scanid: {0}\n".format(self.id)
         ret += "Status: {0}\n".format(self.pstatus)
         ret += "Probes finished: {0}\n".format(self.probes_finished)
         ret += "Probes Total: {0}\n".format(self.probes_total)
-        ret += "Date: {0}\n".format(self.date)
+        ret += "Date: {0}\n".format(self.pdate)
         ret += "Results: {0}\n".format(self.results)
         return ret
 

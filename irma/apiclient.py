@@ -216,7 +216,10 @@ class IrmaScansApi(object):
         for filepath in filelist:
             postfile = dict()
             with open(filepath, 'rb') as f:
-                postfile[filepath] = f.read()
+                if type(filepath) is unicode:
+                    filepath = filepath.encode("utf8")
+                dec_filepath = urllib.quote(filepath)
+                postfile[dec_filepath] = f.read()
             data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(data)
 
@@ -340,7 +343,7 @@ class IrmaFileInfo(object):
     :ivar md5:     md5 hexdigest
     :ivar sha1:    sha1 hexdigest
     :ivar sha256:  sha256 hexdigest
-    :uvar mimetype: mimetype (based on python magic)
+    :ivar mimetype: mimetype (based on python magic)
     :ivar tags:  list of tags
     """
 
@@ -463,16 +466,14 @@ class IrmaResults(object):
     :ivar probe_results: list of IrmaProbeResults objects
     """
 
-    def __init__(self, status, probes_finished, scan_id, name, path,
-                 probes_total, result_id, file_sha256, parent_file_sha256,
-                 file_infos=None, probe_results=None):
-        self.status = status
-        self.probes_finished = probes_finished
-        self.scan_id = scan_id
-        self.name = name
-        self.path = path
-        self.file_sha256 = file_sha256
-        self.parent_file_sha256 = parent_file_sha256
+    def __init__(self, file_infos=None, probe_results=None, **kwargs):
+        self.status = kwargs.pop('status')
+        self.probes_finished = kwargs.pop('probes_finished')
+        self.scan_id = kwargs.pop('scan_id')
+        self.name = kwargs.pop('name')
+        self.path = kwargs.pop('path')
+        self.file_sha256 = kwargs.pop('file_sha256')
+        self.parent_file_sha256 = kwargs.pop('parent_file_sha256')
         self.probe_results = []
         if probe_results is not None:
             for pres in probe_results:
@@ -480,12 +481,14 @@ class IrmaResults(object):
                 self.probe_results.append(pobj)
         else:
             self.probe_results = None
-        self.probes_total = probes_total
+        self.probes_total = kwargs.pop('probes_total')
         if file_infos is not None:
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
         else:
             self.file_infos = None
-        self.result_id = result_id
+        self.result_id = kwargs.pop('result_id')
+        if len(kwargs) != 0:
+            print 'unmap keys: ', ','.join(kwargs.keys())
 
     def to_json(self):
         return IrmaResultsSchema().dumps(self).data
@@ -509,8 +512,8 @@ class IrmaResultsSchema(Schema):
     file_infos = fields.Nested(IrmaFileInfoSchema)
 
     class Meta:
-        fields = ('status', 'probes_total', 'probes_finished', 'scan_id',
-                  'name', 'result_id')
+        fields = ('status', 'probes_finished', 'probes_total', 'scan_id',
+                  'name', 'path', 'parent_file_sha256', 'result_id')
 
     def make_object(self, data):
         return IrmaResults(**data)

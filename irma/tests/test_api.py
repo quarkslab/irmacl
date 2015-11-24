@@ -292,11 +292,14 @@ class IrmaAPITagTests(IrmaAPITests):
             self.assertIn(self.file_name, [x.name for x in found])
 
     def test_file_search_not_existing_tag(self):
-        invalid_tagid = max([x.id for x in self.taglist])
-        (total, _) = file_search(tags=[invalid_tagid])
-        self.assertEqual(total, 0)
-        (total, _) = file_search(name=self.file_name, tags=[invalid_tagid])
-        self.assertEqual(total, 0)
+        invalid_tagid = max([x.id for x in self.taglist]) + 1
+        with self.assertRaises(IrmaError):
+            file_search(tags=[invalid_tagid])
+
+    def test_file_search_not_existing_tag_and_name(self):
+        invalid_tagid = max([x.id for x in self.taglist]) + 1
+        with self.assertRaises(IrmaError):
+            file_search(name=self.file_name, tags=[invalid_tagid])
 
     def test_file_tag_twice(self):
         found = file_search(hash=self.file_sha256)

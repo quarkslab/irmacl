@@ -79,16 +79,16 @@ def print_probe_result(probe_result, justify=12):
 def cmd_scan_results(scan_id, verbose=False):
     scan = scan_get(scan_id, verbose)
     for result in scan.results:
-        file_result = file_results(scan_id, result.result_id)
-        print "[{0} (sha256: {1})]".format(file_result.name,
-                                           file_result.file_infos.sha256)
+        file_result = file_results(result.result_id)
+        print u"[{0} (sha256: {1})]".format(file_result.name,
+                                            file_result.file_infos.sha256)
         for pr in file_result.probe_results:
             print_probe_result(pr)
     return
 
 
 def cmd_scan(filename=None, force=None, probe=None, verbose=False):
-    scan = scan_files(filename, force, probe, verbose)
+    scan = scan_files(filename, force, probe=probe, verbose=verbose)
     print "scan_id {0} launched".format(scan.id)
     return
 

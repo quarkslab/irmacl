@@ -163,16 +163,6 @@ class IrmaTagsApi(object):
             res_list.append(res_obj)
         return res_list
 
-    def file_tag_add(self, sha256, tagid):
-        route = '/files/{0}/tags/{1}/add'.format(sha256, tagid)
-        self._apiclient.get_call(route)
-        return
-
-    def file_tag_remove(self, sha256, tagid):
-        route = '/files/{0}/tags/{1}/remove'.format(sha256, tagid)
-        self._apiclient.get_call(route)
-        return
-
 
 class IrmaScansApi(object):
     """ IrmaScans Api
@@ -244,12 +234,12 @@ class IrmaScansApi(object):
         data = self._apiclient.post_call(route)
         return self._scan_schema.make_object(data)
 
-    def result(self, scan_id):
+    def results(self, scan_id):
         route = '/scans/{0}/results'.format(scan_id)
         data = self._apiclient.get_call(route)
         return self._scan_schema.make_object(data)
 
-    def file_results(self, result_id, formatted=True):
+    def probe_results(self, result_id, formatted=True):
         extra_args = {}
         if not formatted:
             extra_args['formatted'] = 'no'
@@ -265,9 +255,20 @@ class IrmaFilesApi(object):
     def __init__(self, apiclient):
         self._apiclient = apiclient
         self._results_schema = IrmaResultsSchema()
+        self._scan_schema = IrmaScanSchema()
         return
 
-    def search(self, name=None, hash=None, tags=None, offset=None, limit=None):
+    def download(self, sha256, dest_filepath):
+        route = '/files/{0}/download'.format(sha256)
+        with open(dest_filepath, 'wb') as handle:
+            response = requests.get(self._apiclient.url + route, stream=True)
+            if not response.ok:
+                raise IrmaError("Error Downloading file")
+            for block in response.iter_content(1024):
+                handle.write(block)
+        return
+
+    def search(self, name=None, hash=None, tags=None, limit=None, offset=None):
         extra_args = {}
         if name is not None:
             extra_args['name'] = name
@@ -280,13 +281,55 @@ class IrmaFilesApi(object):
         if tags is not None:
             tags = map(lambda x: str(x), tags)
             extra_args['tags'] = ",".join(tags)
-        route = '/search/files'
+        route = '/files'
         data = self._apiclient.get_call(route, **extra_args)
         res_list = []
         items = data.get('items', list())
         total = data.get('total', None)
         for res in items:
             res_obj = self._results_schema.make_object(res)
+            res_list.append(res_obj)
+        return (total, res_list)
+
+    def tag_add(self, sha256, tagid):
+        route = '/files/{0}/tags/{1}/add'.format(sha256, tagid)
+        self._apiclient.get_call(route)
+        return
+
+    def tag_remove(self, sha256, tagid):
+        route = '/files/{0}/tags/{1}/remove'.format(sha256, tagid)
+        self._apiclient.get_call(route)
+        return
+
+    def results(self, sha256, limit=None, offset=None):
+        route = '/files/{0}/results'.format(sha256)
+        extra_args = {}
+        if offset is not None:
+            extra_args['offset'] = offset
+        if limit is not None:
+            extra_args['limit'] = limit
+        data = self._apiclient.get_call(route, **extra_args)
+        res_list = []
+        items = data.get('items', list())
+        total = data.get('total', None)
+        for res in items:
+            res_obj = self._results_schema.make_object(res)
+            res_list.append(res_obj)
+        return (total, res_list)
+
+    def scans(self, sha256, limit=None, offset=None):
+        route = '/files/{0}/scans'.format(sha256)
+        extra_args = {}
+        if offset is not None:
+            extra_args['offset'] = offset
+        if limit is not None:
+            extra_args['limit'] = limit
+        data = self._apiclient.get_call(route, **extra_args)
+        res_list = []
+        items = data.get('items', list())
+        total = data.get('total', None)
+        for res in items:
+            res_obj = self._scan_schema.make_object(res)
             res_list.append(res_obj)
         return (total, res_list)
 
@@ -461,7 +504,7 @@ class IrmaResults(object):
     :ivar name: file name
     :ivar path: file path (as sent during upload or resubmit)
     :ivar result_id: id of specific results for this file and this scan
-     used to fetch probe_results through file_results helper function
+     used to fetch probe_results through scan_proberesults helper function
     :ivar file_infos: IrmaFileInfo object
     :ivar probe_results: list of IrmaProbeResults objects
     """

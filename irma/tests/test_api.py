@@ -4,7 +4,7 @@ import re
 import time
 from irma.apiclient import IrmaProbeResult, IrmaResults, IrmaError
 from irma.helpers import probe_list, scan_new, scan_add, scan_files, \
-    scan_get, scan_launch, file_results, file_search, scan_cancel, \
+    scan_get, scan_launch, scan_proberesults, file_search, scan_cancel, \
     tag_list, file_tag_add, file_tag_remove
 
 
@@ -171,9 +171,9 @@ class IrmaAPIScanTests(IrmaAPITests):
         while not scan.is_finished():
             time.sleep(1)
             scan = scan_get(scan.id)
-        for result in scan.results:
-            self.assertTrue(self._validate_uuid(str(result.result_id)))
-            res = file_results(result.result_id)
+        for get_result in scan.results:
+            self.assertTrue(self._validate_uuid(str(get_result.result_id)))
+            res = scan_proberesults(get_result.result_id)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), list)
             self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
@@ -183,9 +183,9 @@ class IrmaAPIScanTests(IrmaAPITests):
         force = True
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probes, blocking=True)
-        for result in scan.results:
-            self.assertTrue(self._validate_uuid(str(result.result_id)))
-            res = file_results(result.result_id, formatted=False)
+        for get_result in scan.results:
+            self.assertTrue(self._validate_uuid(str(get_result.result_id)))
+            res = scan_proberesults(get_result.result_id, formatted=False)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), list)
             self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
@@ -237,7 +237,7 @@ class IrmaAPITagTests(IrmaAPITests):
     file_sha256 = HASHES[0]
     file_path = FILEPATHS[0]
     file_name = FILENAMES[0]
-    result = None
+    get_result = None
     former_tag = []
 
     def setUp(self):
@@ -247,19 +247,19 @@ class IrmaAPITagTests(IrmaAPITests):
             raise unittest.SkipTest("Skipping No tag found (please add some)")
         # Insure file is present (Force=False)
         scan = scan_files([self.file_path], False, blocking=True)
-        self.result = file_results(scan.results[0].result_id)
+        self.get_result = scan_proberesults(scan.results[0].result_id)
         # Insure file got no tags for test
-        self.former_tag = [x.id for x in self.result.file_infos.tags]
+        self.former_tag = [x.id for x in self.get_result.file_infos.tags]
         if len(self.former_tag) != 0:
             for tagid in self.former_tag:
                 file_tag_remove(self.file_sha256, tagid)
-            self.result = file_results(scan.results[0].result_id)
+            self.get_result = scan_proberesults(scan.results[0].result_id)
 
     def tearDown(self):
-        self.assertEqual(self.file_sha256, self.result.file_sha256)
-        self.assertEqual(self.file_sha256, self.result.file_infos.sha256)
-        self.result = file_results(self.result.result_id)
-        for tag in self.result.file_infos.tags:
+        self.assertEqual(self.file_sha256, self.get_result.file_sha256)
+        self.assertEqual(self.file_sha256, self.get_result.file_infos.sha256)
+        self.get_result = scan_proberesults(self.get_result.result_id)
+        for tag in self.get_result.file_infos.tags:
             file_tag_remove(self.file_sha256, tag.id)
         for tagid in self.former_tag:
             file_tag_add(self.file_sha256, tagid)
@@ -272,17 +272,17 @@ class IrmaAPITagTests(IrmaAPITests):
     def test_file_tag_add_remove(self):
         for tag in self.taglist:
             file_tag_add(self.file_sha256, tag.id)
-            result = file_results(self.result.result_id)
+            get_result = scan_proberesults(self.get_result.result_id)
             self.assertIn(tag.id,
-                          [x.id for x in result.file_infos.tags])
+                          [x.id for x in get_result.file_infos.tags])
         for tag in self.taglist:
             file_tag_remove(self.file_sha256, tag.id)
-            result = file_results(self.result.result_id)
+            get_result = scan_proberesults(self.get_result.result_id)
             self.assertNotIn(tag.id,
-                             [x.id for x in result.file_infos.tags])
+                             [x.id for x in get_result.file_infos.tags])
 
     def test_file_search_tag(self):
-        self.assertEqual(len(self.result.file_infos.tags), 0)
+        self.assertEqual(len(self.get_result.file_infos.tags), 0)
         tagged = []
         for tag in self.taglist:
             file_tag_add(self.file_sha256, tag.id)

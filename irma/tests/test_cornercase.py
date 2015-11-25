@@ -3,7 +3,7 @@ import unittest
 import os
 import time
 from irma.helpers import scan_files, scan_get, \
-    file_results, file_search
+    scan_proberesults, file_search
 
 cwd = os.path.dirname(__file__)
 SAMPLES_DIR = os.path.join(cwd, "samples")
@@ -20,8 +20,8 @@ class TestCornerCase(unittest.TestCase):
 
     def test_utf8(self):
         scan = self._make_scan(UTF8_PATHS)
-        for result in scan.results:
-            res = file_results(result.result_id)
+        for get_result in scan.results:
+            res = scan_proberesults(get_result.result_id)
             self.assertIn(res.name, UTF8_SAMPLES)
         for filename in UTF8_SAMPLES:
             (_, res) = file_search(filename, limit=1)

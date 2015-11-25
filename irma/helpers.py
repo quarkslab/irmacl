@@ -43,27 +43,64 @@ API_ENDPOINT = "http://{0}/api/v1.1".format(address)
 # =========
 
 
-def file_results(result_idx, formatted=True, verbose=False):
-    """Fetch a file results
+def file_download(sha256, dest_filepath, verbose=False):
+    """Download file identified by sha256 to dest_filepath
 
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param result_idx: the result id
-    :type result_idx: str
-    :param formatted: apply frontend formatters on results
-        (optional default:True)
-    :type formatted: bool
-    :param verbose: enable verbose requests
-        (optional default:False)
+    :param sha256: file sha256 hash value
+    :type sha256: str of 64 chars
+    :param dest_filepath: destination path
+    :type str
+    :param verbose: enable verbose requests (optional default:False)
     :type verbose: bool
-    :return: return a IrmaResult object
-    :rtype: IrmaResults
+    :return: return tuple of total files and list of results for the given file
+    :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    file_results = scanapi.file_results(result_idx,
-                                        formatted=formatted)
-    return file_results
+    fileapi = IrmaFilesApi(cli)
+    fileapi.download(sha256, dest_filepath)
+    return
+
+
+def file_results(sha256, limit=None, offset=None, verbose=False):
+    """List all results for a given file identified by sha256
+
+    :param sha256: file sha256 hash value
+    :type sha256: str of 64 chars
+    :param limit: max number of files to receive
+        (optional default:25)
+    :type limit: int
+    :param offset: index of first result
+        (optional default:0)
+    :type offset: int
+    :param verbose: enable verbose requests (optional default:False)
+    :type verbose: bool
+    :return: tuple(int, list of IrmaResults)
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    fileapi = IrmaFilesApi(cli)
+    (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
+    return (total, files_list)
+
+
+def file_scans(sha256, limit=None, offset=None, verbose=False):
+    """List all scans for a given file identified by sha256
+
+    :param sha256: file sha256 hash value
+    :type sha256: str of 64 chars
+    :param limit: max number of files to receive
+        (optional default:25)
+    :type limit: int
+    :param offset: index of first result
+        (optional default:0)
+    :type offset: int
+    :param verbose: enable verbose requests (optional default:False)
+    :type verbose: bool
+    :return: tuple(int, list of IrmaScan)
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    fileapi = IrmaFilesApi(cli)
+    (total, files_list) = fileapi.scans(sha256, limit=limit, offset=offset)
+    return (total, files_list)
 
 
 def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
@@ -82,6 +119,8 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     :param offset: index of first result
         (optional default:0)
     :type offset: int
+    :param verbose: enable verbose requests (optional default:False)
+    :type verbose: bool
     :return: return tuple of total files and list of matching files already
         scanned
     :rtype: tuple(int, list of IrmaResults)
@@ -91,6 +130,36 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
                                          limit=limit, offset=offset)
     return (total, files_list)
+
+
+def file_tag_add(sha256, tagid, verbose=False):
+    """Add a tag to a File
+
+    :param sha256: file sha256 hash
+    :type hash: str of (64 chars)
+    :param tagid: tag id
+    :type int
+    :return: No return
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    fileapi = IrmaFilesApi(cli)
+    fileapi.tag_add(sha256, tagid)
+    return
+
+
+def file_tag_remove(sha256, tagid, verbose=False):
+    """Remove a tag to a File
+
+    :param sha256: file sha256 hash
+    :type hash: str of (64 chars)
+    :param tagid: tag id
+    :type int
+    :return: No return
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    fileapi = IrmaFilesApi(cli)
+    fileapi.tag_remove(sha256, tagid)
+    return
 
 
 def probe_list(verbose=False):
@@ -268,6 +337,28 @@ def scan_new(verbose=False):
     return scan
 
 
+def scan_proberesults(result_idx, formatted=True, verbose=False):
+    """Fetch file probe results (for a given scan
+        one scan <-> one result_idx
+
+    :param result_idx: the result id
+    :type result_idx: str
+    :param formatted: apply frontend formatters on results
+        (optional default:True)
+    :type formatted: bool
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return a IrmaResult object
+    :rtype: IrmaResults
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    proberesults = scanapi.probe_results(result_idx,
+                                         formatted=formatted)
+    return proberesults
+
+
 def tag_list(verbose=False):
     """List all available tags
 
@@ -278,33 +369,3 @@ def tag_list(verbose=False):
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
-
-
-def file_tag_add(sha256, tagid, verbose=False):
-    """Add a tag to a File
-
-    :param sha256: file sha256 hash
-    :type hash: str of (64 chars)
-    :param tagid: tag id
-    :type int
-    :return: No return
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    tagapi = IrmaTagsApi(cli)
-    tagapi.file_tag_add(sha256, tagid)
-    return
-
-
-def file_tag_remove(sha256, tagid, verbose=False):
-    """Remove a tag to a File
-
-    :param sha256: file sha256 hash
-    :type hash: str of (64 chars)
-    :param tagid: tag id
-    :type int
-    :return: No return
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    tagapi = IrmaTagsApi(cli)
-    tagapi.file_tag_remove(sha256, tagid)
-    return

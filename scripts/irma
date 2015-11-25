@@ -18,7 +18,7 @@
 import argparse
 from irma.apiclient import IrmaError
 from irma.helpers import probe_list, scan_files, scan_cancel, \
-    scan_get, file_results
+    scan_get, scan_proberesults
 
 
 # ================================================
@@ -79,7 +79,7 @@ def print_probe_result(probe_result, justify=12):
 def cmd_scan_results(scan_id, verbose=False):
     scan = scan_get(scan_id, verbose)
     for result in scan.results:
-        file_result = file_results(result.result_id)
+        file_result = scan_proberesults(result.result_id)
         print u"[{0} (sha256: {1})]".format(file_result.name,
                                             file_result.file_infos.sha256)
         for pr in file_result.probe_results:

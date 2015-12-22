@@ -49,7 +49,7 @@ def file_download(sha256, dest_filepath, verbose=False):
     :param sha256: file sha256 hash value
     :type sha256: str of 64 chars
     :param dest_filepath: destination path
-    :type str
+    :type dest_filepath: str
     :param verbose: enable verbose requests (optional default:False)
     :type verbose: bool
     :return: return tuple of total files and list of results for the given file
@@ -82,27 +82,6 @@ def file_results(sha256, limit=None, offset=None, verbose=False):
     return (total, files_list)
 
 
-def file_scans(sha256, limit=None, offset=None, verbose=False):
-    """List all scans for a given file identified by sha256
-
-    :param sha256: file sha256 hash value
-    :type sha256: str of 64 chars
-    :param limit: max number of files to receive
-        (optional default:25)
-    :type limit: int
-    :param offset: index of first result
-        (optional default:0)
-    :type offset: int
-    :param verbose: enable verbose requests (optional default:False)
-    :type verbose: bool
-    :return: tuple(int, list of IrmaScan)
-    """
-    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
-    fileapi = IrmaFilesApi(cli)
-    (total, files_list) = fileapi.scans(sha256, limit=limit, offset=offset)
-    return (total, files_list)
-
-
 def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
                 verbose=False):
     """Search a file by name or hash value
@@ -112,7 +91,7 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     :param hash: one of sha1, md5 or sha256 full hash value
     :type hash: str of (64, 40 or 32 chars)
     :param tags: list of tagid
-    :type list of int
+    :type tags: list of int
     :param limit: max number of files to receive
         (optional default:25)
     :type limit: int
@@ -136,9 +115,9 @@ def file_tag_add(sha256, tagid, verbose=False):
     """Add a tag to a File
 
     :param sha256: file sha256 hash
-    :type hash: str of (64 chars)
+    :type sha256: str of (64 chars)
     :param tagid: tag id
-    :type int
+    :type tagid: int
     :return: No return
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
@@ -151,9 +130,9 @@ def file_tag_remove(sha256, tagid, verbose=False):
     """Remove a tag to a File
 
     :param sha256: file sha256 hash
-    :type hash: str of (64 chars)
+    :type sha256: str of (64 chars)
     :param tagid: tag id
-    :type int
+    :type tagid: int
     :return: No return
     """
     cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)

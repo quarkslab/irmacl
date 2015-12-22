@@ -259,7 +259,7 @@ class IrmaFilesApi(object):
         return
 
     def download(self, sha256, dest_filepath):
-        route = '/files/{0}/download'.format(sha256)
+        route = '/files/{0}?alt=media'.format(sha256)
         with open(dest_filepath, 'wb') as handle:
             response = requests.get(self._apiclient.url + route, stream=True)
             if not response.ok:
@@ -302,7 +302,7 @@ class IrmaFilesApi(object):
         return
 
     def results(self, sha256, limit=None, offset=None):
-        route = '/files/{0}/results'.format(sha256)
+        route = '/files/{0}'.format(sha256)
         extra_args = {}
         if offset is not None:
             extra_args['offset'] = offset
@@ -314,22 +314,6 @@ class IrmaFilesApi(object):
         total = data.get('total', None)
         for res in items:
             res_obj = self._results_schema.make_object(res)
-            res_list.append(res_obj)
-        return (total, res_list)
-
-    def scans(self, sha256, limit=None, offset=None):
-        route = '/files/{0}/scans'.format(sha256)
-        extra_args = {}
-        if offset is not None:
-            extra_args['offset'] = offset
-        if limit is not None:
-            extra_args['limit'] = limit
-        data = self._apiclient.get_call(route, **extra_args)
-        res_list = []
-        items = data.get('items', list())
-        total = data.get('total', None)
-        for res in items:
-            res_obj = self._scan_schema.make_object(res)
             res_list.append(res_obj)
         return (total, res_list)
 
@@ -517,6 +501,7 @@ class IrmaResults(object):
         self.path = kwargs.pop('path')
         self.file_sha256 = kwargs.pop('file_sha256')
         self.parent_file_sha256 = kwargs.pop('parent_file_sha256')
+        self.scan_date = kwargs.pop('scan_date')
         self.probe_results = []
         if probe_results is not None:
             for pres in probe_results:
@@ -533,6 +518,10 @@ class IrmaResults(object):
         if len(kwargs) != 0:
             print 'unmap keys: ', ','.join(kwargs.keys())
 
+    @property
+    def pscan_date(self):
+        return timestamp_to_date(self.scan_date)
+
     def to_json(self):
         return IrmaResultsSchema().dumps(self).data
 
@@ -541,6 +530,7 @@ class IrmaResults(object):
         ret += "Probes finished: {0}\n".format(self.probes_finished)
         ret += "Probes Total: {0}\n".format(self.probes_total)
         ret += "Scanid: {0}\n".format(self.scan_id)
+        ret += "Scan Date: {0}\n".format(self.pscan_date)
         ret += "Filename: {0}\n".format(self.name)
         ret += "Filepath: {0}\n".format(self.path)
         ret += "ParentFile SHA256: {0}\n".format(self.parent_file_sha256)

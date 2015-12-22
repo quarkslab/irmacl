@@ -48,7 +48,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "FSecure Antivirus for Linux Desktop",
      "results": "EICAR_Test_File \[FSE\]",
-     "version": "10.20",
+     "version": "11.00",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
@@ -90,7 +90,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "DrWeb Antivirus for Linux Desktop",
      "results": "EICAR Test File \(NOT a Virus!\)",
-     "version": "10.1.0.0.1503311845",
+     "version": "10.1.0.1.1507091917",
      "duration": MAXTIME_SLOW_PROBE,
      "type": "antivirus"
      },
@@ -118,7 +118,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Avast Core Security",
      "results": "EICAR Test-NOT virus!!!",
-     "version": "1.2.2",
+     "version": "2.1.0",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
@@ -153,7 +153,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Sophos Anti-Virus",
      "results": "EICAR-AV-Test",
-     "version": "1.01.1",
+     "version": "5.19.0",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
@@ -281,7 +281,7 @@ class EicarTestCase(unittest.TestCase):
         res = {}
         for get_result in scan.results:
             file_result = scan_proberesults(get_result.result_id,
-                                       formatted=True, verbose=DEBUG)
+                                            formatted=True, verbose=DEBUG)
             self.assertIn(file_result.status, [-1, 0, 1])
             self.assertEqual(file_result.probes_finished,
                              file_result.probes_total)
@@ -399,7 +399,8 @@ class IrmaEicarTest(EicarTestCase):
             raise unittest.SkipTest("Skipping %s not present" % probe)
         probelist = [probe]
         filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
+        res = self._test_scan_file(filelist, probelist, force=True,
+                                   mimetype_filtering=False)
         self.check_eicar_results(res[self.filename])
 
     def test_scan_staticanalyzer(self):

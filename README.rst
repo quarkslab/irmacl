@@ -65,6 +65,7 @@ Usage
    Probes finished: 2
    Probes Total: 2
    Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
+   Scan Date: 2015-12-22 14:36:21
    Filename: eicar.com
    Filepath: ./irma/tests/samples
    ParentFile SHA256: None
@@ -73,11 +74,12 @@ Usage
    None
    Results: None
 
-   >>> print file_results("572f9418-ca3c-4fdf-bb35-50c11629a7e7")
+   >>> print scan_proberesults("572f9418-ca3c-4fdf-bb35-50c11629a7e7")
    Status: 1
    Probes finished: 2
    Probes Total: 2
    Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
+   Scan Date: 2015-12-22 14:36:21
    Filename: eicar.com
    Filepath: ./irma/tests/samples
    ParentFile SHA256: None
@@ -88,7 +90,7 @@ Usage
    Sha256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
    Md5: 44d88612fea8a8f36de82e1278abb02fs
    First Scan: 2015-11-24 14:54:12
-   Last Scan: 2015-11-24 15:43:07
+   Last Scan: 2015-12-22 14:36:21
    Id: 3
    Mimetype: EICAR virus test files
    Tags: []
@@ -148,6 +150,7 @@ Searching for files
    >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140", tags=[1,2])
    (0, [])
 
+   # looking for an unexisting tagid raise IrmaError
    >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140", tags=[100])
    IrmaError: Error 402
 
@@ -242,6 +245,8 @@ Objects (apiclient.py)
 
       * **scan_id** -- id of the scan
 
+      * **scan_date** -- date of the scan
+
       * **name** -- file name
 
       * **path** -- file path (as sent during upload or resubmit)
@@ -255,6 +260,8 @@ Objects (apiclient.py)
       * **probe_results** -- list of IrmaProbeResults objects
 
    to_json()
+
+   pscan_date -- property, humanized date of scan date
 
 
 **class irma.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, force, resubmit_files, mimetype_filtering, results=[])**
@@ -309,26 +316,43 @@ Objects (apiclient.py)
 Helpers (helpers.py)
 -------
 
-**irma.helpers.file_results(result_idx, formatted=True, verbose=False)**
+**irma.helpers.file_download(sha256, dest_filepath, verbose=False)**
 
-   Fetch a file results
+   Download file identified by sha256 to dest_filepath
 
    Parameters:
-      * **scan_id** (*str*) -- the scan id
+      * **sha256** (*str of 64 chars*) -- file sha256 hash value
 
-      * **result_idx** (*str*) -- the result id
-
-      * **formatted** (*bool*) -- apply frontend formatters on
-        results (optional default:True)
+      * **dest_filepath** (*str*) -- destination path
 
       * **verbose** (*bool*) -- enable verbose requests (optional
         default:False)
 
    Returns:
-      return a IrmaResult object
+      return tuple of total files and list of results for the given
+      file
 
    Return type:
-      IrmaResults
+      tuple(int, list of IrmaResults)
+
+**irma.helpers.file_results(sha256, limit=None, offset=None, verbose=False)**
+
+   List all results for a given file identified by sha256
+
+   Parameters:
+      * **sha256** (*str of 64 chars*) -- file sha256 hash value
+
+      * **limit** (*int*) -- max number of files to receive
+        (optional default:25)
+
+      * **offset** (*int*) -- index of first result (optional
+        default:0)
+
+      * **verbose** (*bool*) -- enable verbose requests (optional
+        default:False)
+
+   Returns:
+      tuple(int, list of IrmaResults)
 
 **irma.helpers.file_search(name=None, hash=None, tags=None, limit=None, offset=None, verbose=False)**
 
@@ -341,14 +365,16 @@ Helpers (helpers.py)
       * **hash** (*str of (64, 40 or 32 chars)*) -- one of sha1, md5
         or sha256 full hash value
 
-      * **tags** -- list of tagid
+      * **tags** (*list of int*) -- list of tagid
 
-   :type list of int :param limit: max number of files to receive
+      * **limit** (*int*) -- max number of files to receive
+        (optional default:25)
 
-      (optional default:25)
+      * **offset** (*int*) -- index of first result (optional
+        default:0)
 
-   Parameters:
-      **offset** (*int*) -- index of first result (optional default:0)
+      * **verbose** (*bool*) -- enable verbose requests (optional
+        default:False)
 
    Returns:
       return tuple of total files and list of matching files already
@@ -362,22 +388,24 @@ Helpers (helpers.py)
    Add a tag to a File
 
    Parameters:
-      * **sha256** -- file sha256 hash
+      * **sha256** (*str of (64 chars)*) -- file sha256 hash
 
-      * **tagid** -- tag id
+      * **tagid** (*int*) -- tag id
 
-   :type int :return: No return
+   Returns:
+      No return
 
 **irma.helpers.file_tag_remove(sha256, tagid, verbose=False)**
 
    Remove a tag to a File
 
    Parameters:
-      * **sha256** -- file sha256 hash
+      * **sha256** (*str of (64 chars)*) -- file sha256 hash
 
-      * **tagid** -- tag id
+      * **tagid** (*int*) -- tag id
 
-   :type int :return: No return
+   Returns:
+      No return
 
 **irma.helpers.probe_list(verbose=False)**
 
@@ -535,6 +563,26 @@ Helpers (helpers.py)
 
    Return type:
       IrmaScan
+
+**irma.helpers.scan_proberesults(result_idx, formatted=True, verbose=False)**
+
+   Fetch file probe results (for a given scan
+      one scan <-> one result_idx
+
+   Parameters:
+      * **result_idx** (*str*) -- the result id
+
+      * **formatted** (*bool*) -- apply frontend formatters on
+        results (optional default:True)
+
+      * **verbose** (*bool*) -- enable verbose requests (optional
+        default:False)
+
+   Returns:
+      return a IrmaResult object
+
+   Return type:
+      IrmaResults
 
 **irma.helpers.tag_list(verbose=False)**
 

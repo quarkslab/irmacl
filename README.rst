@@ -38,6 +38,17 @@ Once you set up a working irma.conf settings file, you could run tests on a runn
 
    $ python setup.py test
 
+
+Pip Install
+-----------
+
+Install it directly with pip:
+
+.. code-block:: bash
+
+  $ pip install git+https://github.com/quarkslab/irma-cli.git
+
+
 Usage
 -----
 

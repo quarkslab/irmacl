@@ -46,7 +46,7 @@ Install it directly with pip:
 
 .. code-block:: bash
 
-  $ pip install git+https://github.com/quarkslab/irma-cli.git
+  $ pip install git+https://github.com/quarkslab/irma-cli.git@v1.0
 
 
 Usage

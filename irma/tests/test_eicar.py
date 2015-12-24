@@ -52,7 +52,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "FSecure Antivirus for Linux Desktop",
      "results": "EICAR_Test_File \[FSE\]",
-     "version": "10.20",
+     "version": "11.00",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
@@ -122,7 +122,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Avast Core Security",
      "results": "EICAR Test-NOT virus!!!",
-     "version": "1.2.2",
+     "version": "2.1.0",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
@@ -157,7 +157,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Sophos Anti-Virus",
      "results": "EICAR-AV-Test",
-     "version": "1.01.1",
+     "version": "5.19.0",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },

@@ -163,6 +163,15 @@ class IrmaTagsApi(object):
             res_list.append(res_obj)
         return res_list
 
+    def new(self, text):
+        route = '/tags'
+        headers = {'Content-type': 'application/json; charset=utf8'}
+        params = {'text': text}
+        res = self._apiclient.post_call(route,
+                                        data=json.dumps(params),
+                                        headers=headers)
+        return res
+
 
 class IrmaScansApi(object):
     """ IrmaScans Api

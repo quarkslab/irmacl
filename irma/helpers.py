@@ -348,3 +348,15 @@ def tag_list(verbose=False):
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
+
+
+def tag_new(text, verbose=False):
+    """Create a new tag
+
+    :param text: tag label (utf8 encoded)
+    :type text: str
+    :return: None
+    """
+    cli = IrmaApiClient(API_ENDPOINT, verbose=verbose)
+    tagapi = IrmaTagsApi(cli)
+    return tagapi.new(text)

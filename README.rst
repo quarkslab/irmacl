@@ -605,6 +605,15 @@ Helpers (helpers.py)
    Return type:
       list of IrmaTag
 
+**irma.helpers.tag_new(text, verbose=False)**
+
+   Create a new tag
+
+   Parameters:
+      **text** (*str*) -- tag label (utf8 encoded)
+
+   Returns:
+      None
 
 Documentation
 `````````````

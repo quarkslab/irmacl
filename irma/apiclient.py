@@ -343,7 +343,7 @@ class IrmaTag(object):
         self.text = text
 
     def __repr__(self):
-        ret = "Tag {0} [{1}]\n".format(self.text, self.id)
+        ret = "Tag {0} [{1}]".format(self.text, self.id)
         return ret
 
 

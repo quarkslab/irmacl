@@ -12,11 +12,11 @@ cwd = os.path.dirname(__file__)
 SAMPLES_DIR = os.path.join(cwd, "samples")
 FILENAMES = ["fish", "ls"]
 HASHES = ["7cddf3fa0f8563d49d0e272208290fe8fdc627e5cae0083d4b7ecf901b2ab6c8",
-          "7c81309cc089f80525fd777788c8401ec9a37153e8b98dd8e9ef3231440653da",
+          "71f30d658966bcc7ea162b4e0f20d2305d4a003e854305b524280f4c2a3b48a3",
           "3826e18a5dc849670744752fd27c4eec6136ac90",
-          "c664bf0df003af91573a57128ce022efbaae6e0d",
+          "8d50d7a3929a356542119aa858c492442655e097",
           "07edba6f3f181bad9a56a87d4039487a",
-          "4f428f95740ec935125766de5baa8a0d"]
+          "e718241e1cc6472d4f4bac20c59a0179"]
 FILEPATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), FILENAMES)
 
 

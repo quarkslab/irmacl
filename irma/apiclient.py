@@ -4,6 +4,8 @@ from marshmallow import fields, Schema
 import time
 import urllib
 import datetime
+import os
+import sys
 
 
 def timestamp_to_date(timestamp):
@@ -213,16 +215,34 @@ class IrmaScansApi(object):
             res_list.append(res_obj)
         return (total, res_list)
 
-    def add(self, scan_id, filelist):
+    def add(self, scan_id, filelist, post_max_size_M=100):
+        def get_file_size(filepath):
+            return os.path.getsize(filepath)
+        post_max_size = post_max_size_M * 1024 * 1024 * 90 / 100
         route = '/scans/{0}/files'.format(scan_id)
         data = None
-        for filepath in filelist:
-            postfile = dict()
+        # First check if none of the file is more than
+        # post_max_size
+        file_size_dict = dict((f, get_file_size(f)) for f in filelist)
+        if any(map(lambda x: x > post_max_size, file_size_dict.values())):
+            raise IrmaError("One of the file is bigger than post_max_size")
+        # Then keep track of already uploaded data
+        postfile = dict()
+        total_size = 0
+        for (filepath, filesize) in file_size_dict.items():
+            # if its more than max post size do the post then
+            # create a new postfile with file data
+            if total_size + filesize > post_max_size:
+                data = self._apiclient.post_call(route, files=postfile)
+                postfile = dict()
+                total_size = 0
             with open(filepath, 'rb') as f:
                 if type(filepath) is unicode:
                     filepath = filepath.encode("utf8")
                 dec_filepath = urllib.quote(filepath)
                 postfile[dec_filepath] = f.read()
+                total_size += filesize
+        if total_size != 0:
             data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(data)
 

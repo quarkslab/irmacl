@@ -184,13 +184,15 @@ def probe_list(verbose=False):
     return probelist
 
 
-def scan_add(scan_id, filelist, verbose=False):
+def scan_add(scan_id, filelist, post_max_size_M=100, verbose=False):
     """Add files to an existing scan
 
     :param scan_id: the scan id
     :type scan_id: str
     :param filelist: list of full path qualified files
     :type filelist: list
+    :param post_max_size_M: POST data max size in Mb
+    :type post_max_size_M: int
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool

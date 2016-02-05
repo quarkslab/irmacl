@@ -432,7 +432,7 @@ Helpers (helpers.py)
    Return type:
       list
 
-**irma.helpers.scan_add(scan_id, filelist, verbose=False)**
+**irma.helpers.scan_add(scan_id, filelist, post_max_size_M=100, verbose=False)**
 
    Add files to an existing scan
 
@@ -440,6 +440,8 @@ Helpers (helpers.py)
       * **scan_id** (*str*) -- the scan id
 
       * **filelist** (*list*) -- list of full path qualified files
+
+      * **post_max_size_M** (*int*) -- POST data max size in Mb
 
       * **verbose** (*bool*) -- enable verbose requests (optional
         default:False)

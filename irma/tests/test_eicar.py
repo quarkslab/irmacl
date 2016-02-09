@@ -167,6 +167,13 @@ EICAR_RESULTS = [
      "version": "4.2.14030.221",
      "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "ESET NOD32 Antivirus Business Edition for Linux Desktop",
+     "results": "Eicar test file",
+     "version": "4.0.81",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
      }, ]
 
 

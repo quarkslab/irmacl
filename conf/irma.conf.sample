@@ -1,4 +1,2 @@
 [Server]
-address=172.16.1.30
-max_tries=1
-pause=3
+address=http://172.16.1.30

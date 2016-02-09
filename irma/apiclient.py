@@ -62,11 +62,15 @@ class IrmaApiClient(object):
     """ Basic Api class that just deals with get and post requests
     """
 
-    def __init__(self, url, max_tries=1, pause=3, verbose=False):
+    def __init__(self, url, max_tries=1, pause=3, verify=True, verbose=False):
         self.url = url
         self.verbose = verbose
         self.max_tries = max_tries
         self.pause = pause
+        self.verify = verify
+        # disable warning when verify is not set
+        if self.verify is False:
+            requests.packages.urllib3.disable_warnings()
 
     def get_call(self, route, **extra_args):
         nb_try = 0
@@ -80,7 +84,7 @@ class IrmaApiClient(object):
                     else:
                         dec_extra_args[k] = v
                 args = urllib.urlencode(dec_extra_args)
-                resp = requests.get(self.url + route + "?" + args)
+                resp = requests.get(self.url + route + "?" + args, verify=self.verify)
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:
@@ -97,7 +101,7 @@ class IrmaApiClient(object):
         while nb_try < self.max_tries:
             nb_try += 1
             try:
-                resp = requests.post(self.url + route, **extra_args)
+                resp = requests.post(self.url + route, verify=self.verify, **extra_args)
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:

@@ -373,6 +373,15 @@ class IrmaEicarTest(EicarTestCase):
         res = self._test_scan_file(filelist, probelist, force=True)
         self.check_eicar_results(res[self.filename])
 
+    def test_scan_eset(self):
+        probe = 'EsetNod32'
+        if probe not in self.probelist:
+            raise unittest.SkipTest("Skipping %s not present" % probe)
+        probelist = [probe]
+        filelist = [self.filepath]
+        res = self._test_scan_file(filelist, probelist, force=True)
+        self.check_eicar_results(res[self.filename])
+
     def test_scan_fsecure(self):
         probe = 'FSecure'
         if probe not in self.probelist:

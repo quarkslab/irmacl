@@ -151,7 +151,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scan.id, ["cancelled"],
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
-                         scan.date, True, True, True)
+                         scan.date, force, True, True)
 
     def test_scan_get(self):
         force = False
@@ -162,7 +162,7 @@ class IrmaAPIScanTests(IrmaAPITests):
             scan = scan_get(scan.id)
         self._check_scan(scan, scan.id, ["finished"],
                          FILENAMES, [scan.probes_total], [scan.probes_total],
-                         scan.date, True, True, True)
+                         scan.date, force, True, True)
 
     def test_file_results_formatted(self):
         force = False

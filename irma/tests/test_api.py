@@ -73,7 +73,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         date = scan.date
         scanid = scan.id
         scan = scan_add(scan.id, FILEPATHS)
-        force = True
+        force = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_launch(scan.id, force, probes)
@@ -154,7 +154,7 @@ class IrmaAPIScanTests(IrmaAPITests):
                          scan.date, True, True, True)
 
     def test_scan_get(self):
-        force = True
+        force = False
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probes)
         while not scan.is_finished():
@@ -165,7 +165,7 @@ class IrmaAPIScanTests(IrmaAPITests):
                          scan.date, True, True, True)
 
     def test_file_results_formatted(self):
-        force = True
+        force = False
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probes)
         while not scan.is_finished():
@@ -180,7 +180,7 @@ class IrmaAPIScanTests(IrmaAPITests):
             self.assertEqual(len(res.probe_results), res.probes_finished)
 
     def test_file_results_not_formatted(self):
-        force = True
+        force = False
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probes, blocking=True)
         for get_result in scan.results:

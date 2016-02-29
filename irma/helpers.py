@@ -226,7 +226,7 @@ def scan_cancel(scan_id, verbose=False):
 
 def scan_files(filelist, force, probe=None,
                mimetype_filtering=None, resubmit_files=None,
-               blocking=False, verbose=False):
+               blocking=False, blocking_timeout=60, verbose=False):
     """Wrapper around scan_new / scan_add / scan_launch
 
     :param filelist: list of full path qualified files
@@ -246,6 +246,9 @@ def scan_files(filelist, force, probe=None,
     :param blocking: wether or not the function call should block until
         scan ended
     :type blocking: bool
+    :param blocking_timeout: maximum amount of time before timeout (only
+        enabled while blocking is ON)
+    :type blocking_timeout: int
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -258,7 +261,11 @@ def scan_files(filelist, force, probe=None,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     if blocking:
+        start = time.time()
         while not scan.is_finished():
+            now = time.time()
+            if now > (start + blocking_timeout):
+                raise IrmaError("Timeout waiting for scan to finish")
             time.sleep(1)
             scan = scan_get(scan.id, verbose=verbose)
     return scan

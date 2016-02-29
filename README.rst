@@ -468,7 +468,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_files(filelist, force, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False, verbose=False)**
+**irma.helpers.scan_files(filelist, force, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False, blocking_timeout=60, verbose=False)**
 
    Wrapper around scan_new / scan_add / scan_launch
 
@@ -489,6 +489,9 @@ Helpers (helpers.py)
 
       * **blocking** (*bool*) -- wether or not the function call
         should block until scan ended
+
+      * **blocking_timeout** (*int*) -- maximum amount of time
+        before timeout (only enabled while blocking is ON)
 
       * **verbose** (*bool*) -- enable verbose requests (optional
         default:False)

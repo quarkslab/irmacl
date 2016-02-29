@@ -153,6 +153,13 @@ class IrmaAPIScanTests(IrmaAPITests):
                          FILENAMES, range(nb_jobs), range(nb_jobs + 1),
                          scan.date, force, True, True)
 
+    def test_scan_files_timeout(self):
+        force = True
+        probes = probe_list()
+        with self.assertRaises(IrmaError):
+            scan_files(FILEPATHS, force, probe=probes[0], blocking=True,
+                       blocking_timeout=0)
+
     def test_scan_get(self):
         force = False
         probes = probe_list()

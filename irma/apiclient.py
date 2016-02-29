@@ -86,7 +86,8 @@ class IrmaApiClient(object):
                     else:
                         dec_extra_args[k] = v
                 args = urllib.urlencode(dec_extra_args)
-                resp = requests.get(self.url + route + "?" + args, verify=self.verify)
+                resp = requests.get(self.url + route + "?" + args,
+                                    verify=self.verify)
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:
@@ -103,7 +104,8 @@ class IrmaApiClient(object):
         while nb_try < self.max_tries:
             nb_try += 1
             try:
-                resp = requests.post(self.url + route, verify=self.verify, **extra_args)
+                resp = requests.post(self.url + route, verify=self.verify,
+                                     **extra_args)
                 return self._handle_resp(resp)
             except IrmaError as e:
                 if nb_try < self.max_tries:

@@ -205,7 +205,8 @@ class EicarTestCase(unittest.TestCase):
         resname_list = sorted([r.name for r in results])
         self.assertEqual(resname_list, sorted(filelist))
         for get_result in results:
-            self._check_result(get_result, scanid, filelist, nb_finished, nb_total)
+            self._check_result(get_result, scanid, filelist,
+                               nb_finished, nb_total)
             if none_infos is True:
                 self.assertIsNone(get_result.file_infos)
             if none_results is True:

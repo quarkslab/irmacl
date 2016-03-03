@@ -157,7 +157,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         force = True
         probes = probe_list()
         with self.assertRaises(IrmaError):
-            scan_files(FILEPATHS, force, probe=probes[0], blocking=True,
+            scan_files(FILEPATHS, force, probe=[probes[0]], blocking=True,
                        blocking_timeout=0)
 
     def test_scan_get(self):

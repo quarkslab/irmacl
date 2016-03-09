@@ -77,12 +77,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_launch(scan.id, force, probes)
-        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scanid, ["ready", "uploaded",
+                                        "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, True)
 
     def test_scan_force(self):
@@ -94,12 +95,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_launch(scan.id, force, probe=probes)
-        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scanid, ["ready", "uploaded",
+                                        "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, True)
 
     def test_mimetype_filtering(self):
@@ -113,12 +115,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_launch(scan.id, force, probes,
                            mimetype_filtering=mimetype_filtering)
-        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scanid, ["ready", "uploaded",
+                                        "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, mimetype_filtering, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, mimetype_filtering, True)
 
     def test_resubmit_files(self):
@@ -132,12 +135,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_launch(scan.id, force, probe=probes,
                            resubmit_files=resubmit_files)
-        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scanid, ["ready", "uploaded",
+                                        "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, resubmit_files)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date, force, True, resubmit_files)
 
     def test_scan_files(self):
@@ -145,12 +149,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_files(FILEPATHS, force, probe=probes)
-        self._check_scan(scan, scan.id, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          scan.date, True, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scan.id, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          scan.date, force, True, True)
 
     def test_scan_files_timeout(self):

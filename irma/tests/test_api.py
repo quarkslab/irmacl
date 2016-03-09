@@ -69,13 +69,14 @@ class IrmaAPIScanTests(IrmaAPITests):
         force = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan_launch(scan.id, force, probes)
-        self._check_scan(scan, scanid, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        scan = scan_launch(scan.id, force, probes)
+        self._check_scan(scan, scanid, ["ready", "uploaded",
+                                        "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date)
 
     def test_scan_files(self):
@@ -83,12 +84,13 @@ class IrmaAPIScanTests(IrmaAPITests):
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
         scan = scan_files(FILEPATHS, force, probe=probes)
-        self._check_scan(scan, scan.id, ["ready", "uploaded", "launched"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          scan.date)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scan.id, ["cancelled"],
-                         FILENAMES, range(nb_jobs), range(nb_jobs + 1),
+                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          scan.date)
 
     def test_scan_get(self):

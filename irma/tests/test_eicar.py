@@ -59,7 +59,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Clam AntiVirus Scanner",
      "results": "Eicar-Test-Signature",
-     "version": "0.98.7",
+     "version": "0.99",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },

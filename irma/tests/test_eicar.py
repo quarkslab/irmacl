@@ -218,31 +218,54 @@ class EicarTestCase(unittest.TestCase):
             if ref_res["name"] == probe_result.name:
                 self.assertEqual(probe_result.status,
                                  ref_res["status"],
-                                 "Probe %s failed (status)" %
-                                 probe_result.name)
+                                 "%s status %s got %s" %
+                                 (probe_result.name,
+                                  ref_res["status"],
+                                  probe_result.status)
+                                 )
                 self.assertEqual(probe_result.name,
                                  ref_res["name"],
-                                 "Probe %s failed (name)" % probe_result.name)
+                                 "%s name %s got %s" %
+                                 (probe_result.name,
+                                  ref_res["name"],
+                                  probe_result.name)
+                                 )
                 self.assertEqual(probe_result.version,
                                  ref_res["version"],
-                                 "Probe %s failed (version)" %
-                                 probe_result.name)
+                                 "%s version %s got %s" %
+                                 (probe_result.name,
+                                  ref_res["version"],
+                                  probe_result.version)
+                                 )
                 self.assertEqual(probe_result.type,
                                  ref_res["type"],
-                                 "Probe %s failed type" % probe_result.name)
+                                 "%s type %s got %s" %
+                                 (probe_result.name,
+                                  ref_res["type"],
+                                  probe_result.type)
+                                 )
                 if ref_res["results"] is not None:
                     self.assertIsNotNone(re.match(ref_res["results"],
                                                   probe_result.results),
-                                         "Probe %s failed (results)" %
-                                         probe_result.name)
+                                         "%s results %s got %s" %
+                                         (probe_result.name,
+                                          ref_res["results"],
+                                          probe_result.results)
+                                         )
                 else:
                     self.assertIsNone(probe_result.results,
-                                      "Probe %s failed (results)" %
-                                      probe_result.name)
+                                      "%s results %s got %s" %
+                                      (probe_result.name,
+                                       ref_res["results"],
+                                       probe_result.results)
+                                      )
                 self.assertLessEqual(probe_result.duration,
                                      ref_res["duration"],
-                                     "Probe %s failed (duration)" %
-                                     probe_result.name)
+                                     "%s duration %s got %s" %
+                                     (probe_result.duration,
+                                      ref_res["duration"],
+                                      probe_result.results)
+                                     )
                 return
         self.assertFalse(True,
                          "Missing probe %s ref_result" % probe_result.name)

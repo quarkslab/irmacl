@@ -118,7 +118,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Avast Core Security",
      "results": "EICAR Test-NOT virus!!!",
-     "version": "2.1.0",
+     "version": "2.1.1",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },

@@ -491,7 +491,7 @@ Helpers (helpers.py)
         should block until scan ended
 
       * **blocking_timeout** (*int*) -- maximum amount of time
-        before timeout (only enabled while blocking is ON)
+        before timeout per file (only enabled while blocking is ON)
 
       * **verbose** (*bool*) -- enable verbose requests (optional
         default:False)

@@ -246,8 +246,8 @@ def scan_files(filelist, force, probe=None,
     :param blocking: wether or not the function call should block until
         scan ended
     :type blocking: bool
-    :param blocking_timeout: maximum amount of time before timeout (only
-        enabled while blocking is ON)
+    :param blocking_timeout: maximum amount of time before timeout per file
+        (only enabled while blocking is ON)
     :type blocking_timeout: int
     :param verbose: enable verbose requests
         (optional default:False)
@@ -260,11 +260,12 @@ def scan_files(filelist, force, probe=None,
     scan = scan_launch(scan.id, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
+    total_timeout = blocking_timeout * len(filelist)
     if blocking:
         start = time.time()
         while not scan.is_finished():
             now = time.time()
-            if now > (start + blocking_timeout):
+            if now > (start + total_timeout):
                 raise IrmaError("Timeout waiting for scan to finish")
             time.sleep(1)
             scan = scan_get(scan.id, verbose=verbose)

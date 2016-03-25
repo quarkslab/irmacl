@@ -230,13 +230,12 @@ class EicarTestCase(unittest.TestCase):
                                   ref_res["name"],
                                   probe_result.name)
                                  )
-                self.assertEqual(probe_result.version,
-                                 ref_res["version"],
-                                 "%s version %s got %s" %
-                                 (probe_result.name,
-                                  ref_res["version"],
-                                  probe_result.version)
-                                 )
+                if (probe_result.version != ref_res["version"]):
+                    logging.warning("Outdated version of %s: latest %s got %s" %
+                                    (probe_result.name,
+                                     ref_res["version"],
+                                     probe_result.version)
+                                    )
                 self.assertEqual(probe_result.type,
                                  ref_res["type"],
                                  "%s type %s got %s" %

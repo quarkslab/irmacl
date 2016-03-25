@@ -151,11 +151,12 @@ class IrmaAPIFileTests(IrmaAPITests):
 
     def test_file_search_limit(self):
         (total, _) = file_search()
-        (total, res) = file_search(limit=total)
-        self.assertEqual(type(res), list)
-        self.assertEqual(len(res), total)
-        offset = total - total / 2
-        limit = total / 2
+        if total > 10:
+            offset = total - 10
+            limit = 10
+        else:
+            offset = 0
+            limit = total
         (_, res) = file_search(offset=offset, limit=limit)
         self.assertEqual(type(res), list)
         self.assertEqual(len(res), limit)

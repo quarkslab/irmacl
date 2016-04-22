@@ -153,14 +153,14 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Sophos Anti-Virus",
      "results": "EICAR-AV-Test",
-     "version": "5.19.0",
+     "version": "5.21.0",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
     {"status": 1,
      "name": "GData Anti-Virus",
-     "results": "Virus: EICAR-Test-File (not a virus) (Engine A)",
-     "version": "4.2.14030.221",
+     "results": "Virus: EICAR-Test-File \(not a virus\) \(Engine A\)",
+     "version": "5.0.15051.292",
      "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
      },

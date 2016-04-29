@@ -226,13 +226,6 @@ class EicarTestCase(unittest.TestCase):
                                   ref_res["status"],
                                   probe_result.status)
                                  )
-                self.assertEqual(probe_result.name,
-                                 ref_res["name"],
-                                 "%s name %s got %s" %
-                                 (probe_result.name,
-                                  ref_res["name"],
-                                  probe_result.name)
-                                 )
                 if (probe_result.version != ref_res["version"]):
                     logging.warning("Outdated version of %s: latest %s got %s" %
                                     (probe_result.name,
@@ -264,9 +257,9 @@ class EicarTestCase(unittest.TestCase):
                 self.assertLessEqual(probe_result.duration,
                                      ref_res["duration"],
                                      "%s duration %s got %s" %
-                                     (probe_result.duration,
+                                     (probe_result.name,
                                       ref_res["duration"],
-                                      probe_result.results)
+                                      probe_result.duration)
                                      )
                 return
         self.assertFalse(True,

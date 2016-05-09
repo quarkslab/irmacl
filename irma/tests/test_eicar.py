@@ -224,10 +224,10 @@ class EicarTestCase(unittest.TestCase):
                                   probe_result.status)
                                  )
                 if (probe_result.version != ref_res["version"]):
-                    logging.warning("Outdated version of %s: latest %s got %s" %
-                                    (probe_result.name,
-                                     ref_res["version"],
-                                     probe_result.version)
+                    logging.warning("Outdated version of %s: latest %s got %s"
+                                    % (probe_result.name,
+                                       ref_res["version"],
+                                       probe_result.version)
                                     )
                 self.assertEqual(probe_result.type,
                                  ref_res["type"],

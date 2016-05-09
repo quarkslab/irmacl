@@ -202,7 +202,7 @@ def scan_add(scan_id, filelist, post_max_size_M=100, verbose=False):
     cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.add(scan_id, filelist)
+    scan = scanapi.add(scan_id, filelist, post_max_size_M=post_max_size_M)
     return scan
 
 

@@ -181,6 +181,13 @@ EICAR_RESULTS = [
      "version": "10.0.0.5366",
      "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Kaspersky Anti-Virus",
+     "results": "EICAR-Test-File",
+     "version": "16.0.0.694",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
      }, ]
 
 

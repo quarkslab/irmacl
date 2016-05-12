@@ -28,7 +28,7 @@ cwd = os.path.abspath(__file__)
 EICAR_FILE = "samples/eicar.com"
 EICAR_HASH = '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f'
 MAXTIME_SLOW_PROBE = 60
-MAXTIME_NORMAL_PROBE = 20
+MAXTIME_NORMAL_PROBE = 30
 MAXTIME_FAST_PROBE = 10
 EICAR_RESULTS = [
     {"status": 1,
@@ -167,7 +167,14 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "ESET NOD32 Antivirus Business Edition for Linux Desktop",
      "results": "Eicar test file",
-     "version": "4.0.81",
+     "version": "4.0.82",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Emsisoft Commandline Scanner",
+     "results": "EICAR-Test-File \(not a virus\) \(B\)",
+     "version": "10.0.0.5366",
      "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
      }, ]

@@ -66,6 +66,13 @@ EICAR_RESULTS = [
      "duration": MAXTIME_FAST_PROBE,
      "type": "metadata"
      },
+    {"status": 0,
+     "name": "PE Static Analyzer",
+     "results": "Not a PE file",
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "metadata"
+     },
     {"status": 1,
      "name": "AVG AntiVirus Free",
      "results": "EICAR_Test",
@@ -130,7 +137,21 @@ EICAR_RESULTS = [
      "type": "metadata"
      },
     {"status": 0,
+     "name": "PEiD PE Packer Identifier",
+     "results": "Not a PE",
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "metadata"
+     },
+    {"status": 0,
      "name": "TrID",
+     "results": None,
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "metadata"
+     },
+    {"status": 0,
+     "name": "TrID File Identifier",
      "results": None,
      "version": None,
      "duration": MAXTIME_FAST_PROBE,

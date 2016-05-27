@@ -64,13 +64,6 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 0,
-     "name": "StaticAnalyzer",
-     "results": "Not a PE file",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 0,
      "name": "PE Static Analyzer",
      "results": "Not a PE file",
      "version": None,
@@ -134,22 +127,8 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 0,
-     "name": "PEiD",
-     "results": "Not a PE",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 0,
      "name": "PEiD PE Packer Identifier",
      "results": "Not a PE",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 0,
-     "name": "TrID",
-     "results": None,
      "version": None,
      "duration": MAXTIME_FAST_PROBE,
      "type": "metadata"

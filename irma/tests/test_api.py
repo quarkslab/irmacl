@@ -74,10 +74,6 @@ class IrmaAPIScanTests(IrmaAPITests):
                                         "launched", "finished"],
                          FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          date)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date)
 
     def test_scan_files(self):
         force = True

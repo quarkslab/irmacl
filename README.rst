@@ -16,12 +16,12 @@ Installation
    $ python setup.py install
 
 
-Configuration file contains only the API endpoint address (not the full url).
+Configuration file contains only the API base address (not the full url).
 
 .. code-block::
 
    [Server]
-   address=172.16.1.30
+   address=http://172.16.1.30
 
 
 and is searched in these locations in following order:

@@ -133,7 +133,7 @@ EICAR_RESULTS = [
      "duration": MAXTIME_FAST_PROBE,
      "type": "metadata"
      },
-    {"status": 0,
+    {"status": 1,
      "name": "TrID File Identifier",
      "results": None,
      "version": None,

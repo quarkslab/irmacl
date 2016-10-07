@@ -34,6 +34,7 @@ EICAR_HASH = '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f'
 MAXTIME_SLOW_PROBE = 60
 MAXTIME_NORMAL_PROBE = 30
 MAXTIME_FAST_PROBE = 10
+NOT_CHECKED = "This value is not checked"
 EICAR_RESULTS = [
     {"status": 1,
      "name": "eScan Antivirus for Linux Desktop",
@@ -135,7 +136,7 @@ EICAR_RESULTS = [
      },
     {"status": 1,
      "name": "TrID File Identifier",
-     "results": None,
+     "results": NOT_CHECKED,
      "version": None,
      "duration": MAXTIME_FAST_PROBE,
      "type": "metadata"
@@ -253,7 +254,9 @@ class EicarTestCase(unittest.TestCase):
                                   ref_res["type"],
                                   probe_result.type)
                                  )
-                if ref_res["results"] is not None:
+                if ref_res["results"] == NOT_CHECKED:
+                    pass
+                elif ref_res["results"] is not None:
                     self.assertIsNotNone(re.match(ref_res["results"],
                                                   probe_result.results),
                                          "%s results %s got %s" %

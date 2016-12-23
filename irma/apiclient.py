@@ -6,6 +6,7 @@ import urllib
 import datetime
 import os
 import sys
+from requests import RequestException
 
 
 def timestamp_to_date(timestamp):
@@ -89,7 +90,7 @@ class IrmaApiClient(object):
                 resp = requests.get(self.url + route + "?" + args,
                                     verify=self.verify)
                 return self._handle_resp(resp)
-            except IrmaError as e:
+            except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
                         print "Exception Raised {0} retry #{1}".format(e,
@@ -107,7 +108,7 @@ class IrmaApiClient(object):
                 resp = requests.post(self.url + route, verify=self.verify,
                                      **extra_args)
                 return self._handle_resp(resp)
-            except IrmaError as e:
+            except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
                         print "Exception Raised {0} retry #{1}".format(e,

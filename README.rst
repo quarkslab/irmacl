@@ -1,5 +1,5 @@
-IRMA: Incident Response & Malware Analysis
-------------------------------------------
+Irmacl: command-line tool for IRMA API
+--------------------------------------
 
 |docs|
 
@@ -16,12 +16,15 @@ Installation
    $ python setup.py install
 
 
-Configuration file contains only the API base address (not the full url).
+Configuration file contains the API endpoint (full url) and some optional paramters (max number and
+delay in second between retries)
 
 .. code-block::
 
    [Server]
-   address=http://172.16.1.30
+   api_endpoint=http://172.16.1.30/api/v1.1
+   max_tries=3
+   pause=1
 
 
 and is searched in these locations in following order:
@@ -32,7 +35,7 @@ and is searched in these locations in following order:
 * global directory  ("/etc/irma")
 
 
-Once you set up a working irma.conf settings file, you could run tests on a running IRMA instance:
+Once you set up a working irma.conf settings file, you could run tests on your running IRMA server:
 
 .. code-block:: bash
 
@@ -46,7 +49,7 @@ Install it directly with pip:
 
 .. code-block:: bash
 
-  $ pip install git+https://github.com/quarkslab/irma-cli.git
+  $ pip install irmacl
 
 
 Usage
@@ -54,7 +57,7 @@ Usage
 
 .. code-block:: python
 
-   >>> from irma.helpers import *
+   >>> from irmacl.helpers import *
    >>> probe_list()
    [u'StaticAnalyzer', u'Unarchive', u'VirusBlokAda', u'VirusTotal']
 
@@ -78,10 +81,10 @@ Usage
    Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
    Scan Date: 2015-12-22 14:36:21
    Filename: eicar.com
-   Filepath: ./irma/tests/samples
+   Filepath: ./irmacl/tests/samples
    ParentFile SHA256: None
    Resultid: 572f9418-ca3c-4fdf-bb35-50c11629a7e7
-   FileInfo: 
+   FileInfo:
    None
    Results: None
 
@@ -92,10 +95,10 @@ Usage
    Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
    Scan Date: 2015-12-22 14:36:21
    Filename: eicar.com
-   Filepath: ./irma/tests/samples
+   Filepath: ./irmacl/tests/samples
    ParentFile SHA256: None
    Resultid: 572f9418-ca3c-4fdf-bb35-50c11629a7e7
-   FileInfo: 
+   FileInfo:
    Size: 68
    Sha1: 3395856ce81f2b7382dee72602f798b642f14140
    Sha256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
@@ -106,7 +109,7 @@ Usage
    Mimetype: EICAR virus test files
    Tags: []
 
-   Results: [<irma.apiclient.IrmaProbeResult object at 0x7f3f250b9dd0>, <irma.apiclient.IrmaProbeResult object at 0x7f3f250b9850>]
+   Results: [<irmacl.apiclient.IrmaProbeResult object at 0x7f3f250b9dd0>, <irmacl.apiclient.IrmaProbeResult object at 0x7f3f250b9850>]
 
    >>> fr = _
    >>> print fr.probe_results[0]
@@ -137,7 +140,7 @@ Searching for files
 .. code-block:: python
 
    >>> file_search(name="ei")
-   (1, [<irma.apiclient.IrmaResults at 0x7f3f250491d0>])
+   (1, [<irmacl.apiclient.IrmaResults at 0x7f3f250491d0>])
 
    >>> (total, res) = _
    >>> print res[0]
@@ -150,13 +153,13 @@ Searching for files
 
    >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140")
    (7,
-    [<irma.apiclient.IrmaResults at 0x7f3f250b96d0>,
-     <irma.apiclient.IrmaResults at 0x7f3f24fdc1d0>,
-     <irma.apiclient.IrmaResults at 0x7f3f24fdca90>,
-     <irma.apiclient.IrmaResults at 0x7f3f24fdcdd0>,
-     <irma.apiclient.IrmaResults at 0x7f3f24fdc690>,
-     <irma.apiclient.IrmaResults at 0x7f3f2504f390>,
-     <irma.apiclient.IrmaResults at 0x7f3f24fea350>])
+    [<irmacl.apiclient.IrmaResults at 0x7f3f250b96d0>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f24fdc1d0>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f24fdca90>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f24fdcdd0>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f24fdc690>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f2504f390>,
+     <irmacl.apiclient.IrmaResults at 0x7f3f24fea350>])
 
    >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140", tags=[1,2])
    (0, [])
@@ -169,7 +172,7 @@ Searching for files
 Objects (apiclient.py)
 -------
 
-**class irma.apiclient.IrmaFileInfo(id, size, timestamp_first_scan, timestamp_last_scan, sha1, sha256, md5, mimetype, tags)**
+**class irmacl.apiclient.IrmaFileInfo(id, size, timestamp_first_scan, timestamp_last_scan, sha1, sha256, md5, mimetype, tags)**
 
    Bases: "object"
 
@@ -202,7 +205,7 @@ Objects (apiclient.py)
 
    raw()
 
-**class irma.apiclient.IrmaProbeResult(**kwargs)**
+**class irmacl.apiclient.IrmaProbeResult(**kwargs)**
 
    Bases: "object"
 
@@ -238,7 +241,7 @@ Objects (apiclient.py)
    to_json()
 
 
-**class irma.apiclient.IrmaResults(file_infos=None, probe_results=None, **kwargs)**
+**class irmacl.apiclient.IrmaResults(file_infos=None, probe_results=None, **kwargs)**
 
    Bases: "object"
 
@@ -275,7 +278,7 @@ Objects (apiclient.py)
    pscan_date -- property, humanized date of scan date
 
 
-**class irma.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, force, resubmit_files, mimetype_filtering, results=[])**
+**class irmacl.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, force, resubmit_files, mimetype_filtering, results=[])**
 
    Bases: "object"
 
@@ -312,7 +315,7 @@ Objects (apiclient.py)
 
    pstatus -- property, printable status
 
-**class irma.apiclient.IrmaTag(id, text)**
+**class irmacl.apiclient.IrmaTag(id, text)**
 
    Bases: "object"
 
@@ -327,7 +330,7 @@ Objects (apiclient.py)
 Helpers (helpers.py)
 -------
 
-**irma.helpers.file_download(sha256, dest_filepath, verbose=False)**
+**irmacl.helpers.file_download(sha256, dest_filepath, verbose=False)**
 
    Download file identified by sha256 to dest_filepath
 
@@ -346,7 +349,7 @@ Helpers (helpers.py)
    Return type:
       tuple(int, list of IrmaResults)
 
-**irma.helpers.file_results(sha256, limit=None, offset=None, verbose=False)**
+**irmacl.helpers.file_results(sha256, limit=None, offset=None, verbose=False)**
 
    List all results for a given file identified by sha256
 
@@ -365,7 +368,7 @@ Helpers (helpers.py)
    Returns:
       tuple(int, list of IrmaResults)
 
-**irma.helpers.file_search(name=None, hash=None, tags=None, limit=None, offset=None, verbose=False)**
+**irmacl.helpers.file_search(name=None, hash=None, tags=None, limit=None, offset=None, verbose=False)**
 
    Search a file by name or hash value
 
@@ -394,7 +397,7 @@ Helpers (helpers.py)
    Return type:
       tuple(int, list of IrmaResults)
 
-**irma.helpers.file_tag_add(sha256, tagid, verbose=False)**
+**irmacl.helpers.file_tag_add(sha256, tagid, verbose=False)**
 
    Add a tag to a File
 
@@ -406,7 +409,7 @@ Helpers (helpers.py)
    Returns:
       No return
 
-**irma.helpers.file_tag_remove(sha256, tagid, verbose=False)**
+**irmacl.helpers.file_tag_remove(sha256, tagid, verbose=False)**
 
    Remove a tag to a File
 
@@ -418,7 +421,7 @@ Helpers (helpers.py)
    Returns:
       No return
 
-**irma.helpers.probe_list(verbose=False)**
+**irmacl.helpers.probe_list(verbose=False)**
 
    List availables probes
 
@@ -432,7 +435,7 @@ Helpers (helpers.py)
    Return type:
       list
 
-**irma.helpers.scan_add(scan_id, filelist, post_max_size_M=100, verbose=False)**
+**irmacl.helpers.scan_add(scan_id, filelist, post_max_size_M=100, verbose=False)**
 
    Add files to an existing scan
 
@@ -441,7 +444,9 @@ Helpers (helpers.py)
 
       * **filelist** (*list*) -- list of full path qualified files
 
-      * **post_max_size_M** (*int*) -- POST data max size in Mb
+      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
+        api will be done if total size is more than this limit, note that if
+        one or more file is bigger than this limit it will raise an error)
 
       * **verbose** (*bool*) -- enable verbose requests (optional
         default:False)
@@ -452,7 +457,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_cancel(scan_id, verbose=False)**
+**irmacl.helpers.scan_cancel(scan_id, verbose=False)**
 
    Cancel a scan
 
@@ -478,6 +483,10 @@ Helpers (helpers.py)
       * **force** (*bool*) -- if True force a new analysis of files
         if False use existing results
 
+      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
+        api will be done if total size is more than this limit, note that if
+        one or more file is bigger than this limit it will raise an error)
+
       * **probe** (*list*) -- probe list to use (optional default:
         None means all)
 
@@ -502,7 +511,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_get(scan_id, verbose=False)**
+**irmacl.helpers.scan_get(scan_id, verbose=False)**
 
    Fetch a scan (useful to track scan progress with scan.pstatus)
 
@@ -518,7 +527,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_launch(scan_id, force, probe=None, mimetype_filtering=None, resubmit_files=None, verbose=False)**
+**irmacl.helpers.scan_launch(scan_id, force, probe=None, mimetype_filtering=None, resubmit_files=None, verbose=False)**
 
    Launch an existing scan
 
@@ -546,7 +555,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_list(limit=None, offset=None, verbose=False)**
+**irmacl.helpers.scan_list(limit=None, offset=None, verbose=False)**
 
    List all scans
 
@@ -566,7 +575,7 @@ Helpers (helpers.py)
    Return type:
       tuple(int, list of IrmaScan)
 
-**irma.helpers.scan_new(verbose=False)**
+**irmacl.helpers.scan_new(verbose=False)**
 
    Create a new scan
 
@@ -580,7 +589,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_proberesults(result_idx, formatted=True, verbose=False)**
+**irmacl.helpers.scan_proberesults(result_idx, formatted=True, verbose=False)**
 
    Fetch file probe results (for a given scan
       one scan <-> one result_idx
@@ -600,7 +609,7 @@ Helpers (helpers.py)
    Return type:
       IrmaResults
 
-**irma.helpers.tag_list(verbose=False)**
+**irmacl.helpers.tag_list(verbose=False)**
 
    List all available tags
 
@@ -610,7 +619,7 @@ Helpers (helpers.py)
    Return type:
       list of IrmaTag
 
-**irma.helpers.tag_new(text, verbose=False)**
+**irmacl.helpers.tag_new(text, verbose=False)**
 
    Create a new tag
 
@@ -643,5 +652,5 @@ involved in the project.
 .. |docs| image:: https://readthedocs.org/projects/irma/badge/
     :alt: Documentation Status
     :scale: 100%
-    :target: https://irma.readthedocs.org
-.. _on Read The Docs Website: https://irma.readthedocs.org
+    :target: https://irma.readthedocs.io
+.. _on Read The Docs Website: https://irma.readthedocs.io

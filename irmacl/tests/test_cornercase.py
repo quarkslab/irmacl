@@ -2,7 +2,7 @@
 import unittest
 import os
 import time
-from irma.helpers import scan_files, scan_get, \
+from irmacl.helpers import scan_files, scan_get, \
     scan_proberesults, file_search, probe_list
 
 cwd = os.path.dirname(__file__)

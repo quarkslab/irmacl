@@ -15,7 +15,7 @@
 import unittest
 import os
 import re
-from irma.helpers import probe_list, scan_new, scan_add, scan_get, \
+from irmacl.helpers import probe_list, scan_new, scan_add, scan_get, \
     scan_launch, scan_proberesults
 import time
 import logging

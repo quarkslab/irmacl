@@ -1,4 +1,5 @@
-# Copyright (c) 2013-2016 Quarkslab.
+#
+# Copyright (c) 2013-2015 QuarksLab.
 # This file is part of IRMA project.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +16,14 @@
 import os
 import time
 from apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
+<<<<<<< HEAD
+    IrmaFilesApi, IrmaError
+from ConfigParser import ConfigParser
+=======
     IrmaFilesApi, IrmaError, IrmaTagsApi
 from ConfigParser import ConfigParser, NoOptionError
 
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
 
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),
@@ -36,7 +42,15 @@ if config_file is None:
 
 config = ConfigParser()
 config.read(config_file)
-api_endpoint = config.get("Server", "api_endpoint")
+address = config.get("Server", "address")
+<<<<<<< HEAD
+api_endpoint = "http://{0}/api/v1".format(address)
+# How many times API call should be retried
+# when an error is raised
+max_tries = int(config.get("Server", "max_tries"))
+# How many seconds should we wait till next try
+pause = int(config.get("Server", "pause"))
+=======
 
 # Optional values in the config file
 # Here are the defaults values
@@ -59,11 +73,18 @@ try:
 except NoOptionError:
     pass
 
+API_ENDPOINT = "{0}/api/v1.1".format(address)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
+
 # =========
 #  Helpers
 # =========
 
 
+<<<<<<< HEAD
+def file_results(scan_id, result_idx, formatted=True, verbose=False):
+    """Fetch a file results
+=======
 def file_download(sha256, dest_filepath, verbose=False):
     """Download file identified by sha256 to dest_filepath
 
@@ -76,7 +97,7 @@ def file_download(sha256, dest_filepath, verbose=False):
     :return: return tuple of total files and list of results for the given file
     :rtype: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.download(sha256, dest_filepath)
@@ -85,56 +106,67 @@ def file_download(sha256, dest_filepath, verbose=False):
 
 def file_results(sha256, limit=None, offset=None, verbose=False):
     """List all results for a given file identified by sha256
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
 
-    :param sha256: file sha256 hash value
-    :type sha256: str of 64 chars
-    :param limit: max number of files to receive
-        (optional default:25)
-    :type limit: int
-    :param offset: index of first result
-        (optional default:0)
-    :type offset: int
-    :param verbose: enable verbose requests (optional default:False)
+    :param scan_id: the scan id
+    :type scan_id: str
+    :param result_idx: the result id
+    :type result_idx: str
+    :param formatted: apply frontend formatters on results
+        (optional default:True)
+    :type formatted: bool
+    :param verbose: enable verbose requests
+        (optional default:False)
     :type verbose: bool
-    :return: tuple(int, list of IrmaResults)
+    :return: return a IrmaResult object
+    :rtype: IrmaResults
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    file_results = scanapi.file_results(scan_id, result_idx,
+                                        formatted=formatted)
+    return file_results
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
     return (total, files_list)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
 
 
-def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
-                verbose=False):
+def file_search(name=None, hash=None, limit=None, offset=None, verbose=False):
     """Search a file by name or hash value
 
     :param name: name of the file ('*name*' will be searched)
     :type name: str
     :param hash: one of sha1, md5 or sha256 full hash value
     :type hash: str of (64, 40 or 32 chars)
-    :param tags: list of tagid
-    :type tags: list of int
     :param limit: max number of files to receive
         (optional default:25)
     :type limit: int
     :param offset: index of first result
         (optional default:0)
     :type offset: int
-    :param verbose: enable verbose requests (optional default:False)
-    :type verbose: bool
     :return: return tuple of total files and list of matching files already
         scanned
     :rtype: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     fileapi = IrmaFilesApi(cli)
-    (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
-                                         limit=limit, offset=offset)
+    (total, files_list) = fileapi.search(name=name, hash=hash, limit=limit,
+                                         offset=offset)
     return (total, files_list)
 
 
+<<<<<<< HEAD
+=======
 def file_tag_add(sha256, tagid, verbose=False):
     """Add a tag to a File
 
@@ -144,7 +176,7 @@ def file_tag_add(sha256, tagid, verbose=False):
     :type tagid: int
     :return: No return
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_add(sha256, tagid)
@@ -160,13 +192,14 @@ def file_tag_remove(sha256, tagid, verbose=False):
     :type tagid: int
     :return: No return
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_remove(sha256, tagid)
     return
 
 
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
 def probe_list(verbose=False):
     """List availables probes
 
@@ -175,32 +208,38 @@ def probe_list(verbose=False):
     :return: return probe list
     :rtype: list
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
     return probelist
 
 
-def scan_add(scan_id, filelist, post_max_size_M=100, verbose=False):
+def scan_add(scan_id, filelist, verbose=False):
     """Add files to an existing scan
 
     :param scan_id: the scan id
     :type scan_id: str
     :param filelist: list of full path qualified files
     :type filelist: list
-    :param post_max_size_M: POST data max size in Mb
-    :type post_max_size_M: int
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
     :return: return the updated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.add(scan_id, filelist, post_max_size_M=post_max_size_M)
+    scan = scanapi.add(scan_id, filelist)
     return scan
 
 
@@ -215,16 +254,18 @@ def scan_cancel(scan_id, verbose=False):
     :return: return the scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
     return scan
 
 
-def scan_files(filelist, force, probe=None,
-               mimetype_filtering=None, resubmit_files=None,
-               blocking=False, blocking_timeout=60, verbose=False):
+def scan_files(filelist, force, probe=None, blocking=False, verbose=False):
     """Wrapper around scan_new / scan_add / scan_launch
 
     :param filelist: list of full path qualified files
@@ -235,18 +276,9 @@ def scan_files(filelist, force, probe=None,
     :param probe: probe list to use
         (optional default: None means all)
     :type probe: list
-    :param mimetype_filtering: enable probe selection based on mimetype
-        (optional default:True)
-    :type mimetype_filtering: bool
-    :param resubmit_files: reanalyze files produced by probes
-        (optional default:True)
-    :type resubmit_files: bool
     :param blocking: wether or not the function call should block until
         scan ended
     :type blocking: bool
-    :param blocking_timeout: maximum amount of time before timeout per file
-        (only enabled while blocking is ON)
-    :type blocking_timeout: int
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -255,16 +287,9 @@ def scan_files(filelist, force, probe=None,
     """
     scan = scan_new(verbose=verbose)
     scan = scan_add(scan.id, filelist, verbose=verbose)
-    scan = scan_launch(scan.id, force, probe=probe,
-                       mimetype_filtering=mimetype_filtering,
-                       resubmit_files=resubmit_files, verbose=verbose)
-    total_timeout = blocking_timeout * len(filelist)
+    scan = scan_launch(scan.id, force, probe=probe, verbose=verbose)
     if blocking:
-        start = time.time()
         while not scan.is_finished():
-            now = time.time()
-            if now > (start + total_timeout):
-                raise IrmaError("Timeout waiting for scan to finish")
             time.sleep(1)
             scan = scan_get(scan.id, verbose=verbose)
     return scan
@@ -281,15 +306,18 @@ def scan_get(scan_id, verbose=False):
     :return: return the scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
     return scan
 
 
-def scan_launch(scan_id, force, probe=None,
-                mimetype_filtering=None, resubmit_files=None, verbose=False):
+def scan_launch(scan_id, force, probe=None, verbose=False):
     """Launch an existing scan
 
     :param scan_id: the scan id
@@ -300,24 +328,20 @@ def scan_launch(scan_id, force, probe=None,
     :param probe: probe list to use
         (optional default None means all)
     :type probe: list
-    :param mimetype_filtering: enable probe selection based on mimetype
-        (optional default:True)
-    :type mimetype_filtering: bool
-    :param resubmit_files: reanalyze files produced by probes
-        (optional default:True)
-    :type resubmit_files: bool
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
     :return: return the updated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.launch(scan_id, force, probe=probe,
-                          mimetype_filtering=mimetype_filtering,
-                          resubmit_files=resubmit_files)
+    scan = scanapi.launch(scan_id, force, probe)
     return scan
 
 
@@ -336,8 +360,12 @@ def scan_list(limit=None, offset=None, verbose=False):
     :return: return tuple of total scans and list of scans
     :rtype: tuple(int, list of IrmaScan)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
     return (total, scan_list)
@@ -352,7 +380,13 @@ def scan_new(verbose=False):
     :return: return the new generated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+<<<<<<< HEAD
+    cli = IrmaApiClient(api_endpoint, max_tries, pause, verbose=verbose)
+    scanapi = IrmaScansApi(cli)
+    scan = scanapi.new()
+    return scan
+=======
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.new()
@@ -374,7 +408,7 @@ def scan_proberesults(result_idx, formatted=True, verbose=False):
     :return: return a IrmaResult object
     :rtype: IrmaResults
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     proberesults = scanapi.probe_results(result_idx,
@@ -388,7 +422,7 @@ def tag_list(verbose=False):
     :return: list of existing tags
     :rtype: list of IrmaTag
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
@@ -402,7 +436,8 @@ def tag_new(text, verbose=False):
     :type text: str
     :return: None
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     return tagapi.new(text)
+>>>>>>> dac4dbf... Allow irma-cli to connect to an ssl server with self signed certificate

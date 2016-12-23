@@ -16,8 +16,8 @@
 # terms contained in the LICENSE file.
 
 import argparse
-from irma.apiclient import IrmaError
-from irma.helpers import probe_list, scan_files, scan_cancel, \
+from irmacl.apiclient import IrmaError
+from irmacl.helpers import probe_list, scan_files, scan_cancel, \
     scan_get, scan_proberesults
 
 

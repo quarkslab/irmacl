@@ -1,2 +1,2 @@
 [Server]
-address=http://172.16.1.30
+api_endpoint=http://172.16.1.30/api/v1.1

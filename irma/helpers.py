@@ -1,4 +1,3 @@
-#
 # Copyright (c) 2013-2016 Quarkslab.
 # This file is part of IRMA project.
 #
@@ -36,7 +35,7 @@ if config_file is None:
 
 config = ConfigParser()
 config.read(config_file)
-address = config.get("Server", "address")
+api_endpoint = config.get("Server", "api_endpoint")
 
 # Optional values in the config file
 # Here are the defaults values
@@ -59,8 +58,6 @@ try:
 except NoOptionError:
     pass
 
-API_ENDPOINT = "{0}/api/v1".format(address)
-
 # =========
 #  Helpers
 # =========
@@ -82,7 +79,7 @@ def file_results(scan_id, result_idx, formatted=True, verbose=False):
     :return: return a IrmaResult object
     :rtype: IrmaResults
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     file_results = scanapi.file_results(scan_id, result_idx,
@@ -107,7 +104,7 @@ def file_search(name=None, hash=None, limit=None, offset=None, verbose=False):
         scanned
     :rtype: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.search(name=name, hash=hash, limit=limit,
@@ -123,7 +120,7 @@ def probe_list(verbose=False):
     :return: return probe list
     :rtype: list
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
@@ -143,7 +140,7 @@ def scan_add(scan_id, filelist, verbose=False):
     :return: return the updated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.add(scan_id, filelist)
@@ -161,7 +158,7 @@ def scan_cancel(scan_id, verbose=False):
     :return: return the scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
@@ -209,7 +206,7 @@ def scan_get(scan_id, verbose=False):
     :return: return the scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
@@ -233,7 +230,7 @@ def scan_launch(scan_id, force, probe=None, verbose=False):
     :return: return the updated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.launch(scan_id, force, probe)
@@ -255,7 +252,7 @@ def scan_list(limit=None, offset=None, verbose=False):
     :return: return tuple of total scans and list of scans
     :rtype: tuple(int, list of IrmaScan)
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
@@ -271,7 +268,7 @@ def scan_new(verbose=False):
     :return: return the new generated scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(API_ENDPOINT, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.new()

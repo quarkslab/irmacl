@@ -164,7 +164,7 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_scan_get(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
+        scan = scan_files(FILEPATHS, force, probe=probes)
         while not scan.is_finished():
             time.sleep(1)
             scan = scan_get(scan.id)
@@ -175,7 +175,7 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_file_results_formatted(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
+        scan = scan_files(FILEPATHS, force, probe=probes)
         while not scan.is_finished():
             time.sleep(1)
             scan = scan_get(scan.id)
@@ -190,7 +190,7 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_file_results_not_formatted(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes, blocking=True)
+        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for get_result in scan.results:
             self.assertTrue(self._validate_uuid(str(get_result.result_id)))
             res = scan_proberesults(get_result.result_id, formatted=False)
@@ -205,7 +205,7 @@ class IrmaAPIFileTests(IrmaAPITests):
     def test_file_search_name(self):
         force = False
         probes = probe_list()
-        scan_files(FILEPATHS, force, probes, blocking=True)
+        scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for name in FILENAMES:
             data = file_search(name=name)
             self.assertEqual(type(data), tuple)
@@ -230,7 +230,7 @@ class IrmaAPIFileTests(IrmaAPITests):
     def test_file_search_hash(self):
         force = False
         probes = probe_list()
-        scan_files(FILEPATHS, force, probes, blocking=True)
+        scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for hash in HASHES:
             (_, res) = file_search(hash=hash)
             self.assertTrue(len(res) > 0)

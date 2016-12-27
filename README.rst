@@ -473,7 +473,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_files(filelist, force, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False, blocking_timeout=60, verbose=False)**
+**irmacl.helpers.scan_files(filelist, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)**
 
    Wrapper around scan_new / scan_add / scan_launch
 

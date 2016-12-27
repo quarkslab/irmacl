@@ -224,7 +224,7 @@ def scan_cancel(scan_id, verbose=False):
     return scan
 
 
-def scan_files(filelist, force, probe=None,
+def scan_files(filelist, force, post_max_size_M=100, probe=None,
                mimetype_filtering=None, resubmit_files=None,
                blocking=False, blocking_timeout=60, verbose=False):
     """Wrapper around scan_new / scan_add / scan_launch
@@ -234,6 +234,10 @@ def scan_files(filelist, force, probe=None,
     :param force: if True force a new analysis of files
         if False use existing results
     :type force: bool
+    :param post_max_size_M: POST data max size in Mb (multiple calls to the
+    api will be done if total size is more than this limit, note that if
+    one or more file is bigger than this limit it will raise an error)
+    :type post_max_size_M: int
     :param probe: probe list to use
         (optional default: None means all)
     :type probe: list
@@ -256,7 +260,8 @@ def scan_files(filelist, force, probe=None,
     :rtype: IrmaScan
     """
     scan = scan_new(verbose=verbose)
-    scan = scan_add(scan.id, filelist, verbose=verbose)
+    scan = scan_add(scan.id, filelist, post_max_size_M=post_max_size_M,
+                    verbose=verbose)
     scan = scan_launch(scan.id, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)

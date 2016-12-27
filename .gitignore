@@ -13,3 +13,5 @@
 
 # other
 *~
+.idea
+irma.conf

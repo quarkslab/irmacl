@@ -18,6 +18,7 @@ from apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
     IrmaFilesApi, IrmaError
 from ConfigParser import ConfigParser, NoOptionError
 
+
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),
                  os.path.expanduser("~"),

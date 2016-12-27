@@ -2,9 +2,16 @@ import unittest
 import os
 import re
 import time
+<<<<<<< HEAD:irma/tests/test_api.py
 from irma.apiclient import IrmaProbeResult, IrmaResults, IrmaError
 from irma.helpers import probe_list, scan_new, scan_add, scan_files, \
     scan_get, scan_launch, file_results, file_search, scan_cancel
+=======
+from irmacl.apiclient import IrmaProbeResult, IrmaResults, IrmaError
+from irmacl.helpers import probe_list, scan_new, scan_add, scan_files, \
+    scan_get, scan_launch, scan_proberesults, file_search, scan_cancel, \
+    tag_list, file_tag_add, file_tag_remove
+>>>>>>> f738a45... Rename irma module in irmacl and update doc:irmacl/tests/test_api.py
 
 
 cwd = os.path.dirname(__file__)

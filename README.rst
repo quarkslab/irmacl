@@ -1,5 +1,5 @@
-IRMA: Incident Response & Malware Analysis
-------------------------------------------
+Irmacl: command-line tool for IRMA API
+--------------------------------------
 
 |docs|
 
@@ -16,12 +16,15 @@ Installation
    $ python setup.py install
 
 
-Configuration file contains only the API endpoint address (not the full url).
+Configuration file contains the API endpoint (full url) and some optional paramters (max number and
+delay in second between retries)
 
 .. code-block::
 
    [Server]
-   address=172.16.1.30
+   api_endpoint=http://172.16.1.30/api/v1.1
+   max_tries=3
+   pause=1
 
 
 and is searched in these locations in following order:
@@ -32,7 +35,7 @@ and is searched in these locations in following order:
 * global directory  ("/etc/irma")
 
 
-Once you set up a working irma.conf settings file, you could run tests on a running IRMA instance:
+Once you set up a working irma.conf settings file, you could run tests on your running IRMA server:
 
 .. code-block:: bash
 
@@ -46,7 +49,7 @@ Install it directly with pip:
 
 .. code-block:: bash
 
-  $ pip install git+https://github.com/quarkslab/irma-cli.git@v1.0
+  $ pip install irmacl
 
 
 Usage
@@ -54,7 +57,7 @@ Usage
 
 .. code-block:: python
 
-   >>> from irma.helpers import *
+   >>> from irmacl.helpers import *
    >>> probe_list()
    [u'AVGAntiVirusFree', u'AvastCoreSecurity', u'BitdefenderForUnices', u'ClamAV', u'ComodoCAVL', u'EScan', u'FSecure', u'GData', u'McAfee-Daemon', u'PEiD', u'Sophos', u'StaticAnalyzer', u'TrID', u'VirusBlokAda', u'VirusTotal', u'Zoner']
 
@@ -64,7 +67,7 @@ Usage
    Probes finished: 16
    Probes Total: 16
    Date: 2015-11-24 10:55:15
-   Results: [<irma.apiclient.IrmaResults object at 0x7fdd0430a3d0>]
+   Results: [<irmacl.apiclient.IrmaResults object at 0x7fdd0430a3d0>]
    
    >>> scan = _
    >>> print scan.results[0]
@@ -95,7 +98,7 @@ Usage
    Last Scan: 2015-11-24 10:55:26
    Id: 2482
 
-   Results: [<irma.apiclient.IrmaProbeResult object at 0x7fdd0430af90>, ...]
+   Results: [<irmacl.apiclient.IrmaProbeResult object at 0x7fdd0430af90>, ...]
 
    >>> print res.probe_results[0]
    Status: 1
@@ -106,7 +109,7 @@ Usage
    Results: Malware
 
    >>> file_search(name="eic")
-   (2, [<irma.apiclient.IrmaResults object at 0x7fea53798e90>, <irma.apiclient.IrmaResults object at 0x7fea53751990>])
+   (2, [<irmacl.apiclient.IrmaResults object at 0x7fea53798e90>, <irmacl.apiclient.IrmaResults object at 0x7fea53751990>])
 
    >>> (total, res_list) = _
    >>> print res_list[0]
@@ -117,11 +120,11 @@ Usage
    Filename: eicar.com
    [...]
 
-Results: [<irma.apiclient.IrmaProbeResult object at 0x7fea53738350>
+Results: [<irmacl.apiclient.IrmaProbeResult object at 0x7fea53738350>
 Objects (apiclient.py)
 -------
 
-**class irma.apiclient.IrmaFileInfo(id, size, timestamp_first_scan, timestamp_last_scan, sha1, sha256, md5)**
+**class irmacl.apiclient.IrmaFileInfo(id, size, timestamp_first_scan, timestamp_last_scan, sha1, sha256, md5)**
 
    Bases: "object"
 
@@ -151,7 +154,7 @@ Objects (apiclient.py)
    raw()
 
 
-**class irma.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, results=[])**
+**class irmacl.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, results=[])**
 
    Bases: "object"
 
@@ -181,7 +184,7 @@ Objects (apiclient.py)
    pstatus
 
 
-**class irma.apiclient.IrmaProbeResult(**kwargs)**
+**class irmacl.apiclient.IrmaProbeResult(**kwargs)**
 
    Bases: "object"
 
@@ -217,7 +220,7 @@ Objects (apiclient.py)
    to_json()
 
 
-**class irma.apiclient.IrmaResults(status, probes_finished, scan_id, name, probes_total, result_id, file_infos=None, probe_results=None)**
+**class irmacl.apiclient.IrmaResults(status, probes_finished, scan_id, name, probes_total, result_id, file_infos=None, probe_results=None)**
 
    Bases: "object"
 
@@ -251,7 +254,7 @@ Objects (apiclient.py)
 Helpers (helpers.py)
 -------
 
-**irma.helpers.file_results(scan_id, result_idx, formatted=True, verbose=False)**
+**irmacl.helpers.file_results(scan_id, result_idx, formatted=True, verbose=False)**
 
    Fetch a file results
 
@@ -272,7 +275,7 @@ Helpers (helpers.py)
    Return type:
       IrmaResults
 
-**irma.helpers.file_search(name=None, hash=None, limit=None, offset=None, verbose=False)**
+**irmacl.helpers.file_search(name=None, hash=None, limit=None, offset=None, verbose=False)**
 
    Search a file by name or hash value
 
@@ -296,7 +299,7 @@ Helpers (helpers.py)
    Return type:
       tuple(int, list of IrmaResults)
 
-**irma.helpers.probe_list(verbose=False)**
+**irmacl.helpers.probe_list(verbose=False)**
 
    List availables probes
 
@@ -310,7 +313,7 @@ Helpers (helpers.py)
    Return type:
       list
 
-**irma.helpers.scan_add(scan_id, filelist, verbose=False)**
+**irmacl.helpers.scan_add(scan_id, filelist, verbose=False)**
 
    Add files to an existing scan
 
@@ -328,7 +331,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_cancel(scan_id, verbose=False)**
+**irmacl.helpers.scan_cancel(scan_id, verbose=False)**
 
    Cancel a scan
 
@@ -344,7 +347,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_files(filelist, force, probe=None, blocking=False, verbose=False)**
+**irmacl.helpers.scan_files(filelist, force, probe=None, blocking=False, verbose=False)**
 
    Wrapper around scan_new / scan_add / scan_launch
 
@@ -369,7 +372,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_get(scan_id, verbose=False)**
+**irmacl.helpers.scan_get(scan_id, verbose=False)**
 
    Fetch a scan (useful to track scan progress with scan.pstatus)
 
@@ -385,7 +388,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_launch(scan_id, force, probe=None, verbose=False)**
+**irmacl.helpers.scan_launch(scan_id, force, probe=None, verbose=False)**
 
    Launch an existing scan
 
@@ -407,7 +410,7 @@ Helpers (helpers.py)
    Return type:
       IrmaScan
 
-**irma.helpers.scan_list(limit=None, offset=None, verbose=False)**
+**irmacl.helpers.scan_list(limit=None, offset=None, verbose=False)**
 
    List all scans
 
@@ -427,7 +430,7 @@ Helpers (helpers.py)
    Return type:
       tuple(int, list of IrmaScan)
 
-**irma.helpers.scan_new(verbose=False)**
+**irmacl.helpers.scan_new(verbose=False)**
 
    Create a new scan
 
@@ -464,5 +467,5 @@ involved in the project.
 .. |docs| image:: https://readthedocs.org/projects/irma/badge/
     :alt: Documentation Status
     :scale: 100%
-    :target: https://irma.readthedocs.org
-.. _on Read The Docs Website: https://irma.readthedocs.org
+    :target: https://irma.readthedocs.io
+.. _on Read The Docs Website: https://irma.readthedocs.io

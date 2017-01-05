@@ -15,7 +15,7 @@
 import unittest
 import os
 import re
-from irmacl.helpers import probe_list, scan_new, scan_add, scan_get, \
+from irmacl.helpers import probe_list, scan_new, scan_add_files, scan_get, \
     scan_launch, scan_proberesults
 import time
 import logging
@@ -310,7 +310,7 @@ class EicarTestCase(unittest.TestCase):
         self.assertIsNot(scan.date, None)
         self.assertEqual(len(scan.results), 0)
 
-        scan = scan_add(scan.id, filelist, verbose=DEBUG)
+        scan = scan_add_files(scan.id, filelist, verbose=DEBUG)
         self._check_results(scan.results, scanid, filenames, [0], [0],
                             True, True)
 

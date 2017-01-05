@@ -435,7 +435,32 @@ Helpers (helpers.py)
    Return type:
       list
 
-**irmacl.helpers.scan_add(scan_id, filelist, post_max_size_M=100, verbose=False)**
+**irmacl.helpers.scan_add_data(scan_id, data, filename, post_max_size_M=100, verbose=False)**
+
+   Add files to an existing scan
+
+   Parameters:
+      * **scan_id** (*str*) -- the scan id
+
+      * **data** (*str*) -- data to scan
+
+      * **filename** (*str*) -- filename associated to data
+
+      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
+        api will be done if total size is more than this limit, note that if
+        one or more file is bigger than this limit it will raise an error)
+
+      * **verbose** (*bool*) -- enable verbose requests (optional
+        default:False)
+
+   Returns:
+      return the updated scan object
+
+   Return type:
+      IrmaScan
+
+
+**irmacl.helpers.scan_add_files(scan_id, filelist, post_max_size_M=100, verbose=False)**
 
    Add files to an existing scan
 
@@ -472,6 +497,47 @@ Helpers (helpers.py)
 
    Return type:
       IrmaScan
+
+**irmacl.helpers.scan_data(data, filename, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)**
+
+   Wrapper around scan_new / scan_add / scan_launch
+
+   Parameters:
+      * **data** (*str*) -- data to scan
+
+      * **filename** (*str*) -- filename associated to data
+
+      * **force** (*bool*) -- if True force a new analysis of files
+        if False use existing results
+
+      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
+        api will be done if total size is more than this limit, note that if
+        one or more file is bigger than this limit it will raise an error)
+
+      * **probe** (*list*) -- probe list to use (optional default:
+        None means all)
+
+      * **mimetype_filtering** (*bool*) -- enable probe selection
+        based on mimetype (optional default:True)
+
+      * **resubmit_files** (*bool*) -- reanalyze files produced by
+        probes (optional default:True)
+
+      * **blocking** (*bool*) -- wether or not the function call
+        should block until scan ended
+
+      * **blocking_timeout** (*int*) -- maximum amount of time
+        before timeout per file (only enabled while blocking is ON)
+
+      * **verbose** (*bool*) -- enable verbose requests (optional
+        default:False)
+
+   Returns:
+      return the scan object
+
+   Return type:
+      IrmaScan
+
 
 **irmacl.helpers.scan_files(filelist, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)**
 

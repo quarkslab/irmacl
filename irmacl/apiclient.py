@@ -218,7 +218,7 @@ class IrmaScansApi(object):
             res_list.append(res_obj)
         return (total, res_list)
 
-    def add(self, scan_id, filelist, post_max_size_M=100):
+    def add_files(self, scan_id, filelist, post_max_size_M=100):
         def get_file_size(filepath):
             return os.path.getsize(filepath)
         post_max_size = post_max_size_M * 1024 * 1024 * 90 / 100
@@ -248,6 +248,19 @@ class IrmaScansApi(object):
         if total_size != 0:
             data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(data)
+
+    def add_data(self, scan_id, data, filename, post_max_size_M=100):
+        post_max_size = post_max_size_M * 1024 * 1024 * 90 / 100
+        route = '/scans/{0}/files'.format(scan_id)
+        if len(data) > post_max_size:
+            raise IrmaError("Data is bigger than post_max_size")
+        # Then keep track of already uploaded data
+        postfile = dict()
+        filename = filename.encode("utf8")
+        dec_filename = urllib.quote(filename)
+        postfile[dec_filename] = data
+        scan_data = self._apiclient.post_call(route, files=postfile)
+        return self._scan_schema.make_object(scan_data)
 
     def launch(self, scan_id, force, probe=None,
                mimetype_filtering=None, resubmit_files=None):

@@ -3,9 +3,10 @@ import os
 import re
 import time
 from irmacl.apiclient import IrmaProbeResult, IrmaResults, IrmaError
-from irmacl.helpers import probe_list, scan_new, scan_add, scan_files, \
-    scan_get, scan_launch, scan_proberesults, file_search, scan_cancel, \
-    tag_list, file_tag_add, file_tag_remove
+from irmacl.helpers import probe_list, scan_new, scan_add_data, \
+    scan_add_files, scan_data, scan_files, scan_get, scan_launch, \
+    scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
+    file_tag_remove
 
 
 cwd = os.path.dirname(__file__)
@@ -56,11 +57,11 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scan.id, ["empty"], [], [0], [0], scan.date,
                          False, False, False)
 
-    def test_scan_add(self):
+    def test_scan_add_files(self):
         scan = scan_new()
         date = scan.date
         scanid = scan.id
-        scan = scan_add(scan.id, FILEPATHS)
+        scan = scan_add_files(scan.id, FILEPATHS)
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date,
                          False, False, False)
@@ -68,11 +69,25 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
                          date, False, False, False)
 
+    def test_scan_add_data(self):
+        scan = scan_new()
+        date = scan.date
+        scanid = scan.id
+        with open(FILEPATHS[0]) as f:
+            data = f.read()
+        scan = scan_add_data(scan.id, data, FILENAMES[0])
+        self.assertEqual(scan.pstatus, "ready")
+        self._check_scan(scan, scanid, ["ready"], [FILENAMES[0]], [0], [0],
+                         date, False, False, False)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scanid, ["cancelled"], [FILENAMES[0]], [0], [0],
+                         date, False, False, False)
+
     def test_scan_launch(self):
         scan = scan_new()
         date = scan.date
         scanid = scan.id
-        scan = scan_add(scan.id, FILEPATHS)
+        scan = scan_add_files(scan.id, FILEPATHS)
         force = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
@@ -86,7 +101,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_new()
         date = scan.date
         scanid = scan.id
-        scan = scan_add(scan.id, FILEPATHS)
+        scan = scan_add_files(scan.id, FILEPATHS)
         force = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
@@ -104,7 +119,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_new()
         date = scan.date
         scanid = scan.id
-        scan = scan_add(scan.id, FILEPATHS)
+        scan = scan_add_files(scan.id, FILEPATHS)
         force = True
         mimetype_filtering = False
         probes = probe_list()
@@ -124,7 +139,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_new()
         date = scan.date
         scanid = scan.id
-        scan = scan_add(scan.id, FILEPATHS)
+        scan = scan_add_files(scan.id, FILEPATHS)
         force = True
         resubmit_files = False
         probes = probe_list()
@@ -153,6 +168,22 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scan.id, ["cancelled"],
                          FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
                          scan.date, force, True, True)
+
+    def test_scan_data(self):
+        force = True
+        probes = probe_list()
+        nb_jobs = len(probes)
+        with open(FILEPATHS[0]) as f:
+            data = f.read()
+        scan = scan_data(data, FILENAMES[0], force, probe=probes)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
+                         [FILENAMES[0]], range(nb_jobs + 1),
+                         range(nb_jobs + 1), scan.date, True, True, True)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scan.id, ["cancelled"],
+                         [FILENAMES[0]], range(nb_jobs + 1),
+                         range(nb_jobs + 1), scan.date, force, True, True)
 
     def test_scan_files_timeout(self):
         force = True

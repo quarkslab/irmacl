@@ -6,7 +6,7 @@ def readme():
         return f.read()
 
 setup(name='irmacl',
-      version='1.1.2',
+      version='1.1.3',
       description='Irma command line tool for API v1.1',
       long_description=readme(),
       url='https://github.com/quarkslab/irma-cli',

@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 import os
-import sys
 import time
-pardir = os.path.abspath(os.path.join(__file__, os.path.pardir))
-pardir = os.path.abspath(os.path.join(pardir, os.path.pardir))
-sys.path.append(os.path.dirname(pardir))
 from irmacl.helpers import scan_files, scan_get, \
     file_results, file_search
 
@@ -13,7 +9,7 @@ cwd = os.path.dirname(__file__)
 SAMPLES_DIR = os.path.join(cwd, "samples")
 UTF8_SAMPLES = [u"☀.vir", u"فایل.exe", u"вирус.exe", u"ვირუსი.exe",
                 u"परीक्षण.exe", u"病毒.exe"]
-UTF8_PATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), UTF8_SAMPLES)
+UTF8_PATHS = list(map(lambda x: os.path.join(SAMPLES_DIR, x), UTF8_SAMPLES))
 
 
 class TestCornerCase(unittest.TestCase):

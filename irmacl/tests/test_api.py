@@ -16,7 +16,7 @@ HASHES = ["7cddf3fa0f8563d49d0e272208290fe8fdc627e5cae0083d4b7ecf901b2ab6c8",
           "8d50d7a3929a356542119aa858c492442655e097",
           "07edba6f3f181bad9a56a87d4039487a",
           "e718241e1cc6472d4f4bac20c59a0179"]
-FILEPATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), FILENAMES)
+FILEPATHS = list(map(lambda x: os.path.join(SAMPLES_DIR, x), FILENAMES))
 
 
 class IrmaAPITests(unittest.TestCase):

@@ -15,8 +15,8 @@
 import unittest
 import os
 import re
-from irmacl.helpers import probe_list, scan_new, scan_add, scan_get, scan_launch, \
-    file_results
+from irmacl.helpers import probe_list, scan_new, scan_add, scan_get, \
+    scan_launch, file_results
 import time
 import logging
 
@@ -251,8 +251,9 @@ class EicarTestCase(unittest.TestCase):
                                   ref_res["status"],
                                   probe_result.status)
                                  )
-                if (probe_result.version != ref_res["version"]):
-                    logging.warning("Outdated version of %s: latest %s got %s" %
+                if probe_result.version != ref_res["version"]:
+                    logging.warning("Outdated version of %s: "
+                                    "latest %s got %s" %
                                     (probe_result.name,
                                      ref_res["version"],
                                      probe_result.version)
@@ -300,7 +301,7 @@ class EicarTestCase(unittest.TestCase):
         nb_probes = len(probelist)
         nb_files = len(filelist)
         nb_jobs = nb_probes * nb_files
-        filenames = map(lambda f: os.path.basename(f), filelist)
+        filenames = list(map(lambda f: os.path.basename(f), filelist))
         scan = scan_new(verbose=DEBUG)
         self.assertIsNot(scan.id, None)
         scanid = scan.id

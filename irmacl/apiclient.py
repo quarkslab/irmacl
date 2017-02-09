@@ -683,7 +683,7 @@ class IrmaScanSchema(Schema):
     class Meta:
         fields = ('status', 'probes_finished', 'date',
                   'probes_total', 'date', 'id', 'force',
-                  'resumbit_files', 'mimetype_filtering')
+                  'resubmit_files', 'mimetype_filtering')
 
     def make_object(self, data):
         return IrmaScan(**data)

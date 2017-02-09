@@ -14,10 +14,14 @@
 
 import os
 import time
-from apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
+from irmacl.apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
     IrmaFilesApi, IrmaError, IrmaTagsApi
-from ConfigParser import ConfigParser, NoOptionError
-
+try:
+    # Python 2 import
+    from ConfigParser import ConfigParser, NoOptionError
+except ImportError:
+    # Python 3 import
+    from configparser import ConfigParser, NoOptionError
 
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),

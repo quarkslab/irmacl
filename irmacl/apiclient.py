@@ -2,10 +2,14 @@ import requests
 import json
 from marshmallow import fields, Schema
 import time
-import urllib
+try:
+    # Python 2 import
+    from urllib import quote, urlencode
+except ImportError:
+    # Python 3 import
+    from urllib.parse import quote, urlencode
 import datetime
 import os
-import sys
 from requests import RequestException
 
 
@@ -82,19 +86,25 @@ class IrmaApiClient(object):
             try:
                 dec_extra_args = {}
                 for (k, v) in extra_args.items():
-                    if type(v) == unicode or type(v) == str:
-                        dec_extra_args[k] = v.encode("utf8")
-                    else:
+                    try:
+                        if type(v) == unicode or type(v) == str:
+                            dec_extra_args[k] = v.encode("utf8")
+                        else:
+                            dec_extra_args[k] = v
+                    except NameError:
+                        # unicode does not exists in python3
+                        # and str are encoded in utf8 by default
+                        # so just pass
                         dec_extra_args[k] = v
-                args = urllib.urlencode(dec_extra_args)
+                args = urlencode(dec_extra_args)
                 resp = requests.get(self.url + route + "?" + args,
                                     verify=self.verify)
                 return self._handle_resp(resp)
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
-                        print "Exception Raised {0} retry #{1}".format(e,
-                                                                       nb_try)
+                        print("Exception Raised {0} retry #{1}").format(e,
+                                                                        nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -111,8 +121,8 @@ class IrmaApiClient(object):
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
-                        print "Exception Raised {0} retry #{1}".format(e,
-                                                                       nb_try)
+                        print("Exception Raised {0} retry #{1}").format(e,
+                                                                        nb_try)
                     time.sleep(self.pause)
                     continue
                 else:
@@ -120,18 +130,19 @@ class IrmaApiClient(object):
         raise ValueError
 
     def _handle_resp(self, resp):
+        content = resp.content.decode("utf-8")
         if self.verbose:
-            print "http code : {0}".format(resp.status_code)
-            print "content : {0}".format(resp.content)
+            print("http code : {0}".format(resp.status_code))
+            print("content : {0}".format(content))
         if resp.status_code == 200:
             if len(resp.content) > 0:
-                return json.loads(resp.content)
+                return json.loads(content)
             else:
                 return
         else:
             reason = "Error {0}".format(resp.status_code)
             try:
-                data = json.loads(resp.content)
+                data = json.loads(content)
                 if 'message' in data and data['message'] is not None:
                     reason += ": {0}".format(data['message'])
             except:
@@ -240,9 +251,13 @@ class IrmaScansApi(object):
                 postfile = dict()
                 total_size = 0
             with open(filepath, 'rb') as f:
-                if type(filepath) is unicode:
-                    filepath = filepath.encode("utf8")
-                dec_filepath = urllib.quote(filepath)
+                try:
+                    if type(filepath) is unicode:
+                        filepath = filepath.encode("utf8")
+                except NameError:
+                    # Python3 strings are already unicode
+                    pass
+                dec_filepath = quote(filepath)
                 postfile[dec_filepath] = f.read()
                 total_size += filesize
         if total_size != 0:
@@ -257,7 +272,7 @@ class IrmaScansApi(object):
         # Then keep track of already uploaded data
         postfile = dict()
         filename = filename.encode("utf8")
-        dec_filename = urllib.quote(filename)
+        dec_filename = quote(filename)
         postfile[dec_filename] = data
         scan_data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(scan_data)
@@ -497,7 +512,7 @@ class IrmaProbeResult(object):
         self.database = kwargs.pop('database', None)
         self.platform = kwargs.pop('platform', None)
         if len(kwargs) != 0:
-            print 'unmap keys: ', ','.join(kwargs.keys())
+            print('unmap keys: ', ','.join(kwargs.keys()))
 
     def to_json(self):
         return IrmaProbeResultSchema().dumps(self).data
@@ -565,7 +580,7 @@ class IrmaResults(object):
             self.file_infos = None
         self.result_id = kwargs.pop('result_id')
         if len(kwargs) != 0:
-            print 'unmap keys: ', ','.join(kwargs.keys())
+            print('unmap keys: ', ','.join(kwargs.keys()))
 
     @property
     def pscan_date(self):

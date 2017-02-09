@@ -303,7 +303,7 @@ class EicarTestCase(unittest.TestCase):
         nb_probes = len(probelist)
         nb_files = len(filelist)
         nb_jobs = nb_probes * nb_files
-        filenames = map(lambda f: os.path.basename(f), filelist)
+        filenames = list(map(lambda f: os.path.basename(f), filelist))
         scan = scan_new(verbose=DEBUG)
         self.assertIsNot(scan.id, None)
         scanid = scan.id

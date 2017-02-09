@@ -10,7 +10,7 @@ SAMPLES_DIR = os.path.join(cwd, "samples")
 ZIP_SAMPLE = "eicar.zip"
 UTF8_SAMPLES = [u"☀.vir", u"فایل.exe", u"вирус.exe", u"ვირუსი.exe",
                 u"परीक्षण.exe", u"病毒.exe"]
-UTF8_PATHS = map(lambda x: os.path.join(SAMPLES_DIR, x), UTF8_SAMPLES)
+UTF8_PATHS = list(map(lambda x: os.path.join(SAMPLES_DIR, x), UTF8_SAMPLES))
 
 
 class TestCornerCase(unittest.TestCase):

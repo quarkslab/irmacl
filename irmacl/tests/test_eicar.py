@@ -237,9 +237,9 @@ class EicarTestCase(unittest.TestCase):
             self._check_result(get_result, scanid, filelist,
                                nb_finished, nb_total)
             if none_infos is True:
-                self.assertIsNone(get_result.file_infos)
+                self.assertFalse(hasattr(get_result, 'file_infos'))
             if none_results is True:
-                self.assertIsNone(get_result.probe_results)
+                self.assertFalse(hasattr(get_result, 'probe_results'))
         return
 
     def _check_probe_result(self, probe_result, ref_results):

@@ -416,7 +416,7 @@ class IrmaFileInfoSchema(Schema):
 
     class Meta:
         fields = ('size', 'sha1', 'timestamp_first_scan',
-                  'timestamp_last_scan', 'sha256', 'id', 'md5', 'mimetype'
+                  'timestamp_last_scan', 'sha256', 'id', 'md5', 'mimetype',
                   'tags')
 
     def make_object(self, data):
@@ -455,11 +455,17 @@ class IrmaFileInfo(object):
 
     @property
     def pdate_first_scan(self):
-        return timestamp_to_date(self.timestamp_first_scan)
+        try:
+            return timestamp_to_date(self.timestamp_first_scan)
+        except TypeError:
+            return None
 
     @property
     def pdate_last_scan(self):
-        return timestamp_to_date(self.timestamp_last_scan)
+        try:
+            return timestamp_to_date(self.timestamp_last_scan)
+        except TypeError:
+            return None
 
     def __repr__(self):
         ret = "Size: {0}\n".format(self.size)
@@ -472,9 +478,6 @@ class IrmaFileInfo(object):
         ret += "Mimetype: {0}\n".format(self.mimetype)
         ret += "Tags: {0}\n".format(self.tags)
         return ret
-
-    def raw(self):
-        return IrmaFileInfoSchema()
 
 
 class IrmaProbeResult(object):
@@ -557,7 +560,7 @@ class IrmaResults(object):
     :ivar probe_results: list of IrmaProbeResults objects
     """
 
-    def __init__(self, file_infos=None, probe_results=None, **kwargs):
+    def __init__(self, **kwargs):
         self.status = kwargs.pop('status')
         self.probes_finished = kwargs.pop('probes_finished')
         self.scan_id = kwargs.pop('scan_id')
@@ -566,18 +569,16 @@ class IrmaResults(object):
         self.file_sha256 = kwargs.pop('file_sha256')
         self.parent_file_sha256 = kwargs.pop('parent_file_sha256')
         self.scan_date = kwargs.pop('scan_date')
-        self.probe_results = []
-        if probe_results is not None:
+        if 'probe_results' in kwargs:
+            self.probe_results = []
+            probe_results = kwargs.pop('probe_results')
             for pres in probe_results:
                 pobj = IrmaProbeResultSchema().make_object(pres)
                 self.probe_results.append(pobj)
-        else:
-            self.probe_results = None
         self.probes_total = kwargs.pop('probes_total')
-        if file_infos is not None:
+        if 'file_infos' in kwargs:
+            file_infos = kwargs.pop('file_infos')
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
-        else:
-            self.file_infos = None
         self.result_id = kwargs.pop('result_id')
         if len(kwargs) != 0:
             print('unmap keys: ', ','.join(kwargs.keys()))
@@ -597,10 +598,13 @@ class IrmaResults(object):
         ret += "Scan Date: {0}\n".format(self.pscan_date)
         ret += "Filename: {0}\n".format(self.name)
         ret += "Filepath: {0}\n".format(self.path)
+        ret += "SHA256: {0}\n".format(self.file_sha256)
         ret += "ParentFile SHA256: {0}\n".format(self.parent_file_sha256)
         ret += "Resultid: {0}\n".format(self.result_id)
-        ret += "FileInfo: \n{0}\n".format(self.file_infos)
-        ret += "Results: {0}\n".format(self.probe_results)
+        if hasattr(self, 'file_infos'):
+            ret += "FileInfo: \n{0}\n".format(self.file_infos)
+        if hasattr(self, 'results'):
+            ret += "Results: {0}\n".format(self.probe_results)
         return ret
 
 
@@ -610,7 +614,8 @@ class IrmaResultsSchema(Schema):
 
     class Meta:
         fields = ('status', 'probes_finished', 'probes_total', 'scan_id',
-                  'name', 'path', 'parent_file_sha256', 'result_id')
+                  'name', 'path', 'parent_file_sha256', 'result_id',
+                  'file_sha256', 'scan_date', 'file_infos', 'probe_results')
 
     def make_object(self, data):
         return IrmaResults(**data)
@@ -678,12 +683,13 @@ class IrmaScan(object):
 
 
 class IrmaScanSchema(Schema):
-    results = fields.Nested(IrmaResultsSchema, many=True)
+    results = fields.Nested(IrmaResultsSchema, many=True,
+                            exclude=('probe_results', 'file_infos'))
 
     class Meta:
         fields = ('status', 'probes_finished', 'date',
                   'probes_total', 'date', 'id', 'force',
-                  'resubmit_files', 'mimetype_filtering')
+                  'resubmit_files', 'mimetype_filtering', 'results')
 
     def make_object(self, data):
         return IrmaScan(**data)

@@ -77,7 +77,7 @@ EICAR_RESULTS = [
     {"status": 1,
      "name": "Emsisoft Commandline Scanner (Windows)",
      "results": "EICAR-Test-File \(not a virus\) \(B\)",
-     "version": "10.0.0.5366",
+     "version": "12.2.0.7060",
      "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
      },

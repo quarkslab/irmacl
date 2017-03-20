@@ -92,10 +92,7 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_scan_get(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probes)
-        while not scan.is_finished():
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         self._check_scan(scan, scan.id, ["finished"],
                          FILENAMES, [scan.probes_total], [scan.probes_total],
                          scan.date)
@@ -103,10 +100,7 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_file_results_formatted(self):
         force = False
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probe=probes)
-        while not scan.is_finished():
-            time.sleep(1)
-            scan = scan_get(scan.id)
+        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for result in scan.results:
             self.assertTrue(self._validate_uuid(str(result.result_id)) or
                             result.result_id in range(len(FILENAMES)))

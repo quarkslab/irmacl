@@ -33,10 +33,87 @@ MAXTIME_FAST_PROBE = 10
 NOT_CHECKED = "This value is not checked"
 EICAR_RESULTS = [
     {"status": 1,
+     "name": "AVG AntiVirus Free (Linux)",
+     "results": "EICAR_Test",
+     "version": "13.0.3114",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Avast Core Security (Linux)",
+     "results": "EICAR Test-NOT virus!!!",
+     "version": "2.1.1",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Bitdefender Antivirus Scanner (Linux)",
+     "results": "EICAR-Test-File \(not a virus\)",
+     "version": "7.141118",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Clam AntiVirus Scanner (Linux)",
+     "results": "Eicar-Test-Signature",
+     "version": "0.99.2",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Comodo Antivirus (Linux)",
+     "results": "Malware",
+     "version": "1.1.268025.1",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "DrWeb Antivirus (Linux)",
+     "results": "EICAR Test File \(NOT a Virus!\)",
+     "version": "10.1.0.1.1507091917",
+     "duration": MAXTIME_SLOW_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Emsisoft Commandline Scanner (Windows)",
+     "results": "EICAR-Test-File \(not a virus\) \(B\)",
+     "version": "10.0.0.5366",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
      "name": "eScan Antivirus (Linux)",
      "results": "EICAR-Test-File \(not a virus\)\(DB\)",
      "version": "7.0-18",
      "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "ESET NOD32 Antivirus Business Edition (Linux)",
+     "results": "Eicar test file",
+     "version": "4.0.82",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "FSecure Antivirus (Linux)",
+     "results": "EICAR_Test_File \[FSE\]",
+     "version": "11.00",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "GData Anti-Virus (Windows)",
+     "results": "Virus: EICAR-Test-File \(not a virus\) \(Engine A\)",
+     "version": "5.0.15051.292",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
+     "name": "Kaspersky Anti-Virus (Windows)",
+     "results": "EICAR-Test-File",
+     "version": "16.0.0.694",
+     "duration": MAXTIME_FAST_PROBE,
      "type": "antivirus"
      },
     {"status": 1,
@@ -54,80 +131,10 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 1,
-     "name": "FSecure Antivirus (Linux)",
-     "results": "EICAR_Test_File \[FSE\]",
-     "version": "11.00",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Clam AntiVirus Scanner (Linux)",
-     "results": "Eicar-Test-Signature",
-     "version": "0.99",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 0,
-     "name": "PE Static Analyzer",
-     "results": "Not a PE file",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 1,
-     "name": "AVG AntiVirus Free (Linux)",
-     "results": "EICAR_Test",
-     "version": "13.0.3114",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Zoner Antivirus (Linux)",
-     "results": "EICAR.Test.File-NoVirus",
-     "version": "1.3.0",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
      "name": "McAfee VirusScan Daemon (Linux)",
      "results": "EICAR test file",
      "version": "6.0.4.564",
      "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "DrWeb Antivirus (Linux)",
-     "results": "EICAR Test File \(NOT a Virus!\)",
-     "version": "10.1.0.0.1503311845",
-     "duration": MAXTIME_SLOW_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Comodo Antivirus (Linux)",
-     "results": "Malware",
-     "version": "1.1.268025.1",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "VirusBlokAda Console Scanner (Linux)",
-     "results": "EICAR-Test-File",
-     "version": "3.12.26.4",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Bitdefender Antivirus Scanner (Linux)",
-     "results": "EICAR-Test-File \(not a virus\)",
-     "version": "7.141118",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Avast Core Security (Linux)",
-     "results": "EICAR Test-NOT virus!!!",
-     "version": "2.1.1",
-     "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
     {"status": 0,
@@ -136,27 +143,6 @@ EICAR_RESULTS = [
      "version": None,
      "duration": MAXTIME_FAST_PROBE,
      "type": "metadata"
-     },
-    {"status": 1,
-     "name": "TrID File Identifier",
-     "results": NOT_CHECKED,
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 1,
-     "name": "VirusTotal",
-     "results": "detected by \d{1,2}/\d{2}",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "external"
-     },
-    {"status": -1,
-     "name": "Unarchive",
-     "results": None,
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "tools"
      },
     {"status": 1,
      "name": "Sophos Anti-Virus (Linux)",
@@ -172,34 +158,49 @@ EICAR_RESULTS = [
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
-    {"status": 1,
-     "name": "GData Anti-Virus (Windows)",
-     "results": "Virus: EICAR-Test-File \(not a virus\) \(Engine A\)",
-     "version": "5.0.15051.292",
+    {"status": 0,
+     "name": "PE Static Analyzer",
+     "results": "Not a PE file",
+     "version": None,
      "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
+     "type": "metadata"
      },
     {"status": 1,
-     "name": "ESET NOD32 Antivirus Business Edition (Linux)",
-     "results": "Eicar test file",
-     "version": "4.0.82",
+     "name": "TrID File Identifier",
+     "results": NOT_CHECKED,
+     "version": None,
      "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
+     "type": "metadata"
+     },
+    {"status": -1,
+     "name": "Unarchive",
+     "results": None,
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "tools"
      },
     {"status": 1,
-     "name": "Emsisoft Commandline Scanner (Windows)",
-     "results": "EICAR-Test-File \(not a virus\) \(B\)",
-     "version": "10.0.0.5366",
+     "name": "VirusTotal",
+     "results": "detected by \d{1,2}/\d{2}",
+     "version": None,
      "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
+     "type": "external"
      },
     {"status": 1,
-     "name": "Kaspersky Anti-Virus (Windows)",
+     "name": "VirusBlokAda Console Scanner (Linux)",
      "results": "EICAR-Test-File",
-     "version": "16.0.0.694",
-     "duration": MAXTIME_FAST_PROBE,
+     "version": "3.12.26.4",
+     "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
-     }, ]
+     },
+    {"status": 1,
+     "name": "Zoner Antivirus (Linux)",
+     "results": "EICAR.Test.File-NoVirus",
+     "version": "1.3.0",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus"
+     },
+]
 
 
 ##############################################################################
@@ -353,163 +354,87 @@ class IrmaEicarTest(EicarTestCase):
         for probe in reslist.keys():
             self._check_probe_result(reslist[probe], EICAR_RESULTS)
 
-    def test_scan_avg(self):
-        probe = 'AVGAntiVirusFree'
+    def _scan_eicar(self, probe):
         if probe not in self.probelist:
             raise unittest.SkipTest("Skipping %s not present" % probe)
         probelist = [probe]
         filelist = [self.filepath]
         res = self._test_scan_file(filelist, probelist, force=True)
         self.check_eicar_results(res[self.filename])
+
+    def test_scan_avg(self):
+        self._scan_eicar('AVGAntiVirusFree')
 
     def test_scan_avast(self):
-        probe = 'AvastCoreSecurity'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('AvastCoreSecurity')
 
     def test_scan_bitdefender(self):
-        probe = 'BitdefenderForUnices'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('BitdefenderForUnices')
 
     def test_scan_clamav(self):
-        probe = 'ClamAV'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('ClamAV')
 
     def test_scan_comodo(self):
-        probe = 'ComodoCAVL'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('ComodoCAVL')
 
     def test_scan_drweb(self):
-        probe = 'DrWeb'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('DrWeb')
+
+    def test_scan_emsisoft_windows(self):
+        self._scan_eicar('ASquaredCmdWin')
 
     def test_scan_escan(self):
-        probe = 'EScan'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('EScan')
 
     def test_scan_eset(self):
-        probe = 'EsetNod32'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('EsetNod32')
 
     def test_scan_fsecure(self):
-        probe = 'FSecure'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('FSecure')
 
-    def test_scan_mcafeed(self):
-        probe = 'McAfee-Daemon'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+    def test_scan_gdata_windows(self):
+        self._scan_eicar('GDataWin')
+
+    def test_scan_kaspersky_windows(self):
+        self._scan_eicar('KasperskyWin')
 
     def test_scan_mcafee(self):
-        probe = 'McAfeeVSCL'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('McAfeeVSCL')
+
+    def test_scan_mcafee_windows(self):
+        self._scan_eicar('McAfeeVSCLWin')
+
+    def test_scan_mcafeed(self):
+        self._scan_eicar('McAfee-Daemon')
 
     def test_scan_peid(self):
-        probe = 'PEiD'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('PEiD')
+
+    def test_scan_sophos(self):
+        self._scan_eicar('Sophos')
+
+    def test_scan_sophos_windows(self):
+        self._scan_eicar('SophosWin')
 
     def test_scan_staticanalyzer(self):
-        probe = 'StaticAnalyzer'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('StaticAnalyzer')
 
     def test_scan_trid(self):
-        probe = 'TrID'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('TrID')
 
     def test_scan_virustotal(self):
-        probe = 'VirusTotal'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
         # dont raise on VT error cause of API limitations
         # to 4 requests per minute
         try:
-            self.check_eicar_results(res[self.filename])
+            self._scan_eicar('VirusTotal')
         except:
-            raise unittest.SkipTest("Skipping Virustotal test")
+            raise unittest.SkipTest("Virustotal test Failed")
 
     def test_scan_VirusBlokAda(self):
-        probe = 'VirusBlokAda'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('VirusBlokAda')
 
     def test_scan_zoner(self):
-        probe = 'Zoner'
-        if probe not in self.probelist:
-            raise unittest.SkipTest("Skipping %s not present" % probe)
-        probelist = [probe]
-        filelist = [self.filepath]
-        res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._scan_eicar('Zoner')
 
     def test_scan_all_probes(self):
         filelist = [self.filepath]

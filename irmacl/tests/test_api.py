@@ -203,7 +203,7 @@ class IrmaAPIScanTests(IrmaAPITests):
                          scan.date, force, True, True)
 
     def test_file_results_formatted(self):
-        force = False
+        force = True
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for get_result in scan.results:
@@ -215,7 +215,7 @@ class IrmaAPIScanTests(IrmaAPITests):
             self.assertEqual(len(res.probe_results), res.probes_finished)
 
     def test_file_results_not_formatted(self):
-        force = False
+        force = True
         probes = probe_list()
         scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         for get_result in scan.results:

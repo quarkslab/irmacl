@@ -103,8 +103,8 @@ class IrmaApiClient(object):
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
-                        print("Exception Raised {0} retry #{1}").format(e,
-                                                                        nb_try)
+                        print("Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try))
                     time.sleep(self.pause)
                     continue
                 else:
@@ -121,8 +121,8 @@ class IrmaApiClient(object):
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
                     if self.verbose:
-                        print("Exception Raised {0} retry #{1}").format(e,
-                                                                        nb_try)
+                        print("Exception Raised {0} retry #{1}".format(e,
+                                                                       nb_try))
                     time.sleep(self.pause)
                     continue
                 else:

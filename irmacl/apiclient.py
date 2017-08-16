@@ -596,7 +596,7 @@ class IrmaResults(object):
         ret += "Probes Total: {0}\n".format(self.probes_total)
         ret += "Scanid: {0}\n".format(self.scan_id)
         ret += "Scan Date: {0}\n".format(self.pscan_date)
-        ret += "Filename: {0}\n".format(self.name)
+        ret += u"Filename: {0}\n".format(self.name)
         ret += "Filepath: {0}\n".format(self.path)
         ret += "SHA256: {0}\n".format(self.file_sha256)
         ret += "ParentFile SHA256: {0}\n".format(self.parent_file_sha256)

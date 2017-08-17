@@ -416,7 +416,7 @@ class IrmaFileInfoSchema(Schema):
 
     class Meta:
         fields = ('size', 'sha1', 'timestamp_first_scan',
-                  'timestamp_last_scan', 'sha256', 'id', 'md5', 'mimetype',
+                  'timestamp_last_scan', 'sha256', 'md5', 'mimetype',
                   'tags')
 
     def make_object(self, data):
@@ -427,7 +427,6 @@ class IrmaFileInfo(object):
     """ IrmaFileInfo
     Description for class
 
-    :ivar id:      id
     :ivar timestamp_first_scan: timestamp when file was first scanned in IRMA
     :ivar timestamp_last_scan: timestamp when file was last scanned in IRMA
     :ivar size:    size in bytes
@@ -438,14 +437,14 @@ class IrmaFileInfo(object):
     :ivar tags:  list of tags
     """
 
-    def __init__(self, id, size, timestamp_first_scan,
-                 timestamp_last_scan, sha1, sha256, md5, mimetype, tags):
+    def __init__(self, size, timestamp_first_scan,
+                 timestamp_last_scan, sha1, sha256, md5, mimetype, tags,
+                 **kwargs):
         self.size = size
         self.sha1 = sha1
         self.timestamp_first_scan = timestamp_first_scan
         self.timestamp_last_scan = timestamp_last_scan
         self.sha256 = sha256
-        self.id = id
         self.md5 = md5
         self.mimetype = mimetype
         self.tags = []
@@ -474,7 +473,6 @@ class IrmaFileInfo(object):
         ret += "Md5: {0}s\n".format(self.md5)
         ret += "First Scan: {0}\n".format(self.pdate_first_scan)
         ret += "Last Scan: {0}\n".format(self.pdate_last_scan)
-        ret += "Id: {0}\n".format(self.id)
         ret += "Mimetype: {0}\n".format(self.mimetype)
         ret += "Tags: {0}\n".format(self.tags)
         return ret

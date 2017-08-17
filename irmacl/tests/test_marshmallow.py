@@ -14,7 +14,6 @@ file_infos_sample = \
         u"timestamp_last_scan": 1488453424.26,
         u"sha256":
         u"275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f",
-        u"id": 4,
         u"md5": u"44d88612fea8a8f36de82e1278abb02f",
         u"size": 68
     }

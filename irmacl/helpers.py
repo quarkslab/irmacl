@@ -186,19 +186,31 @@ def probe_list(verbose=False):
     return probelist
 
 
-def scan_add_data(scan_id, data, filename, post_max_size_M=100, verbose=False):
+def data_upload(data, filename, verbose=False):
     """Add data to an existing scan
 
-    :param scan_id: the scan id
-    :type scan_id: str
     :param data: data to scan
     :type data: raw string
     :param filename: filename associated to data
     :type filename: string
-    :param post_max_size_M: POST data max size in Mb (multiple calls to the
-    api will be done if total size is more than this limit, note that if
-    one or more file is bigger than this limit it will raise an error)
-    :type post_max_size_M: int
+    :param verbose: enable verbose requests
+        (optional default:False)
+    :type verbose: bool
+    :return: return the created file object
+    :rtype: IrmaFile
+    """
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+                        verify=verify, verbose=verbose)
+    fileapi = IrmaFilesApi(cli)
+    fileweb = fileapi.add_data(data, filename)
+    return fileweb
+
+
+def file_upload(filepath, verbose=False):
+    """Upload file to IRMA server
+
+    :param filepath: full path qualified file
+    :type filepath: str
     :param verbose: enable verbose requests
         (optional default:False)
     :type verbose: bool
@@ -207,35 +219,9 @@ def scan_add_data(scan_id, data, filename, post_max_size_M=100, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.add_data(scan_id, data, filename,
-                            post_max_size_M=post_max_size_M)
-    return scan
-
-
-def scan_add_files(scan_id, filelist, post_max_size_M=100, verbose=False):
-    """Add files to an existing scan
-
-    :param scan_id: the scan id
-    :type scan_id: str
-    :param filelist: list of full path qualified files
-    :type filelist: list
-    :param post_max_size_M: POST data max size in Mb (multiple calls to the
-    api will be done if total size is more than this limit, note that if
-    one or more file is bigger than this limit it will raise an error)
-    :type post_max_size_M: int
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the updated scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.add_files(scan_id, filelist,
-                             post_max_size_M=post_max_size_M)
-    return scan
+    fileapi = IrmaFilesApi(cli)
+    fileweb = fileapi.create(filepath)
+    return fileweb
 
 
 def scan_cancel(scan_id, verbose=False):
@@ -293,10 +279,8 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    scan = scan_new(verbose=verbose)
-    scan = scan_add_data(scan.id, data, filename,
-                         post_max_size_M=post_max_size_M, verbose=verbose)
-    scan = scan_launch(scan.id, force, probe=probe,
+    fileweb = data_upload(data, filename, verbose=verbose)
+    scan = scan_launch([fileweb.result_id], force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     if blocking:
@@ -310,20 +294,16 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     return scan
 
 
-def scan_files(filelist, force, post_max_size_M=100, probe=None,
+def scan_files(filelist, force, probe=None,
                mimetype_filtering=None, resubmit_files=None,
                blocking=False, blocking_timeout=60, verbose=False):
-    """Wrapper around scan_new / scan_add_files / scan_launch
+    """Wrapper around file_upload / scan_launch
 
     :param filelist: list of full path qualified files
     :type filelist: list
     :param force: if True force a new analysis of files
         if False use existing results
     :type force: bool
-    :param post_max_size_M: POST data max size in Mb (multiple calls to the
-    api will be done if total size is more than this limit, note that if
-    one or more file is bigger than this limit it will raise an error)
-    :type post_max_size_M: int
     :param probe: probe list to use
         (optional default: None means all)
     :type probe: list
@@ -345,10 +325,12 @@ def scan_files(filelist, force, post_max_size_M=100, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    scan = scan_new(verbose=verbose)
-    scan = scan_add_files(scan.id, filelist, post_max_size_M=post_max_size_M,
-                          verbose=verbose)
-    scan = scan_launch(scan.id, force, probe=probe,
+    file_ids = []
+    for filepath in filelist:
+        f = file_upload(filepath, verbose)
+        file_ids.append(f.result_id)
+
+    scan = scan_launch(file_ids, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     total_timeout = blocking_timeout * len(filelist)
@@ -381,12 +363,12 @@ def scan_get(scan_id, verbose=False):
     return scan
 
 
-def scan_launch(scan_id, force, probe=None,
-                mimetype_filtering=None, resubmit_files=None, verbose=False):
+def scan_launch(file_list, force, probe=None, mimetype_filtering=None,
+                resubmit_files=None, verbose=False):
     """Launch an existing scan
 
-    :param scan_id: the scan id
-    :type scan_id: str
+    :param file_list: list of files result_id returned by upload_data or
+    upload_files
     :param force: if True force a new analysis of files
         if False use existing results
     :type force: bool
@@ -408,7 +390,7 @@ def scan_launch(scan_id, force, probe=None,
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.launch(scan_id, force, probe=probe,
+    scan = scanapi.launch(file_list, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,
                           resubmit_files=resubmit_files)
     return scan
@@ -436,28 +418,12 @@ def scan_list(limit=None, offset=None, verbose=False):
     return (total, scan_list)
 
 
-def scan_new(verbose=False):
-    """Create a new scan
-
-    :param verbose: enable verbose requests
-        (optional default:False)
-    :type verbose: bool
-    :return: return the new generated scan object
-    :rtype: IrmaScan
-    """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
-    scanapi = IrmaScansApi(cli)
-    scan = scanapi.new()
-    return scan
-
-
-def scan_proberesults(result_idx, formatted=True, verbose=False):
+def scan_proberesults(fw_id, formatted=True, verbose=False):
     """Fetch file probe results (for a given scan
-        one scan <-> one result_idx
+        one scan <-> one fw_id
 
-    :param result_idx: the result id
-    :type result_idx: str
+    :param result_idx: the fileweb id
+    :type fw_id: str
     :param formatted: apply frontend formatters on results
         (optional default:True)
     :type formatted: bool
@@ -470,7 +436,7 @@ def scan_proberesults(result_idx, formatted=True, verbose=False):
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    proberesults = scanapi.probe_results(result_idx,
+    proberesults = scanapi.probe_results(fw_id,
                                          formatted=formatted)
     return proberesults
 

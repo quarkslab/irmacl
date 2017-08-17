@@ -2,9 +2,9 @@ import unittest
 import os
 import re
 import time
-from irmacl.apiclient import IrmaProbeResult, IrmaResults, IrmaError
-from irmacl.helpers import probe_list, scan_new, scan_add_data, \
-    scan_add_files, scan_data, scan_files, scan_get, scan_launch, \
+from irmacl.apiclient import IrmaProbeResult, IrmaFileWeb, IrmaError
+from irmacl.helpers import probe_list, data_upload, \
+    file_upload, scan_data, scan_files, scan_get, scan_launch, \
     scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
     file_tag_remove
 
@@ -29,7 +29,7 @@ class IrmaAPITests(unittest.TestCase):
         return regex.match(uuid) is not None
 
     def _check_scan(self, scan, scanid, range_status, filelist,
-                    range_finished, range_total, date,
+                    range_finished, range_total,
                     force, mimetype_filtering, resubmit_files):
         nb_files = len(filelist)
         self.assertEqual(scan.id, scanid)
@@ -38,7 +38,6 @@ class IrmaAPITests(unittest.TestCase):
         self.assertEqual(len(scan.results), nb_files)
         self.assertIn(scan.probes_finished, range_finished)
         self.assertIn(scan.probes_total, range_total)
-        self.assertEqual(scan.date, date)
         self.assertEqual(scan.force, force)
         self.assertEqual(scan.mimetype_filtering, mimetype_filtering)
         self.assertEqual(scan.resubmit_files, resubmit_files)
@@ -51,80 +50,37 @@ class IrmaAPIScanTests(IrmaAPITests):
         self.assertIs(type(probelist), list)
         self.assertNotEqual(len(probelist), 0)
 
-    def test_scan_new(self):
-        scan = scan_new()
-        self.assertTrue(self._validate_uuid(scan.id))
-        self._check_scan(scan, scan.id, ["empty"], [], [0], [0], scan.date,
-                         False, False, False)
+    def test_file_upload(self):
+        fw = file_upload(FILEPATHS[0])
+        self.assertEqual(fw.name, FILENAMES[0])
+        self.assertEqual(fw.scan_id, None)
 
-    def test_scan_add_files(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
-        scan = scan_add_files(scan.id, FILEPATHS)
-        self.assertEqual(scan.pstatus, "ready")
-        self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date,
-                         False, False, False)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
-                         date, False, False, False)
-
-    def test_scan_add_0len_file(self):
-        filename = "empty_file"
-        filepath = os.path.join(SAMPLES_DIR, filename)
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
-        scan = scan_add_files(scan.id, [filepath])
-        self.assertEqual(scan.pstatus, "ready")
-        self._check_scan(scan, scanid, ["ready"], [filename], [0], [0], date,
-                         False, False, False)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"], [filename], [0], [0],
-                         date, False, False, False)
-
-    def test_scan_add_data(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
+    def test_data_upload(self):
         with open(FILEPATHS[0], "rb") as f:
             data = f.read()
-        scan = scan_add_data(scan.id, data, FILENAMES[0])
-        self.assertEqual(scan.pstatus, "ready")
-        self._check_scan(scan, scanid, ["ready"], [FILENAMES[0]], [0], [0],
-                         date, False, False, False)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"], [FILENAMES[0]], [0], [0],
-                         date, False, False, False)
+        fw = data_upload(data, FILENAMES[0])
+        self.assertEqual(fw.name, FILENAMES[0])
+        self.assertEqual(fw.scan_id, None)
 
     def test_scan_launch(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
-        scan = scan_add_files(scan.id, FILEPATHS)
         force = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan = scan_launch(scan.id, force, probes)
-        self._check_scan(scan, scanid, ["ready", "uploaded",
-                                        "launched", "finished"],
-                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, True, True)
+        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
+        self._check_scan(scan, scan.id, ["finished"],
+                         FILENAMES, range(nb_jobs+1), range(nb_jobs+1),
+                         force, True, True)
 
     def test_scan_force(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
         filelist = [FILENAMES[0]]
-        scan = scan_add_files(scan.id, [FILEPATHS[0]])
         force = False
         probes = [probe_list()[0]]
         nb_jobs = len(filelist) * len(probes)
-        scan = scan_launch(scan.id, force, probe=probes)
-        self._check_scan(scan, scanid, ["ready", "uploaded",
-                                        "launched", "finished"],
+        scan = scan_files([FILEPATHS[0]], force, probe=probes)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
                          filelist, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, True, True)
+                         force, True, True)
         try:
             scan_cancel(scan.id)
         except IrmaError:
@@ -132,44 +88,47 @@ class IrmaAPIScanTests(IrmaAPITests):
             pass
 
     def test_mimetype_filtering(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
-        scan = scan_add_files(scan.id, FILEPATHS)
         force = True
         mimetype_filtering = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan = scan_launch(scan.id, force, probes,
-                           mimetype_filtering=mimetype_filtering)
-        self._check_scan(scan, scanid, ["ready", "uploaded",
-                                        "launched", "finished"],
+        scan = scan_files(FILEPATHS, force, probes,
+                          mimetype_filtering=mimetype_filtering)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
                          FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, mimetype_filtering, True)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, mimetype_filtering, True)
+                         force, mimetype_filtering, True)
+
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
+                             force, mimetype_filtering, True)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             FILENAMES, [nb_jobs], [nb_jobs],
+                             force, mimetype_filtering, True)
 
     def test_resubmit_files(self):
-        scan = scan_new()
-        date = scan.date
-        scanid = scan.id
-        scan = scan_add_files(scan.id, FILEPATHS)
         force = True
         resubmit_files = False
         probes = probe_list()
         nb_jobs = len(FILENAMES) * len(probes)
-        scan = scan_launch(scan.id, force, probe=probes,
-                           resubmit_files=resubmit_files)
-        self._check_scan(scan, scanid, ["ready", "uploaded",
-                                        "launched", "finished"],
+        scan = scan_files(FILEPATHS, force, probe=probes,
+                          resubmit_files=resubmit_files)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
                          FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, True, resubmit_files)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scanid, ["cancelled"],
-                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         date, force, True, resubmit_files)
+                         force, True, resubmit_files)
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
+                             force, True, resubmit_files)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             FILENAMES, [nb_jobs], [nb_jobs],
+                             force, True, resubmit_files)
 
     def test_scan_files(self):
         force = True
@@ -179,11 +138,16 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scan.id, ["ready", "uploaded",
                                          "launched", "finished"],
                          FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         scan.date, True, True, True)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scan.id, ["cancelled"],
-                         FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
-                         scan.date, force, True, True)
+                         True, True, True)
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             FILENAMES, range(nb_jobs + 1), range(nb_jobs + 1),
+                             force, True, True)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             FILENAMES, [nb_jobs], [nb_jobs],
+                             force, True, True)
 
     def test_scan_data(self):
         force = True
@@ -195,11 +159,16 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scan.id, ["ready", "uploaded",
                                          "launched", "finished"],
                          [FILENAMES[0]], range(nb_jobs + 1),
-                         range(nb_jobs + 1), scan.date, True, True, True)
-        scan = scan_cancel(scan.id)
-        self._check_scan(scan, scan.id, ["cancelled"],
-                         [FILENAMES[0]], range(nb_jobs + 1),
-                         range(nb_jobs + 1), scan.date, force, True, True)
+                         range(nb_jobs + 1), True, True, True)
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             [FILENAMES[0]], range(nb_jobs + 1),
+                             range(nb_jobs + 1), force, True, True)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             [FILENAMES[0]], [nb_jobs], [nb_jobs],
+                             force, True, True)
 
     def test_scan_files_timeout(self):
         force = True
@@ -214,7 +183,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
         self._check_scan(scan, scan.id, ["finished"],
                          FILENAMES, [scan.probes_total], [scan.probes_total],
-                         scan.date, force, True, True)
+                         force, True, True)
 
     def test_file_results_formatted(self):
         force = True
@@ -252,7 +221,7 @@ class IrmaAPIFileTests(IrmaAPITests):
             self.assertEqual(type(data), tuple)
             (total, res) = file_search(name, limit=1)
             self.assertEqual(type(res), list)
-            self.assertEqual(type(res[0]), IrmaResults)
+            self.assertEqual(type(res[0]), IrmaFileWeb)
             self.assertEqual(len(res), 1)
             self.assertEqual(type(total), int)
 
@@ -275,7 +244,7 @@ class IrmaAPIFileTests(IrmaAPITests):
         for hash in HASHES:
             (_, res) = file_search(hash=hash)
             self.assertTrue(len(res) > 0)
-            self.assertEqual(type(res[0]), IrmaResults)
+            self.assertEqual(type(res[0]), IrmaFileWeb)
 
     def test_file_search_hash_name(self):
         with self.assertRaises(IrmaError):

@@ -15,8 +15,8 @@
 import unittest
 import os
 import re
-from irmacl.helpers import probe_list, scan_new, scan_add_files, scan_get, \
-    scan_launch, scan_proberesults
+from irmacl.helpers import probe_list, file_upload, scan_get, \
+    scan_launch, scan_proberesults, scan_files
 import time
 import logging
 
@@ -305,23 +305,14 @@ class EicarTestCase(unittest.TestCase):
         nb_files = len(filelist)
         nb_jobs = nb_probes * nb_files
         filenames = list(map(lambda f: os.path.basename(f), filelist))
-        scan = scan_new(verbose=DEBUG)
-        self.assertIsNot(scan.id, None)
-        scanid = scan.id
-        self.assertIsNot(scan.date, None)
-        self.assertEqual(len(scan.results), 0)
 
-        scan = scan_add_files(scan.id, filelist, verbose=DEBUG)
-        self._check_results(scan.results, scanid, filenames, [0], [0],
-                            True, True)
-
-        scan = scan_launch(scan.id, force=force, probe=probelist,
-                           mimetype_filtering=mimetype_filtering,
-                           resubmit_files=resubmit_files,
-                           verbose=DEBUG)
+        scan = scan_files(filelist, force=force, probe=probelist,
+                          mimetype_filtering=mimetype_filtering,
+                          resubmit_files=resubmit_files,
+                          verbose=DEBUG)
         start = time.time()
         while not scan.is_finished():
-            self._check_results(scan.results, scanid, filenames,
+            self._check_results(scan.results, scan.id, filenames,
                                 range(nb_probes + 1), range(nb_jobs + 1),
                                 True, True)
             time.sleep(BEFORE_NEXT_PROGRESS)
@@ -330,7 +321,7 @@ class EicarTestCase(unittest.TestCase):
             scan = scan_get(scan.id)
 
         # Scan finished
-        self._check_results(scan.results, scanid, filenames,
+        self._check_results(scan.results, scan.id, filenames,
                             [scan.probes_total], [scan.probes_total],
                             True, True)
         res = {}

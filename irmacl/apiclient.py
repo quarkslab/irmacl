@@ -200,7 +200,7 @@ class IrmaScansApi(object):
     def __init__(self, apiclient):
         self._apiclient = apiclient
         self._scan_schema = IrmaScanSchema()
-        self._results_schema = IrmaResultsSchema()
+        self._results_schema = IrmaFileWebsSchema()
         return
 
     def new(self):
@@ -227,67 +227,23 @@ class IrmaScansApi(object):
         for res in items:
             res_obj = self._scan_schema.make_object(res)
             res_list.append(res_obj)
-        return (total, res_list)
+        return total, res_list
 
-    def add_files(self, scan_id, filelist, post_max_size_M=100):
-        def get_file_size(filepath):
-            return os.path.getsize(filepath)
-        post_max_size = post_max_size_M * 1024 * 1024 * 90 / 100
-        route = '/scans/{0}/files'.format(scan_id)
-        data = None
-        # First check if none of the file is more than
-        # post_max_size
-        file_size_dict = dict((f, get_file_size(f)) for f in filelist)
-        if any(map(lambda x: x > post_max_size, file_size_dict.values())):
-            raise IrmaError("One of the file is bigger than post_max_size")
-        # Then keep track of already uploaded data
-        postfile = dict()
-        total_size = 0
-        for (filepath, filesize) in file_size_dict.items():
-            # if its more than max post size do the post then
-            # create a new postfile with file data
-            if total_size + filesize > post_max_size:
-                data = self._apiclient.post_call(route, files=postfile)
-                postfile = dict()
-                total_size = 0
-            with open(filepath, 'rb') as f:
-                try:
-                    if type(filepath) is unicode:
-                        filepath = filepath.encode("utf8")
-                except NameError:
-                    # Python3 strings are already unicode
-                    pass
-                dec_filepath = quote(filepath)
-                postfile[dec_filepath] = f.read()
-                total_size += filesize
-        if len(postfile) != 0:
-            data = self._apiclient.post_call(route, files=postfile)
-        return self._scan_schema.make_object(data)
-
-    def add_data(self, scan_id, data, filename, post_max_size_M=100):
-        post_max_size = post_max_size_M * 1024 * 1024 * 90 / 100
-        route = '/scans/{0}/files'.format(scan_id)
-        if len(data) > post_max_size:
-            raise IrmaError("Data is bigger than post_max_size")
-        # Then keep track of already uploaded data
-        postfile = dict()
-        filename = filename.encode("utf8")
-        dec_filename = quote(filename)
-        postfile[dec_filename] = data
-        scan_data = self._apiclient.post_call(route, files=postfile)
-        return self._scan_schema.make_object(scan_data)
-
-    def launch(self, scan_id, force, probe=None,
+    def launch(self, fileweb_list, force, probe=None,
                mimetype_filtering=None, resubmit_files=None):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        params = {'force': force}
+        params = dict()
+        params["files"] = fileweb_list
+        options = dict()
+        options["force"] = force
         if mimetype_filtering is not None:
-            params['mimetype_filtering'] = mimetype_filtering
+            options["mimetype_filtering"] = mimetype_filtering
         if resubmit_files is not None:
-            params['resubmit_files'] = resubmit_files
+            options["resubmit_files"] = resubmit_files
         if probe is not None:
-            params['probes'] = ','.join(probe)
-        route = "/scans/{0}/launch".format(scan_id)
+            options["probes"] = probe
+        params["options"] = options
+        route = "/scans/"
         data = self._apiclient.post_call(route,
                                          data=json.dumps(params),
                                          headers=headers)
@@ -303,11 +259,11 @@ class IrmaScansApi(object):
         data = self._apiclient.get_call(route)
         return self._scan_schema.make_object(data)
 
-    def probe_results(self, result_id, formatted=True):
+    def probe_results(self, fw_id, formatted=True):
         extra_args = {}
         if not formatted:
             extra_args['formatted'] = 'no'
-        route = '/results/{0}'.format(result_id)
+        route = '/filewebs/{0}'.format(fw_id)
         data = self._apiclient.get_call(route, **extra_args)
         return self._results_schema.make_object(data)
 
@@ -318,7 +274,7 @@ class IrmaFilesApi(object):
 
     def __init__(self, apiclient):
         self._apiclient = apiclient
-        self._results_schema = IrmaResultsSchema()
+        self._results_schema = IrmaFileWebsSchema()
         self._scan_schema = IrmaScanSchema()
         return
 
@@ -380,6 +336,27 @@ class IrmaFilesApi(object):
             res_obj = self._results_schema.make_object(res)
             res_list.append(res_obj)
         return (total, res_list)
+
+    def create(self, filepath):
+        with open(filepath, 'rb') as f:
+            res = self.add_data(f.read(), filepath)
+        return res
+
+    def add_data(self, data, filepath):
+        route = '/filewebs'
+        try:
+            if type(filepath) is unicode:
+                filepath = filepath.encode("utf8")
+        except NameError:
+            # Python3 strings are already unicode
+            pass
+        dec_filepath = quote(filepath)
+        postfile = dict()
+        postfile[dec_filepath] = data
+
+        res = self._apiclient.post_call(route, files=postfile)
+        return self._results_schema.make_object(res)
+
 
 # =============
 #  Deserialize
@@ -549,8 +526,8 @@ class IrmaProbeResultSchema(Schema):
         return IrmaProbeResult(**data)
 
 
-class IrmaResults(object):
-    """ IrmaResults
+class IrmaFileWeb(object):
+    """ IrmaFileWeb
     Description for class
 
     :ivar status: int
@@ -560,7 +537,7 @@ class IrmaResults(object):
     :ivar scan_id: id of the scan
     :ivar name: file name
     :ivar path: file path (as sent during upload or resubmit)
-    :ivar result_id: id of specific results for this file and this scan
+    :ivar id: id of this fileweb (specific results for this file and this scan)
      used to fetch probe_results through scan_proberesults helper function
     :ivar file_infos: IrmaFileInfo object
     :ivar probe_results: list of IrmaProbeResults objects
@@ -593,7 +570,7 @@ class IrmaResults(object):
         return timestamp_to_date(self.scan_date)
 
     def to_json(self):
-        return IrmaResultsSchema().dumps(self).data
+        return IrmaFileWebsSchema().dumps(self).data
 
     def __str__(self):
         ret = u"Status: {0}\n".format(self.status)
@@ -613,7 +590,7 @@ class IrmaResults(object):
         return ret
 
 
-class IrmaResultsSchema(Schema):
+class IrmaFileWebsSchema(Schema):
     probe_results = fields.Nested(IrmaProbeResultSchema, many=True)
     file_infos = fields.Nested(IrmaFileInfoSchema)
 
@@ -623,7 +600,7 @@ class IrmaResultsSchema(Schema):
                   'file_sha256', 'scan_date', 'file_infos', 'probe_results')
 
     def make_object(self, data):
-        return IrmaResults(**data)
+        return IrmaFileWeb(**data)
 
 
 class IrmaScan(object):
@@ -640,7 +617,7 @@ class IrmaScan(object):
         or not
     :ivar mimetype_filtering: probes list should be decided based on files
         mimetype or not
-    :ivar results: list of IrmaResults objects
+    :ivar results: list of IrmaFileWeb objects
     """
 
     def __init__(self, id, status, probes_finished,
@@ -657,7 +634,7 @@ class IrmaScan(object):
         self.results = None
         if results is not None:
             self.results = []
-            schema = IrmaResultsSchema()
+            schema = IrmaFileWebsSchema()
             for r in results:
                 self.results.append(schema.make_object(r))
 
@@ -689,7 +666,7 @@ class IrmaScan(object):
 
 
 class IrmaScanSchema(Schema):
-    results = fields.Nested(IrmaResultsSchema, many=True,
+    results = fields.Nested(IrmaFileWebsSchema, many=True,
                             exclude=('probe_results', 'file_infos'))
 
     class Meta:

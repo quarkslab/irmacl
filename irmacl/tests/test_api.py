@@ -69,6 +69,20 @@ class IrmaAPIScanTests(IrmaAPITests):
         self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
                          date, False, False, False)
 
+    def test_scan_add_0len_file(self):
+        filename = "empty_file"
+        filepath = os.path.join(SAMPLES_DIR, filename)
+        scan = scan_new()
+        date = scan.date
+        scanid = scan.id
+        scan = scan_add_files(scan.id, [filepath])
+        self.assertEqual(scan.pstatus, "ready")
+        self._check_scan(scan, scanid, ["ready"], [filename], [0], [0], date,
+                         False, False, False)
+        scan = scan_cancel(scan.id)
+        self._check_scan(scan, scanid, ["cancelled"], [filename], [0], [0],
+                         date, False, False, False)
+
     def test_scan_add_data(self):
         scan = scan_new()
         date = scan.date

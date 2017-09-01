@@ -260,7 +260,7 @@ class IrmaScansApi(object):
                 dec_filepath = quote(filepath)
                 postfile[dec_filepath] = f.read()
                 total_size += filesize
-        if total_size != 0:
+        if len(postfile) != 0:
             data = self._apiclient.post_call(route, files=postfile)
         return self._scan_schema.make_object(data)
 

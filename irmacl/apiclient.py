@@ -393,12 +393,12 @@ class IrmaTag(object):
     :ivar id: id of the tag
     :ivar text: tag label
     """
-    def __init__(self, id, text):
+    def __init__(self, id, text, **kwargs):
         self.id = id
         self.text = text
 
     def __repr__(self):
-        ret = "Tag {0} [{1}]".format(self.text, self.id)
+        ret = u"Tag {0} [{1}]".format(self.text, self.id)
         return ret
 
 
@@ -467,14 +467,14 @@ class IrmaFileInfo(object):
             return None
 
     def __repr__(self):
-        ret = "Size: {0}\n".format(self.size)
-        ret += "Sha1: {0}\n".format(self.sha1)
-        ret += "Sha256: {0}\n".format(self.sha256)
-        ret += "Md5: {0}s\n".format(self.md5)
-        ret += "First Scan: {0}\n".format(self.pdate_first_scan)
-        ret += "Last Scan: {0}\n".format(self.pdate_last_scan)
-        ret += "Mimetype: {0}\n".format(self.mimetype)
-        ret += "Tags: {0}\n".format(self.tags)
+        ret = u"Size: {0}\n".format(self.size)
+        ret += u"Sha1: {0}\n".format(self.sha1)
+        ret += u"Sha256: {0}\n".format(self.sha256)
+        ret += u"Md5: {0}s\n".format(self.md5)
+        ret += u"First Scan: {0}\n".format(self.pdate_first_scan)
+        ret += u"Last Scan: {0}\n".format(self.pdate_last_scan)
+        ret += u"Mimetype: {0}\n".format(self.mimetype)
+        ret += u"Tags: {0}\n".format(self.tags)
         return ret
 
 
@@ -501,34 +501,42 @@ class IrmaProbeResult(object):
         (need unformatted results)
     """
 
-    def __init__(self, **kwargs):
-        self.status = kwargs.pop('status')
-        self.name = kwargs.pop('name')
-        self.version = kwargs.pop('version', None)
-        self.type = kwargs.pop('type')
-        self.results = kwargs.pop('results', None)
-        self.duration = kwargs.pop('duration', 0)
-        self.error = kwargs.pop('error', None)
-        self.external_url = kwargs.pop('external_url', None)
-        self.database = kwargs.pop('database', None)
-        self.platform = kwargs.pop('platform', None)
-        if len(kwargs) != 0:
-            print('unmap keys: ', ','.join(kwargs.keys()))
+    def __init__(self, status, name, type,
+                 version=None,
+                 results=None,
+                 duration=0,
+                 error=None,
+                 external_url=None,
+                 database=None,
+                 platform=None,
+                 **kwargs):
+        self.status = status
+        self.type = type
+        self.name = name
+        self.version = version
+        self.results = results
+        self.duration = duration
+        self.error = error
+        self.external_url = external_url
+        self.database = database
+        self.platform = platform
 
     def to_json(self):
         return IrmaProbeResultSchema().dumps(self).data
 
     def __str__(self):
-        ret = "Status: {0}\n".format(self.status)
-        ret += "Name: {0}\n".format(self.name)
-        ret += "Category: {0}\n".format(self.type)
-        ret += "Version: {0}\n".format(self.version)
-        ret += "Duration: {0}s\n".format(self.duration)
+        ret = u"Status: {0}\n".format(self.status)
+        ret += u"Name: {0}\n".format(self.name)
+        ret += u"Type: {0}\n".format(self.type)
+        ret += u"Version: {0}\n".format(self.version)
+        ret += u"Duration: {0}s\n".format(self.duration)
         if self.error is not None:
-            ret += "Error: {0}\n".format(self.error)
-        ret += "Results: {0}\n".format(self.results)
+            ret += u"Error: {0}\n".format(self.error)
+        ret += u"Results: {0}\n".format(self.results)
         if self.external_url is not None:
-            ret += "External URL: {0}".format(self.external_url)
+            ret += u"External URL: {0}".format(self.external_url)
+        if self.platform is not None:
+            ret += u"Platform: {0}".format(self.platform)
         return ret
 
 
@@ -558,28 +566,27 @@ class IrmaResults(object):
     :ivar probe_results: list of IrmaProbeResults objects
     """
 
-    def __init__(self, **kwargs):
-        self.status = kwargs.pop('status')
-        self.probes_finished = kwargs.pop('probes_finished')
-        self.scan_id = kwargs.pop('scan_id')
-        self.name = kwargs.pop('name')
-        self.path = kwargs.pop('path')
-        self.file_sha256 = kwargs.pop('file_sha256')
-        self.parent_file_sha256 = kwargs.pop('parent_file_sha256')
-        self.scan_date = kwargs.pop('scan_date')
-        if 'probe_results' in kwargs:
+    def __init__(self, status, probes_finished, probes_total,
+                 scan_id, scan_date, name, path,
+                 file_sha256, parent_file_sha256, result_id,
+                 probe_results=None, file_infos=None, **kwargs):
+        self.status = status
+        self.probes_finished = probes_finished
+        self.probes_total = probes_total
+        self.scan_id = scan_id
+        self.scan_date = scan_date
+        self.name = name
+        self.path = path
+        self.file_sha256 = file_sha256
+        self.parent_file_sha256 = parent_file_sha256
+        self.result_id = result_id
+        if probe_results is not None:
             self.probe_results = []
-            probe_results = kwargs.pop('probe_results')
             for pres in probe_results:
                 pobj = IrmaProbeResultSchema().make_object(pres)
                 self.probe_results.append(pobj)
-        self.probes_total = kwargs.pop('probes_total')
-        if 'file_infos' in kwargs:
-            file_infos = kwargs.pop('file_infos')
+        if file_infos is not None:
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
-        self.result_id = kwargs.pop('result_id')
-        if len(kwargs) != 0:
-            print('unmap keys: ', ','.join(kwargs.keys()))
 
     @property
     def pscan_date(self):
@@ -589,20 +596,20 @@ class IrmaResults(object):
         return IrmaResultsSchema().dumps(self).data
 
     def __str__(self):
-        ret = "Status: {0}\n".format(self.status)
-        ret += "Probes finished: {0}\n".format(self.probes_finished)
-        ret += "Probes Total: {0}\n".format(self.probes_total)
-        ret += "Scanid: {0}\n".format(self.scan_id)
-        ret += "Scan Date: {0}\n".format(self.pscan_date)
+        ret = u"Status: {0}\n".format(self.status)
+        ret += u"Probes finished: {0}\n".format(self.probes_finished)
+        ret += u"Probes Total: {0}\n".format(self.probes_total)
+        ret += u"Scanid: {0}\n".format(self.scan_id)
+        ret += u"Scan Date: {0}\n".format(self.pscan_date)
         ret += u"Filename: {0}\n".format(self.name)
-        ret += "Filepath: {0}\n".format(self.path)
-        ret += "SHA256: {0}\n".format(self.file_sha256)
-        ret += "ParentFile SHA256: {0}\n".format(self.parent_file_sha256)
-        ret += "Resultid: {0}\n".format(self.result_id)
+        ret += u"Filepath: {0}\n".format(self.path)
+        ret += u"SHA256: {0}\n".format(self.file_sha256)
+        ret += u"ParentFile SHA256: {0}\n".format(self.parent_file_sha256)
+        ret += u"Resultid: {0}\n".format(self.result_id)
         if hasattr(self, 'file_infos'):
-            ret += "FileInfo: \n{0}\n".format(self.file_infos)
+            ret += u"FileInfo: \n{0}\n".format(self.file_infos)
         if hasattr(self, 'results'):
-            ret += "Results: {0}\n".format(self.probe_results)
+            ret += u"Results: {0}\n".format(self.probe_results)
         return ret
 
 
@@ -638,20 +645,21 @@ class IrmaScan(object):
 
     def __init__(self, id, status, probes_finished,
                  probes_total, date, force, resubmit_files,
-                 mimetype_filtering, results=[]):
+                 mimetype_filtering, results=None, **kwargs):
+        self.id = id
         self.status = status
         self.probes_finished = probes_finished
-        self.results = []
-        if len(results) > 0:
-            schema = IrmaResultsSchema()
-            for r in results:
-                self.results.append(schema.make_object(r))
         self.probes_total = probes_total
         self.date = date
-        self.id = id
         self.force = force
         self.resubmit_files = resubmit_files
         self.mimetype_filtering = mimetype_filtering
+        self.results = None
+        if results is not None:
+            self.results = []
+            schema = IrmaResultsSchema()
+            for r in results:
+                self.results.append(schema.make_object(r))
 
     def is_launched(self):
         return self.status == IrmaScanStatus.launched
@@ -668,15 +676,15 @@ class IrmaScan(object):
         return timestamp_to_date(self.date)
 
     def __repr__(self):
-        ret = "Scanid: {0}\n".format(self.id)
-        ret += "Status: {0}\n".format(self.pstatus)
-        ret += "Options: Force [{0}] ".format(self.force)
-        ret += "Mimetype [{0}] ".format(self.mimetype_filtering)
-        ret += "Resubmit [{0}]\n".format(self.resubmit_files)
-        ret += "Probes finished: {0}\n".format(self.probes_finished)
-        ret += "Probes Total: {0}\n".format(self.probes_total)
-        ret += "Date: {0}\n".format(self.pdate)
-        ret += "Results: {0}\n".format(self.results)
+        ret = u"Scanid: {0}\n".format(self.id)
+        ret += u"Status: {0}\n".format(self.pstatus)
+        ret += u"Probes finished: {0}\n".format(self.probes_finished)
+        ret += u"Probes Total: {0}\n".format(self.probes_total)
+        ret += u"Date: {0}\n".format(self.pdate)
+        ret += u"Options: Force [{0}] ".format(self.force)
+        ret += u"Resubmit [{0}]\n".format(self.resubmit_files)
+        ret += u"Mimetype [{0}] ".format(self.mimetype_filtering)
+        ret += u"Results: {0}\n".format(self.results)
         return ret
 
 

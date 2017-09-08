@@ -69,8 +69,11 @@ class IrmaApiClient(object):
     """ Basic Api class that just deals with get and post requests
     """
 
-    def __init__(self, url, max_tries=1, pause=3, verify=True, verbose=False):
+    def __init__(self, url, submitter="cli",
+                 max_tries=1, pause=3, verify=True,
+                 verbose=False):
         self.url = url
+        self.submitter = submitter
         self.verbose = verbose
         self.max_tries = max_tries
         self.pause = pause
@@ -200,7 +203,7 @@ class IrmaScansApi(object):
     def __init__(self, apiclient):
         self._apiclient = apiclient
         self._scan_schema = IrmaScanSchema()
-        self._results_schema = IrmaFileWebsSchema()
+        self._results_schema = IrmaFileExtSchema()
         return
 
     def new(self):
@@ -229,11 +232,11 @@ class IrmaScansApi(object):
             res_list.append(res_obj)
         return total, res_list
 
-    def launch(self, fileweb_list, force, probe=None,
+    def launch(self, fileext_list, force, probe=None,
                mimetype_filtering=None, resubmit_files=None):
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
         params = dict()
-        params["files"] = fileweb_list
+        params["files"] = fileext_list
         options = dict()
         options["force"] = force
         if mimetype_filtering is not None:
@@ -263,7 +266,7 @@ class IrmaScansApi(object):
         extra_args = {}
         if not formatted:
             extra_args['formatted'] = 'no'
-        route = '/filewebs/{0}'.format(fw_id)
+        route = '/files_ext/{0}'.format(fw_id)
         data = self._apiclient.get_call(route, **extra_args)
         return self._results_schema.make_object(data)
 
@@ -274,7 +277,7 @@ class IrmaFilesApi(object):
 
     def __init__(self, apiclient):
         self._apiclient = apiclient
-        self._results_schema = IrmaFileWebsSchema()
+        self._results_schema = IrmaFileExtSchema()
         self._scan_schema = IrmaScanSchema()
         return
 
@@ -343,7 +346,7 @@ class IrmaFilesApi(object):
         return res
 
     def add_data(self, data, filepath):
-        route = '/filewebs'
+        route = '/files_ext'
         try:
             if type(filepath) is unicode:
                 filepath = filepath.encode("utf8")
@@ -351,10 +354,12 @@ class IrmaFilesApi(object):
             # Python3 strings are already unicode
             pass
         dec_filepath = quote(filepath)
-        postfile = dict()
-        postfile[dec_filepath] = data
+        file_dict = {"files": (dec_filepath, data)}
+        data = {"submitter": self._apiclient.submitter}
 
-        res = self._apiclient.post_call(route, files=postfile)
+        res = self._apiclient.post_call(route,
+                                        files=file_dict,
+                                        data=data)
         return self._results_schema.make_object(res)
 
 
@@ -526,8 +531,8 @@ class IrmaProbeResultSchema(Schema):
         return IrmaProbeResult(**data)
 
 
-class IrmaFileWeb(object):
-    """ IrmaFileWeb
+class IrmaFileExt(object):
+    """ IrmaFileExt
     Description for class
 
     :ivar status: int
@@ -537,14 +542,15 @@ class IrmaFileWeb(object):
     :ivar scan_id: id of the scan
     :ivar name: file name
     :ivar path: file path (as sent during upload or resubmit)
-    :ivar id: id of this fileweb (specific results for this file and this scan)
+    :ivar id: id of this file_ext (specific results for this file and this
+    scan)
      used to fetch probe_results through scan_proberesults helper function
     :ivar file_infos: IrmaFileInfo object
     :ivar probe_results: list of IrmaProbeResults objects
     """
 
     def __init__(self, status, probes_finished, probes_total,
-                 scan_id, scan_date, name, path,
+                 scan_id, scan_date, name,
                  file_sha256, parent_file_sha256, result_id,
                  probe_results=None, file_infos=None, **kwargs):
         self.status = status
@@ -553,7 +559,6 @@ class IrmaFileWeb(object):
         self.scan_id = scan_id
         self.scan_date = scan_date
         self.name = name
-        self.path = path
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
         self.result_id = result_id
@@ -570,7 +575,7 @@ class IrmaFileWeb(object):
         return timestamp_to_date(self.scan_date)
 
     def to_json(self):
-        return IrmaFileWebsSchema().dumps(self).data
+        return IrmaFileExtSchema().dumps(self).data
 
     def __str__(self):
         ret = u"Status: {0}\n".format(self.status)
@@ -579,7 +584,6 @@ class IrmaFileWeb(object):
         ret += u"Scanid: {0}\n".format(self.scan_id)
         ret += u"Scan Date: {0}\n".format(self.pscan_date)
         ret += u"Filename: {0}\n".format(self.name)
-        ret += u"Filepath: {0}\n".format(self.path)
         ret += u"SHA256: {0}\n".format(self.file_sha256)
         ret += u"ParentFile SHA256: {0}\n".format(self.parent_file_sha256)
         ret += u"Resultid: {0}\n".format(self.result_id)
@@ -590,17 +594,17 @@ class IrmaFileWeb(object):
         return ret
 
 
-class IrmaFileWebsSchema(Schema):
+class IrmaFileExtSchema(Schema):
     probe_results = fields.Nested(IrmaProbeResultSchema, many=True)
     file_infos = fields.Nested(IrmaFileInfoSchema)
 
     class Meta:
         fields = ('status', 'probes_finished', 'probes_total', 'scan_id',
-                  'name', 'path', 'parent_file_sha256', 'result_id',
+                  'name', 'parent_file_sha256', 'result_id',
                   'file_sha256', 'scan_date', 'file_infos', 'probe_results')
 
     def make_object(self, data):
-        return IrmaFileWeb(**data)
+        return IrmaFileExt(**data)
 
 
 class IrmaScan(object):
@@ -617,7 +621,7 @@ class IrmaScan(object):
         or not
     :ivar mimetype_filtering: probes list should be decided based on files
         mimetype or not
-    :ivar results: list of IrmaFileWeb objects
+    :ivar results: list of IrmaFileExt objects
     """
 
     def __init__(self, id, status, probes_finished,
@@ -634,7 +638,7 @@ class IrmaScan(object):
         self.results = None
         if results is not None:
             self.results = []
-            schema = IrmaFileWebsSchema()
+            schema = IrmaFileExtSchema()
             for r in results:
                 self.results.append(schema.make_object(r))
 
@@ -666,7 +670,7 @@ class IrmaScan(object):
 
 
 class IrmaScanSchema(Schema):
-    results = fields.Nested(IrmaFileWebsSchema, many=True,
+    results = fields.Nested(IrmaFileExtSchema, many=True,
                             exclude=('probe_results', 'file_infos'))
 
     class Meta:

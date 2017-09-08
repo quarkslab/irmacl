@@ -2,7 +2,7 @@ import unittest
 import os
 import re
 import time
-from irmacl.apiclient import IrmaProbeResult, IrmaFileWeb, IrmaError
+from irmacl.apiclient import IrmaProbeResult, IrmaFileExt, IrmaError
 from irmacl.helpers import probe_list, data_upload, \
     file_upload, scan_data, scan_files, scan_get, scan_launch, \
     scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
@@ -221,7 +221,7 @@ class IrmaAPIFileTests(IrmaAPITests):
             self.assertEqual(type(data), tuple)
             (total, res) = file_search(name, limit=1)
             self.assertEqual(type(res), list)
-            self.assertEqual(type(res[0]), IrmaFileWeb)
+            self.assertEqual(type(res[0]), IrmaFileExt)
             self.assertEqual(len(res), 1)
             self.assertEqual(type(total), int)
 
@@ -244,7 +244,7 @@ class IrmaAPIFileTests(IrmaAPITests):
         for hash in HASHES:
             (_, res) = file_search(hash=hash)
             self.assertTrue(len(res) > 0)
-            self.assertEqual(type(res[0]), IrmaFileWeb)
+            self.assertEqual(type(res[0]), IrmaFileExt)
 
     def test_file_search_hash_name(self):
         with self.assertRaises(IrmaError):

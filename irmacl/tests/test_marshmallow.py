@@ -2,7 +2,7 @@ import unittest
 from copy import deepcopy
 from irmacl.apiclient import IrmaFileInfo, IrmaFileInfoSchema, \
     IrmaScan, IrmaScanSchema, \
-    IrmaFileWeb, IrmaFileWebsSchema, \
+    IrmaFileExt, IrmaFileExtSchema, \
     IrmaTag, IrmaTagSchema
 
 file_infos_sample = \
@@ -39,7 +39,6 @@ results_summary_sample = \
         u"name": u"eicar.com",
         u"scan_date": 1488453418,
         u"probes_total": 1,
-        u"path": u"irma-cli/irmacl/tests/samples",
         u"file_sha256":
             u"275a021bbfb6489e54d471899f7db9d1663fc6'"
             u"95ec2fe2a2c4538aabf651fd0f",
@@ -114,15 +113,15 @@ class IrmaMarshmallowTests(unittest.TestCase):
 
     def test_results_serialization(self):
         self.maxDiff = None
-        res = IrmaFileWeb(**results_sample)
-        res_dumps = IrmaFileWebsSchema().dump(res).data
+        res = IrmaFileExt(**results_sample)
+        res_dumps = IrmaFileExtSchema().dump(res).data
         self.assertDictEqual(res_dumps, results_sample)
 
     def test_results_deserialization(self):
         self.maxDiff = None
-        res1 = IrmaFileWeb(**results_sample)
-        res_dumps = IrmaFileWebsSchema().dump(res1).data
-        res2 = IrmaFileWeb(**res_dumps)
+        res1 = IrmaFileExt(**results_sample)
+        res_dumps = IrmaFileExtSchema().dump(res1).data
+        res2 = IrmaFileExt(**res_dumps)
         dict1 = res1.__dict__.copy()
         dict1.pop("file_infos")
         dict1.pop("probe_results")

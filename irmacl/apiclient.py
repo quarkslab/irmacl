@@ -340,12 +340,12 @@ class IrmaFilesApi(object):
             res_list.append(res_obj)
         return (total, res_list)
 
-    def create(self, filepath):
+    def create(self, filepath, payload=None):
         with open(filepath, 'rb') as f:
-            res = self.add_data(f.read(), filepath)
+            res = self.add_data(f.read(), filepath, payload)
         return res
 
-    def add_data(self, data, filepath):
+    def add_data(self, data, filepath, payload=None):
         route = '/files_ext'
         try:
             if type(filepath) is unicode:
@@ -354,12 +354,16 @@ class IrmaFilesApi(object):
             # Python3 strings are already unicode
             pass
         dec_filepath = quote(filepath)
-        file_dict = {"files": (dec_filepath, data)}
-        data = {"submitter": self._apiclient.submitter}
+        json_data = {"submitter": self._apiclient.submitter}
+        if payload is not None:
+            json_data.update(payload)
+        data = {
+                "files": (dec_filepath, data, 'application/octet-stream'),
+                "json": (None, json.dumps(json_data),
+                         'application/json')}
 
         res = self._apiclient.post_call(route,
-                                        files=file_dict,
-                                        data=data)
+                                        files=data)
         return self._results_schema.make_object(res)
 
 

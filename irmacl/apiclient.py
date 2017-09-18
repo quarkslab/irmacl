@@ -567,16 +567,14 @@ class IrmaResults(object):
     """
 
     def __init__(self, status, probes_finished, probes_total,
-                 scan_id, scan_date, name, path,
-                 file_sha256, parent_file_sha256, result_id,
-                 probe_results=None, file_infos=None, **kwargs):
+                 scan_id, scan_date, name, file_sha256, parent_file_sha256,
+                 result_id, probe_results=None, file_infos=None, **kwargs):
         self.status = status
         self.probes_finished = probes_finished
         self.probes_total = probes_total
         self.scan_id = scan_id
         self.scan_date = scan_date
         self.name = name
-        self.path = path
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
         self.result_id = result_id
@@ -587,6 +585,7 @@ class IrmaResults(object):
                 self.probe_results.append(pobj)
         if file_infos is not None:
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
+        self.path = kwargs.get('path', None)
 
     @property
     def pscan_date(self):

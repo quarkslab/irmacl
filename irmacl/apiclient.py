@@ -14,6 +14,8 @@ from requests import RequestException
 
 
 def timestamp_to_date(timestamp):
+    if timestamp is None:
+        return None
     date = datetime.datetime.fromtimestamp(int(timestamp))
     return date.strftime('%Y-%m-%d %H:%M:%S')
 

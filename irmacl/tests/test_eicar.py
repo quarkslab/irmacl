@@ -29,178 +29,193 @@ EICAR_FILE = "samples/eicar.com"
 EICAR_HASH = '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f'
 MAXTIME_SLOW_PROBE = 60
 MAXTIME_NORMAL_PROBE = 30
-MAXTIME_FAST_PROBE = 10
 NOT_CHECKED = "This value is not checked"
-EICAR_RESULTS = [
-    {"status": 1,
-     "name": "AVG AntiVirus Free (Linux)",
-     "results": "EICAR_Test",
-     "version": "13.0.3114",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Avast Core Security (Linux)",
-     "results": "EICAR Test-NOT virus!!!",
-     "version": "2.1.1",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Bitdefender Antivirus Scanner (Linux)",
-     "results": "EICAR-Test-File \(not a virus\)",
-     "version": "7.141118",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Clam AntiVirus Scanner (Linux)",
-     "results": "Eicar-Test-Signature",
-     "version": "0.99.2",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Comodo Antivirus (Linux)",
-     "results": "Malware",
-     "version": "1.1.268025.1",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "DrWeb Antivirus (Linux)",
-     "results": "EICAR Test File \(NOT a Virus!\)",
-     "version": "10.1.0.1.1507091917",
-     "duration": MAXTIME_SLOW_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Emsisoft Commandline Scanner (Windows)",
-     "results": "EICAR-Test-File \(not a virus\) \(B\)",
-     "version": "12.2.0.7060",
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "eScan Antivirus (Linux)",
-     "results": "EICAR-Test-File \(not a virus\)\(DB\)",
-     "version": "7.0-18",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "ESET NOD32 Antivirus Business Edition (Linux)",
-     "results": "Eicar test file",
-     "version": "4.0.82",
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "FSecure Antivirus (Linux)",
-     "results": "EICAR_Test_File \[FSE\]",
-     "version": "11.00",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "GData Anti-Virus (Windows)",
-     "results": "Virus: EICAR-Test-File \(not a virus\) \(Engine A\)",
-     "version": "5.0.15051.292",
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Kaspersky Anti-Virus (Windows)",
-     "results": "EICAR-Test-File",
-     "version": "16.0.0.694",
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "McAfee VirusScan Command Line scanner (Linux)",
-     "results": "EICAR test file",
-     "version": "6.0.4.564",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "McAfee VirusScan Command Line scanner (Windows)",
-     "results": "EICAR test file",
-     "version": "6.0.4.564",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "McAfee VirusScan Daemon (Linux)",
-     "results": "EICAR test file",
-     "version": "6.0.4.564",
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 0,
-     "name": "PEiD PE Packer Identifier",
-     "results": "Not a PE",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 1,
-     "name": "Sophos Anti-Virus (Linux)",
-     "results": "EICAR-AV-Test",
-     "version": "5.21.0",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Sophos Endpoint Protection (Windows)",
-     "results": "EICAR-AV-Test",
-     "version": "10.6",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 0,
-     "name": "PE Static Analyzer",
-     "results": "Not a PE file",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": 1,
-     "name": "TrID File Identifier",
-     "results": NOT_CHECKED,
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "metadata"
-     },
-    {"status": -1,
-     "name": "Unarchive",
-     "results": None,
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "tools"
-     },
-    {"status": 1,
-     "name": "VirusTotal",
-     "results": "detected by \d{1,2}/\d{2}",
-     "version": None,
-     "duration": MAXTIME_FAST_PROBE,
-     "type": "external"
-     },
-    {"status": 1,
-     "name": "VirusBlokAda Console Scanner (Linux)",
-     "results": "EICAR-Test-File",
-     "version": "3.12.26.4",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-    {"status": 1,
-     "name": "Zoner Antivirus (Linux)",
-     "results": "EICAR.Test.File-NoVirus",
-     "version": "1.3.0",
-     "duration": MAXTIME_NORMAL_PROBE,
-     "type": "antivirus"
-     },
-]
+MAXTIME_FAST_PROBE = 10
+EICAR_RESULTS = {
+    "antivirus":
+        {
+            "AVG AntiVirus Free (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR_Test",
+                    "version": "13.0.3114",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "Avast Core Security (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR Test-NOT virus!!!",
+                    "version": "2.1.1",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "Bitdefender Antivirus Scanner (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR-Test-File \(not a virus\)",
+                    "version": "7.141118",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "Clam AntiVirus Scanner (Linux)":
+                {
+                    "status": 1,
+                    "results": "Eicar-Test-Signature",
+                    "version": "0.99.2",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "Comodo Antivirus (Linux)":
+                {
+                    "status": 1,
+                    "results": "Malware",
+                    "version": "1.1.268025.1",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "DrWeb Antivirus (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR Test File \(NOT a Virus!\)",
+                    "version": "10.1.0.1.1507091917",
+                    "duration": MAXTIME_SLOW_PROBE,
+                 },
+            "Emsisoft Commandline Scanner (Windows)":
+                {
+                    "status": 1,
+                    "results": "EICAR-Test-File \(not a virus\) \(B\)",
+                    "version": "12.2.0.7060",
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "eScan Antivirus (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR-Test-File \(not a virus\)\(DB\)",
+                    "version": "7.0-18",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "ESET NOD32 Antivirus Business Edition (Linux)":
+                {
+                    "status": 1,
+                    "results": "Eicar test file",
+                    "version": "4.0.82",
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "FSecure Antivirus (Linux)":
+                {
+                     "status": 1,
+                     "results": "EICAR_Test_File \[FSE\]",
+                     "version": "11.00",
+                     "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "GData Anti-Virus (Windows)":
+                {
+                    "status": 1,
+                    "results": "Virus: EICAR-Test-File \(not a virus\)"
+                               " \(Engine A\)",
+                    "version": "5.0.15051.292",
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "Kaspersky Anti-Virus (Windows)":
+                {
+                    "status": 1,
+                    "results": "EICAR-Test-File",
+                    "version": "16.0.0.694",
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "McAfee VirusScan Command Line scanner (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR test file",
+                    "version": "6.0.4.564",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "McAfee VirusScan Command Line scanner (Windows)":
+                {
+                    "status": 1,
+                    "results": "EICAR test file",
+                    "version": "6.0.4.564",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "McAfee VirusScan Daemon (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR test file",
+                    "version": "6.0.4.564",
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "Sophos Anti-Virus (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR-AV-Test",
+                    "version": "5.21.0",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "Sophos Endpoint Protection (Windows)":
+                {
+                    "status": 1,
+                    "results": "EICAR-AV-Test",
+                    "version": "10.6",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                 },
+            "VirusBlokAda Console Scanner (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR-Test-File",
+                    "version": "3.12.26.4",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                },
+            "Zoner Antivirus (Linux)":
+                {
+                    "status": 1,
+                    "results": "EICAR.Test.File-NoVirus",
+                    "version": "1.3.0",
+                    "duration": MAXTIME_NORMAL_PROBE,
+                },
+        },
+    "metadata":
+        {
+            "PEiD PE Packer Identifier":
+                {
+                    "status": 0,
+                    "results": "Not a PE",
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "PE Static Analyzer":
+                {
+                    "status": 0,
+                    "results": "Not a PE file",
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+            "TrID File Identifier":
+                {
+                    "status": 1,
+                    "results": NOT_CHECKED,
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
+
+        },
+    "tools":
+        {
+            "Unarchive":
+                {
+                    "status": -1,
+                    "results": None,
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                },
+
+        },
+    "external":
+        {
+            "VirusTotal":
+                {
+                    "status": 1,
+                    "results": "detected by \d{1,2}/\d{2}",
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                },
+        },
+}
 
 
 ##############################################################################
@@ -243,56 +258,54 @@ class EicarTestCase(unittest.TestCase):
                 self.assertFalse(hasattr(get_result, 'probe_results'))
         return
 
-    def _check_probe_result(self, probe_result, ref_results):
-        for ref_res in ref_results:
-            if ref_res["name"] == probe_result.name:
-                self.assertEqual(probe_result.status,
+    def _check_probe_result(self, probe_results, ref_results):
+        for (pr_cat, pr_dict) in probe_results.items():
+            for (probename, probe_result) in pr_dict.items():
+                try:
+                    ref_res = ref_results[pr_cat][probename]
+                except KeyError:
+                    self.assertFalse(True,
+                                     "Missing probe %s ref_result" %
+                                     probename)
+
+                self.assertEqual(probe_result["status"],
                                  ref_res["status"],
                                  "%s status %s got %s" %
-                                 (probe_result.name,
+                                 (probename,
                                   ref_res["status"],
-                                  probe_result.status)
+                                  probe_result["status"])
                                  )
-                if (probe_result.version != ref_res["version"]):
+                if probe_result["version"] != ref_res["version"]:
                     logging.warning("Outdated version of %s: latest %s got %s"
-                                    % (probe_result.name,
+                                    % (probename,
                                        ref_res["version"],
-                                       probe_result.version)
+                                       probe_result["version"])
                                     )
-                self.assertEqual(probe_result.type,
-                                 ref_res["type"],
-                                 "%s type %s got %s" %
-                                 (probe_result.name,
-                                  ref_res["type"],
-                                  probe_result.type)
-                                 )
                 if ref_res["results"] == NOT_CHECKED:
                     pass
                 elif ref_res["results"] is not None:
                     self.assertIsNotNone(re.match(ref_res["results"],
-                                                  probe_result.results),
+                                                  probe_result["results"]),
                                          "%s results %s got %s" %
-                                         (probe_result.name,
+                                         (probename,
                                           ref_res["results"],
-                                          probe_result.results)
+                                          probe_result["results"])
                                          )
                 else:
-                    self.assertIsNone(probe_result.results,
+                    self.assertIsNone(probe_result["results"],
                                       "%s results %s got %s" %
-                                      (probe_result.name,
+                                      (probename,
                                        ref_res["results"],
-                                       probe_result.results)
+                                       probe_resultprobename)
                                       )
-                self.assertLessEqual(probe_result.duration,
+                self.assertLessEqual(probe_result["duration"],
                                      ref_res["duration"],
                                      "%s duration %s got %s" %
-                                     (probe_result.name,
+                                     (probename,
                                       ref_res["duration"],
-                                      probe_result.duration)
+                                      probe_result["duration"])
                                      )
-                return
-        self.assertFalse(True,
-                         "Missing probe %s ref_result" % probe_result.name)
+        return
 
     def _test_scan_file(self,
                         filelist,
@@ -333,9 +346,7 @@ class EicarTestCase(unittest.TestCase):
                              file_result.probes_total)
             self.assertEqual(len(file_result.probe_results),
                              file_result.probes_total)
-            res[get_result.name] = {}
-            for pr in file_result.probe_results:
-                res[get_result.name][pr.name] = pr
+            res[get_result.name] = file_result.probe_results
         return res
 
     def assertListContains(self, list1, list2):
@@ -345,17 +356,13 @@ class EicarTestCase(unittest.TestCase):
 
 class IrmaEicarTest(EicarTestCase):
 
-    def check_eicar_results(self, reslist):
-        for probe in reslist.keys():
-            self._check_probe_result(reslist[probe], EICAR_RESULTS)
-
     def _scan_eicar(self, probe):
         if probe not in self.probelist:
             raise unittest.SkipTest("Skipping %s not present" % probe)
         probelist = [probe]
         filelist = [self.filepath]
         res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._check_probe_result(res[self.filename], EICAR_RESULTS)
 
     def test_scan_avg(self):
         self._scan_eicar('AVGAntiVirusFree')
@@ -441,7 +448,7 @@ class IrmaEicarTest(EicarTestCase):
         except ValueError:
             pass
         res = self._test_scan_file(filelist, probelist, force=True)
-        self.check_eicar_results(res[self.filename])
+        self._check_probe_result(res[self.filename], EICAR_RESULTS)
 
 if __name__ == '__main__':
     unittest.main()

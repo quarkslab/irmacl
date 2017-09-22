@@ -20,13 +20,15 @@ file_infos_sample = \
 
 probe_results_sample = \
     {
-        u"status": 1,
-        u"error": None,
-        u"name": u"VirusBlokAda Console Scanner (Linux)",
-        u"results": u"EICAR-Test-File",
-        u"version": u"3.12.26.4",
-        u"duration": 3.04,
-        u"type": u"antivirus"
+        u"antivirus": {
+            u"VirusBlokAda Console Scanner (Linux)": {
+                u"status": 1,
+                u"error": None,
+                u"results": u"EICAR-Test-File",
+                u"version": u"3.12.26.4",
+                u"duration": 3.04,
+            }
+        }
     }
 
 results_summary_sample = \
@@ -134,8 +136,8 @@ class IrmaMarshmallowTests(unittest.TestCase):
         self.assertDictEqual(file_infos1.__dict__, file_infos2.__dict__)
         self.assertEqual(len(probe_res1), len(probe_res2))
         for i in range(len(probe_res1)):
-            self.assertDictEqual(probe_res1[i].__dict__,
-                                 probe_res2[i].__dict__)
+            self.assertDictEqual(probe_res1[i],
+                                 probe_res2[i])
 
 
 if __name__ == "__main__":

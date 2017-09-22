@@ -2,7 +2,7 @@ import unittest
 import os
 import re
 import time
-from irmacl.apiclient import IrmaProbeResult, IrmaFileExt, IrmaError
+from irmacl.apiclient import IrmaFileExt, IrmaError
 from irmacl.helpers import probe_list, data_upload, \
     file_upload, scan_data, scan_files, scan_get, scan_launch, \
     scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
@@ -193,9 +193,9 @@ class IrmaAPIScanTests(IrmaAPITests):
             self.assertTrue(self._validate_uuid(str(get_result.result_id)))
             res = scan_proberesults(get_result.result_id)
             self.assertIn(res.name, FILENAMES)
-            self.assertEqual(type(res.probe_results), list)
-            self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
-            self.assertEqual(len(res.probe_results), res.probes_finished)
+            self.assertEqual(type(res.probe_results), dict)
+            self.assertEqual(len(res.probe_results.values()),
+                             res.probes_finished)
 
     def test_file_results_not_formatted(self):
         force = True
@@ -205,9 +205,9 @@ class IrmaAPIScanTests(IrmaAPITests):
             self.assertTrue(self._validate_uuid(str(get_result.result_id)))
             res = scan_proberesults(get_result.result_id, formatted=False)
             self.assertIn(res.name, FILENAMES)
-            self.assertEqual(type(res.probe_results), list)
-            self.assertEqual(type(res.probe_results[0]), IrmaProbeResult)
-            self.assertEqual(len(res.probe_results), res.probes_finished)
+            self.assertEqual(type(res.probe_results), dict)
+            self.assertEqual(len(res.probe_results.values()),
+                             res.probes_finished)
 
 
 class IrmaAPIFileTests(IrmaAPITests):

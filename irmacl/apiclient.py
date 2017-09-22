@@ -466,77 +466,6 @@ class IrmaFileInfo(object):
         return ret
 
 
-class IrmaProbeResult(object):
-    """ IrmaProbeResult
-    Description for class
-
-    :ivar status: int probe specific
-        (usually -1 is error, 0 nothing found 1 something found)
-    :ivar name: probe name
-    :ivar type: one of IrmaProbeType
-        ('antivirus', 'external', 'database', 'metadata'...)
-    :ivar version: probe version
-    :ivar duration: analysis duration in seconds
-    :ivar results: probe results (could be str, list, dict)
-    :ivar error:  error string
-        (only relevant in error case when status == -1)
-    :ivar external_url: remote url if available
-        (only relevant when type == 'external')
-    :ivar database: antivirus database digest
-        (need unformatted results)
-        (only relevant when type == 'antivirus')
-    :ivar platform:  'linux' or 'windows'
-        (need unformatted results)
-    """
-
-    def __init__(self, status, name, type,
-                 version=None,
-                 results=None,
-                 duration=0,
-                 error=None,
-                 external_url=None,
-                 database=None,
-                 platform=None,
-                 **kwargs):
-        self.status = status
-        self.type = type
-        self.name = name
-        self.version = version
-        self.results = results
-        self.duration = duration
-        self.error = error
-        self.external_url = external_url
-        self.database = database
-        self.platform = platform
-
-    def to_json(self):
-        return IrmaProbeResultSchema().dumps(self).data
-
-    def __str__(self):
-        ret = u"Status: {0}\n".format(self.status)
-        ret += u"Name: {0}\n".format(self.name)
-        ret += u"Type: {0}\n".format(self.type)
-        ret += u"Version: {0}\n".format(self.version)
-        ret += u"Duration: {0}s\n".format(self.duration)
-        if self.error is not None:
-            ret += u"Error: {0}\n".format(self.error)
-        ret += u"Results: {0}\n".format(self.results)
-        if self.external_url is not None:
-            ret += u"External URL: {0}".format(self.external_url)
-        if self.platform is not None:
-            ret += u"Platform: {0}".format(self.platform)
-        return ret
-
-
-class IrmaProbeResultSchema(Schema):
-    class Meta:
-        fields = ('status', 'name', 'results', 'version',
-                  'duration', 'type', 'error')
-
-    def make_object(self, data):
-        return IrmaProbeResult(**data)
-
-
 class IrmaFileExt(object):
     """ IrmaFileExt
     Description for class
@@ -568,11 +497,8 @@ class IrmaFileExt(object):
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
         self.result_id = result_id
-        if probe_results is not None:
-            self.probe_results = []
-            for pres in probe_results:
-                pobj = IrmaProbeResultSchema().make_object(pres)
-                self.probe_results.append(pobj)
+        if file_infos is not None:
+            self.probe_results = probe_results
         if file_infos is not None:
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
 
@@ -601,7 +527,6 @@ class IrmaFileExt(object):
 
 
 class IrmaFileExtSchema(Schema):
-    probe_results = fields.Nested(IrmaProbeResultSchema, many=True)
     file_infos = fields.Nested(IrmaFileInfoSchema)
 
     class Meta:

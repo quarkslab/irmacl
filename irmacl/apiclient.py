@@ -521,7 +521,7 @@ class IrmaFileExt(object):
         ret += u"Resultid: {0}\n".format(self.result_id)
         if hasattr(self, 'file_infos'):
             ret += u"FileInfo: \n{0}\n".format(self.file_infos)
-        if hasattr(self, 'results'):
+        if hasattr(self, 'probe_results'):
             ret += u"Results: {0}\n".format(self.probe_results)
         return ret
 

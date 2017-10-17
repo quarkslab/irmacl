@@ -18,10 +18,10 @@ from irmacl.apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
     IrmaFilesApi, IrmaError, IrmaTagsApi
 try:
     # Python 2 import
-    from ConfigParser import ConfigParser, NoOptionError
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except ImportError:
     # Python 3 import
-    from configparser import ConfigParser, NoOptionError
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),
@@ -47,6 +47,9 @@ api_endpoint = config.get("Server", "api_endpoint")
 max_tries = 1
 verify = True
 pause = 3
+cert = None
+key = None
+ca = None
 
 try:
     max_tries = config.getint("Server", "max_tries")
@@ -63,6 +66,20 @@ try:
 except NoOptionError:
     pass
 
+try:
+    ca = config.get("Server", "ca")
+except NoOptionError:
+    pass
+
+try:
+    cert = config.get("Client", "cert")
+except (NoOptionError, NoSectionError):
+    pass
+
+try:
+    key = config.get("Client", "key")
+except (NoOptionError, NoSectionError):
+    pass
 # =========
 #  Helpers
 # =========
@@ -81,7 +98,8 @@ def file_download(sha256, dest_filepath, verbose=False):
     :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.download(sha256, dest_filepath)
     return
@@ -103,7 +121,8 @@ def file_results(sha256, limit=None, offset=None, verbose=False):
     :return: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
     return (total, files_list)
@@ -132,7 +151,8 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
                                          limit=limit, offset=offset)
@@ -149,7 +169,8 @@ def file_tag_add(sha256, tagid, verbose=False):
     :return: No return
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_add(sha256, tagid)
     return
@@ -165,7 +186,8 @@ def file_tag_remove(sha256, tagid, verbose=False):
     :return: No return
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_remove(sha256, tagid)
     return
@@ -180,7 +202,8 @@ def probe_list(verbose=False):
     :rtype: list
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
     return probelist
@@ -206,7 +229,8 @@ def scan_add_data(scan_id, data, filename, post_max_size_M=100, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.add_data(scan_id, data, filename,
                             post_max_size_M=post_max_size_M)
@@ -231,7 +255,8 @@ def scan_add_files(scan_id, filelist, post_max_size_M=100, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.add_files(scan_id, filelist,
                              post_max_size_M=post_max_size_M)
@@ -250,7 +275,8 @@ def scan_cancel(scan_id, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
     return scan
@@ -375,7 +401,8 @@ def scan_get(scan_id, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
     return scan
@@ -406,7 +433,8 @@ def scan_launch(scan_id, force, probe=None,
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.launch(scan_id, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,
@@ -430,7 +458,8 @@ def scan_list(limit=None, offset=None, verbose=False):
     :rtype: tuple(int, list of IrmaScan)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
     return (total, scan_list)
@@ -446,7 +475,8 @@ def scan_new(verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.new()
     return scan
@@ -468,7 +498,8 @@ def scan_proberesults(result_idx, formatted=True, verbose=False):
     :rtype: IrmaResults
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     proberesults = scanapi.probe_results(result_idx,
                                          formatted=formatted)
@@ -482,7 +513,8 @@ def tag_list(verbose=False):
     :rtype: list of IrmaTag
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
@@ -496,6 +528,7 @@ def tag_new(text, verbose=False):
     :return: None
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     return tagapi.new(text)

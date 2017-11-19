@@ -14,8 +14,8 @@
 
 import os
 import time
-from irmacl.apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
-    IrmaFilesApi, IrmaError, IrmaTagsApi
+from irmacl.apiclient import IrmaApiClient, IrmaAboutApi, IrmaScansApi, \
+    IrmaProbesApi, IrmaFilesApi, IrmaError, IrmaTagsApi
 try:
     # Python 2 import
     from ConfigParser import ConfigParser, NoOptionError, NoSectionError
@@ -83,6 +83,21 @@ except (NoOptionError, NoSectionError):
 # =========
 #  Helpers
 # =========
+
+
+def about(verbose=False):
+    """Retreives information about the application
+
+    :param verbose: enable verbose requests (optional default:False)
+    :type verbose: bool
+    :return: return dictionary of information about the applcation
+    :rtype: bool
+    """
+    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
+    aboutapi = IrmaAboutApi(cli)
+    return aboutapi.get()
 
 
 def file_download(sha256, dest_filepath, verbose=False):

@@ -163,6 +163,20 @@ class IrmaApiClient(object):
             raise IrmaError(reason)
 
 
+class IrmaAboutApi(object):
+    """ Probes Api
+    """
+
+    def __init__(self, apiclient):
+        self._apiclient = apiclient
+        return
+
+    def get(self):
+        route = '/about'
+        res = self._apiclient.get_call(route)
+        return res
+
+
 class IrmaProbesApi(object):
     """ Probes Api
     """

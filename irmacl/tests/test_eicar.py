@@ -96,6 +96,13 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 1,
+     "name": "F-PROT Antivirus (Linux)",
+     "results": "EICAR_Test_File \(exact\)",
+     "version": "4.6.5.141",
+     "duration": MAXTIME_NORMAL_PROBE,
+     "type": "antivirus",
+     },
+    {"status": 1,
      "name": "FSecure Antivirus (Linux)",
      "results": "EICAR_Test_File \[FSE\]",
      "version": "11.00",
@@ -392,6 +399,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_eset(self):
         self._scan_eicar('EsetNod32')
+
+    def test_scan_fprot(self):
+        self._scan_eicar('FProt')
 
     def test_scan_fsecure(self):
         self._scan_eicar('FSecure')

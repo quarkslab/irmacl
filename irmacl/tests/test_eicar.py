@@ -89,7 +89,7 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 1,
-     "name": "ESET NOD32 Antivirus Business Edition (Linux)",
+     "name": "ESET File Security (Linux)",
      "results": "Eicar test file",
      "version": "4.0.82",
      "duration": MAXTIME_FAST_PROBE,
@@ -397,8 +397,8 @@ class IrmaEicarTest(EicarTestCase):
     def test_scan_escan(self):
         self._scan_eicar('EScan')
 
-    def test_scan_eset(self):
-        self._scan_eicar('EsetNod32')
+    def test_scan_eset_file_security(self):
+        self._scan_eicar('EsetFileSecurity')
 
     def test_scan_fprot(self):
         self._scan_eicar('FProt')

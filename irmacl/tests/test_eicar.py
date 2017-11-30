@@ -448,10 +448,10 @@ class IrmaEicarTest(EicarTestCase):
         # to 4 requests per minute
         try:
             self._scan_eicar('VirusTotal')
-        except:
+        except Exception:
             raise unittest.SkipTest("Virustotal test Failed")
 
-    def test_scan_VirusBlokAda(self):
+    def test_scan_virusblokada(self):
         self._scan_eicar('VirusBlokAda')
 
     def test_scan_windefender(self):
@@ -471,6 +471,7 @@ class IrmaEicarTest(EicarTestCase):
             pass
         res = self._test_scan_file(filelist, probelist, force=True)
         self.check_eicar_results(res[self.filename])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -201,6 +201,13 @@ EICAR_RESULTS = [
      "type": "antivirus"
      },
     {"status": 1,
+     "name": "Windefender Anti-Virus (Windows)",
+     "results": "Virus:DOS/EICAR_Test_File",
+     "version": "4.10.14393.0   ",
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "antivirus"
+     },
+    {"status": 1,
      "name": "Zoner Antivirus (Linux)",
      "results": "EICAR.Test.File-NoVirus",
      "version": "1.3.0",
@@ -446,6 +453,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_VirusBlokAda(self):
         self._scan_eicar('VirusBlokAda')
+
+    def test_scan_windefender(self):
+        self._scan_eicar('WinDefender')
 
     def test_scan_zoner(self):
         self._scan_eicar('Zoner')

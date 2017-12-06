@@ -194,8 +194,8 @@ class IrmaAPIScanTests(IrmaAPITests):
             res = scan_proberesults(get_result.result_id)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), dict)
-            self.assertEqual(len(res.probe_results.values()),
-                             res.probes_finished)
+            results_cnt = sum(len(rs) for rs in res.probe_results.values())
+            self.assertEqual(results_cnt, res.probes_finished)
 
     def test_file_results_not_formatted(self):
         force = True
@@ -206,8 +206,8 @@ class IrmaAPIScanTests(IrmaAPITests):
             res = scan_proberesults(get_result.result_id, formatted=False)
             self.assertIn(res.name, FILENAMES)
             self.assertEqual(type(res.probe_results), dict)
-            self.assertEqual(len(res.probe_results.values()),
-                             res.probes_finished)
+            results_cnt = sum(len(rs) for rs in res.probe_results.values())
+            self.assertEqual(results_cnt, res.probes_finished)
 
 
 class IrmaAPIFileTests(IrmaAPITests):

@@ -90,12 +90,19 @@ EICAR_RESULTS = {
                     "version": "7.0-18",
                     "duration": MAXTIME_NORMAL_PROBE,
                  },
-            "ESET NOD32 Antivirus Business Edition (Linux)":
+            "ESET File Security (Linux)":
                 {
                     "status": 1,
                     "results": "Eicar test file",
                     "version": "4.0.82",
                     "duration": MAXTIME_FAST_PROBE,
+                 },
+            "F-PROT Antivirus (Linux)":
+                {
+                     "status": 1,
+                     "results": "EICAR_Test_File \(exact\)",
+                     "version": "4.6.5.141",
+                     "duration": MAXTIME_NORMAL_PROBE,
                  },
             "FSecure Antivirus (Linux)":
                 {
@@ -154,6 +161,13 @@ EICAR_RESULTS = {
                     "version": "10.6",
                     "duration": MAXTIME_NORMAL_PROBE,
                  },
+            "Windefender Anti-Virus (Windows)":
+                {
+                    "status": 1,
+                    "results": "Virus:DOS/EICAR_Test_File",
+                    "version": "4.10.14393.0",
+                    "duration": MAXTIME_FAST_PROBE,
+                },
             "VirusBlokAda Console Scanner (Linux)":
                 {
                     "status": 1,
@@ -344,8 +358,9 @@ class EicarTestCase(unittest.TestCase):
             self.assertIn(file_result.status, [-1, 0, 1])
             self.assertEqual(file_result.probes_finished,
                              file_result.probes_total)
-            self.assertEqual(len(file_result.probe_results),
-                             file_result.probes_total)
+            results_cnt = sum(len(rs)
+                              for rs in file_result.probe_results.values())
+            self.assertEqual(results_cnt, file_result.probes_total)
             res[get_result.name] = file_result.probe_results
         return res
 

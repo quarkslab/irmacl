@@ -209,6 +209,48 @@ class IrmaAPIScanTests(IrmaAPITests):
             results_cnt = sum(len(rs) for rs in res.probe_results.values())
             self.assertEqual(results_cnt, res.probes_finished)
 
+    def test_scan_empty_data(self):
+        force = True
+        probes = probe_list()
+        nb_jobs = len(probes)
+        filename = "empty_file"
+        scan = scan_data("", filename, force, probe=probes)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
+                         [filename], range(nb_jobs + 1),
+                         range(nb_jobs + 1), True, True, True)
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             [filename], range(nb_jobs + 1),
+                             range(nb_jobs + 1), force, True, True)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             [filename], [nb_jobs], [nb_jobs],
+                             force, True, True)
+
+    def test_scan_empty_file(self):
+        force = True
+        probes = probe_list()
+        nb_jobs = len(probes)
+        filename = "empty_file"
+        filepath = os.path.join(SAMPLES_DIR, filename)
+
+        scan = scan_files([filepath], force, probe=probes)
+        self._check_scan(scan, scan.id, ["ready", "uploaded",
+                                         "launched", "finished"],
+                         [filename], range(nb_jobs + 1),
+                         range(nb_jobs + 1), True, True, True)
+        try:
+            scan = scan_cancel(scan.id)
+            self._check_scan(scan, scan.id, ["cancelled"],
+                             [filename], range(nb_jobs + 1),
+                             range(nb_jobs + 1), force, True, True)
+        except IrmaError:
+            self._check_scan(scan, scan.id, ["finished"],
+                             [filename], [nb_jobs], [nb_jobs],
+                             force, True, True)
+
 
 class IrmaAPIFileTests(IrmaAPITests):
 
@@ -328,6 +370,7 @@ class IrmaAPITagTests(IrmaAPITests):
         self.assertGreaterEqual(total, 1)
         with self.assertRaises(IrmaError):
             file_tag_add(self.file_sha256, self.taglist[0].id)
+
 
 if __name__ == "__main__":
     unittest.main()

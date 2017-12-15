@@ -29,6 +29,7 @@ EICAR_FILE = "samples/eicar.com"
 EICAR_HASH = '275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f'
 MAXTIME_SLOW_PROBE = 60
 MAXTIME_NORMAL_PROBE = 30
+MAXTIME_FAST_PROBE = 10
 NOT_CHECKED = "This value is not checked"
 MAXTIME_FAST_PROBE = 10
 EICAR_RESULTS = {
@@ -406,6 +407,9 @@ class IrmaEicarTest(EicarTestCase):
     def test_scan_eset(self):
         self._scan_eicar('EsetNod32')
 
+    def test_scan_fprot(self):
+        self._scan_eicar('FProt')
+
     def test_scan_fsecure(self):
         self._scan_eicar('FSecure')
 
@@ -444,7 +448,7 @@ class IrmaEicarTest(EicarTestCase):
         # to 4 requests per minute
         try:
             self._scan_eicar('VirusTotal')
-        except:
+        except Exception:
             raise unittest.SkipTest("Virustotal test Failed")
 
     def test_scan_VirusBlokAda(self):
@@ -464,6 +468,7 @@ class IrmaEicarTest(EicarTestCase):
             pass
         res = self._test_scan_file(filelist, probelist, force=True)
         self._check_probe_result(res[self.filename], EICAR_RESULTS)
+
 
 if __name__ == '__main__':
     unittest.main()

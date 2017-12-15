@@ -2,11 +2,13 @@ import unittest
 import os
 import re
 import time
+import tempfile
+import hashlib
 from irmacl.apiclient import IrmaProbeResult, IrmaResults, IrmaError
 from irmacl.helpers import probe_list, scan_new, scan_add_data, \
     scan_add_files, scan_data, scan_files, scan_get, scan_launch, \
     scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
-    file_tag_remove
+    file_tag_remove, file_download, about
 
 
 cwd = os.path.dirname(__file__)
@@ -281,6 +283,24 @@ class IrmaAPIFileTests(IrmaAPITests):
         with self.assertRaises(IrmaError):
             file_search(name="name", hash="hash")
 
+    def test_file_download(self):
+        scan_files([FILEPATHS[0]], False, blocking=True)
+        dst = tempfile.NamedTemporaryFile(delete=False)
+        file_download(HASHES[0], dst.name)
+        hash = hashlib.sha256()
+        with open(dst.name, "rb") as f:
+            hash.update(f.read())
+        os.unlink(dst.name)
+        hashval = hash.hexdigest()
+        self.assertEqual(hashval, HASHES[0])
+
+
+class IrmaAPIAboutTests(IrmaAPITests):
+
+    def test_about(self):
+        res = about()
+        self.assertTrue("version" in res)
+
 
 class IrmaAPITagTests(IrmaAPITests):
     taglist = None
@@ -359,6 +379,7 @@ class IrmaAPITagTests(IrmaAPITests):
         self.assertGreaterEqual(total, 1)
         with self.assertRaises(IrmaError):
             file_tag_add(self.file_sha256, self.taglist[0].id)
+
 
 if __name__ == "__main__":
     unittest.main()

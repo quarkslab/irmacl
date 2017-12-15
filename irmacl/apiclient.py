@@ -286,11 +286,11 @@ class IrmaScansApi(object):
         data = self._apiclient.get_call(route)
         return self._scan_schema.make_object(data)
 
-    def probe_results(self, fw_id, formatted=True):
+    def probe_results(self, fe_id, formatted=True):
         extra_args = {}
         if not formatted:
             extra_args['formatted'] = 'no'
-        route = '/files_ext/{0}'.format(fw_id)
+        route = '/files_ext/{0}'.format(fe_id)
         data = self._apiclient.get_call(route, **extra_args)
         return self._results_schema.make_object(data)
 
@@ -518,7 +518,7 @@ class IrmaFileExt(object):
         self.name = name
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
-        self.result_id = result_id
+        self.id = self.result_id = result_id
         if file_infos is not None:
             self.probe_results = probe_results
         if file_infos is not None:
@@ -532,7 +532,8 @@ class IrmaFileExt(object):
         return IrmaFileExtSchema().dumps(self).data
 
     def __str__(self):
-        ret = u"Status: {0}\n".format(self.status)
+        ret = u"id: {0}\n".format(self.id)
+        ret += u"Status: {0}\n".format(self.status)
         ret += u"Probes finished: {0}\n".format(self.probes_finished)
         ret += u"Probes Total: {0}\n".format(self.probes_total)
         ret += u"Scanid: {0}\n".format(self.scan_id)
@@ -540,7 +541,6 @@ class IrmaFileExt(object):
         ret += u"Filename: {0}\n".format(self.name)
         ret += u"SHA256: {0}\n".format(self.file_sha256)
         ret += u"ParentFile SHA256: {0}\n".format(self.parent_file_sha256)
-        ret += u"Resultid: {0}\n".format(self.result_id)
         if hasattr(self, 'file_infos'):
             ret += u"FileInfo: \n{0}\n".format(self.file_infos)
         if hasattr(self, 'probe_results'):

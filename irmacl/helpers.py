@@ -320,8 +320,8 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    fileweb = data_upload(data, filename, verbose=verbose)
-    scan = scan_launch([fileweb.result_id], force, probe=probe,
+    file_ext = data_upload(data, filename, verbose=verbose)
+    scan = scan_launch([file_ext.id], force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     if blocking:
@@ -366,12 +366,12 @@ def scan_files(filelist, force, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    file_ids = []
+    file_ext_ids = []
     for filepath in filelist:
-        f = file_upload(filepath, verbose)
-        file_ids.append(f.result_id)
+        file_ext = file_upload(filepath, verbose)
+        file_ext_ids.append(file_ext.id)
 
-    scan = scan_launch(file_ids, force, probe=probe,
+    scan = scan_launch(file_ext_ids, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     total_timeout = blocking_timeout * len(filelist)
@@ -409,7 +409,7 @@ def scan_launch(file_list, force, probe=None, mimetype_filtering=None,
                 resubmit_files=None, verbose=False):
     """Launch an existing scan
 
-    :param file_list: list of files result_id returned by upload_data or
+    :param file_list: list of files_ext ids returned by upload_data or
     upload_files
     :param force: if True force a new analysis of files
         if False use existing results
@@ -455,18 +455,19 @@ def scan_list(limit=None, offset=None, verbose=False):
     :rtype: tuple(int, list of IrmaScan)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
     return (total, scan_list)
 
 
-def scan_proberesults(fw_id, formatted=True, verbose=False):
+def scan_proberesults(fe_id, formatted=True, verbose=False):
     """Fetch file probe results (for a given scan
-        one scan <-> one fw_id
+        one scan <-> one fe_id
 
-    :param result_idx: the fileweb id
-    :type fw_id: str
+    :param fe_id: the file_ext id
+    :type fe_id: str
     :param formatted: apply frontend formatters on results
         (optional default:True)
     :type formatted: bool
@@ -477,9 +478,10 @@ def scan_proberesults(fw_id, formatted=True, verbose=False):
     :rtype: IrmaResults
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    proberesults = scanapi.probe_results(fw_id,
+    proberesults = scanapi.probe_results(fe_id,
                                          formatted=formatted)
     return proberesults
 
@@ -491,7 +493,8 @@ def tag_list(verbose=False):
     :rtype: list of IrmaTag
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
@@ -505,6 +508,7 @@ def tag_new(text, verbose=False):
     :return: None
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     return tagapi.new(text)

@@ -404,8 +404,8 @@ class IrmaEicarTest(EicarTestCase):
     def test_scan_escan(self):
         self._scan_eicar('EScan')
 
-    def test_scan_eset(self):
-        self._scan_eicar('EsetNod32')
+    def test_scan_eset_file_security(self):
+        self._scan_eicar('EsetFileSecurity')
 
     def test_scan_fprot(self):
         self._scan_eicar('FProt')

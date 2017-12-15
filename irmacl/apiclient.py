@@ -73,6 +73,7 @@ class IrmaApiClient(object):
 
     def __init__(self, url, submitter="cli",
                  max_tries=1, pause=3, verify=True,
+                 cert=None, key=None, ca=None,
                  verbose=False):
         self.url = url
         self.submitter = submitter
@@ -83,6 +84,10 @@ class IrmaApiClient(object):
         # disable warning when verify is not set
         if self.verify is False:
             requests.packages.urllib3.disable_warnings()
+        self.cert = cert
+        self.key = key
+        if verify is True and ca is not None:
+            self.verify = ca
 
     def get_call(self, route, **extra_args):
         nb_try = 0
@@ -103,7 +108,9 @@ class IrmaApiClient(object):
                         dec_extra_args[k] = v
                 args = urlencode(dec_extra_args)
                 resp = requests.get(self.url + route + "?" + args,
-                                    verify=self.verify)
+                                    verify=self.verify,
+                                    cert=(self.cert, self.key))
+
                 return self._handle_resp(resp)
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
@@ -121,6 +128,7 @@ class IrmaApiClient(object):
             nb_try += 1
             try:
                 resp = requests.post(self.url + route, verify=self.verify,
+                                     cert=(self.cert, self.key),
                                      **extra_args)
                 return self._handle_resp(resp)
             except (IrmaError, RequestException) as e:
@@ -150,7 +158,7 @@ class IrmaApiClient(object):
                 data = json.loads(content)
                 if 'message' in data and data['message'] is not None:
                     reason += ": {0}".format(data['message'])
-            except:
+            except Exception:
                 pass
             raise IrmaError(reason)
 

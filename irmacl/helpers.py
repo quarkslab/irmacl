@@ -18,10 +18,10 @@ from irmacl.apiclient import IrmaApiClient, IrmaScansApi, IrmaProbesApi, \
     IrmaFilesApi, IrmaError, IrmaTagsApi
 try:
     # Python 2 import
-    from ConfigParser import ConfigParser, NoOptionError
+    from ConfigParser import ConfigParser, NoOptionError, NoSectionError
 except ImportError:
     # Python 3 import
-    from configparser import ConfigParser, NoOptionError
+    from configparser import ConfigParser, NoOptionError, NoSectionError
 
 conf_location = [os.curdir,
                  os.environ.get("IRMA_CONF", ""),
@@ -47,6 +47,9 @@ api_endpoint = config.get("Server", "api_endpoint")
 max_tries = 1
 verify = True
 pause = 3
+cert = None
+key = None
+ca = None
 
 try:
     max_tries = config.getint("Server", "max_tries")
@@ -63,6 +66,20 @@ try:
 except NoOptionError:
     pass
 
+try:
+    ca = config.get("Server", "ca")
+except NoOptionError:
+    pass
+
+try:
+    cert = config.get("Client", "cert")
+except (NoOptionError, NoSectionError):
+    pass
+
+try:
+    key = config.get("Client", "key")
+except (NoOptionError, NoSectionError):
+    pass
 # =========
 #  Helpers
 # =========
@@ -81,7 +98,8 @@ def file_download(sha256, dest_filepath, verbose=False):
     :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.download(sha256, dest_filepath)
     return
@@ -103,7 +121,8 @@ def file_results(sha256, limit=None, offset=None, verbose=False):
     :return: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
     return (total, files_list)
@@ -132,7 +151,8 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     :rtype: tuple(int, list of IrmaResults)
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
                                          limit=limit, offset=offset)
@@ -149,7 +169,8 @@ def file_tag_add(sha256, tagid, verbose=False):
     :return: No return
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_add(sha256, tagid)
     return
@@ -165,7 +186,8 @@ def file_tag_remove(sha256, tagid, verbose=False):
     :return: No return
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_remove(sha256, tagid)
     return
@@ -180,7 +202,8 @@ def probe_list(verbose=False):
     :rtype: list
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
     return probelist
@@ -200,7 +223,8 @@ def data_upload(data, filename, verbose=False):
     :rtype: IrmaFile
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileweb = fileapi.add_data(data, filename)
     return fileweb
@@ -218,7 +242,8 @@ def file_upload(filepath, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileweb = fileapi.create(filepath)
     return fileweb
@@ -236,7 +261,8 @@ def scan_cancel(scan_id, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
     return scan
@@ -357,7 +383,8 @@ def scan_get(scan_id, verbose=False):
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
     return scan
@@ -388,7 +415,8 @@ def scan_launch(file_list, force, probe=None, mimetype_filtering=None,
     :rtype: IrmaScan
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, verbose=verbose)
+                        verify=verify, cert=cert, key=key, ca=ca,
+                        verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.launch(file_list, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,

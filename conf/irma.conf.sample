@@ -3,3 +3,7 @@ api_endpoint=https://172.16.1.30/api/v1.1
 verify=False
 max_tries=3
 pause=5
+ca=
+[Client]
+cert=
+key=

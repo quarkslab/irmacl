@@ -2,8 +2,10 @@ import unittest
 import os
 import re
 import time
+import tempfile
+import hashlib
 from irmacl.apiclient import IrmaFileExt, IrmaError
-from irmacl.helpers import probe_list, data_upload, \
+from irmacl.helpers import probe_list, data_upload, file_download, about, \
     file_upload, scan_data, scan_files, scan_get, scan_launch, \
     scan_proberesults, file_search, scan_cancel, tag_list, file_tag_add, \
     file_tag_remove
@@ -291,6 +293,25 @@ class IrmaAPIFileTests(IrmaAPITests):
     def test_file_search_hash_name(self):
         with self.assertRaises(IrmaError):
             file_search(name="name", hash="hash")
+
+    def test_file_download(self):
+        scan_files([FILEPATHS[0]], False, blocking=True)
+        dst = tempfile.NamedTemporaryFile(delete=False)
+        file_download(HASHES[0], dst.name)
+        hash = hashlib.sha256()
+        with open(dst.name, "rb") as f:
+            hash.update(f.read())
+        os.unlink(dst.name)
+        hashval = hash.hexdigest()
+        self.assertEqual(hashval, HASHES[0])
+
+
+class IrmaAPIAboutTests(IrmaAPITests):
+
+    def test_about(self):
+        res = about()
+        self.assertTrue("version" in res)
+        self.assertIs(type(res["version"]), str)
 
 
 class IrmaAPITagTests(IrmaAPITests):

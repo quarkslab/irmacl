@@ -454,6 +454,9 @@ class IrmaEicarTest(EicarTestCase):
     def test_scan_VirusBlokAda(self):
         self._scan_eicar('VirusBlokAda')
 
+    def test_scan_windefender(self):
+        self._scan_eicar('WinDefender')
+
     def test_scan_zoner(self):
         self._scan_eicar('Zoner')
 

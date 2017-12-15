@@ -1,5 +1,6 @@
 # for python
-/venv/
+venv/
+venv3/
 *.pyc
 
 # Setuptools distribution folder.

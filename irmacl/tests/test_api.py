@@ -311,7 +311,6 @@ class IrmaAPIAboutTests(IrmaAPITests):
     def test_about(self):
         res = about()
         self.assertTrue("version" in res)
-        self.assertIs(type(res["version"]), str)
 
 
 class IrmaAPITagTests(IrmaAPITests):

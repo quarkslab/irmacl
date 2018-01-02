@@ -308,7 +308,11 @@ class IrmaFilesApi(object):
     def download(self, sha256, dest_filepath):
         route = '/files/{0}?alt=media'.format(sha256)
         with open(dest_filepath, 'wb') as handle:
-            response = requests.get(self._apiclient.url + route, stream=True)
+            response = requests.get(self._apiclient.url + route,
+                                    verify=self._apiclient.verify,
+                                    cert=(self._apiclient.cert,
+                                          self._apiclient.key),
+                                    stream=True)
             if not response.ok:
                 raise IrmaError("Error Downloading file")
             for block in response.iter_content(1024):

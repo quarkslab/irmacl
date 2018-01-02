@@ -473,6 +473,5 @@ class IrmaEicarTest(EicarTestCase):
         self._check_probe_result(res[self.filename], EICAR_RESULTS)
 
 
-
 if __name__ == '__main__':
     unittest.main()

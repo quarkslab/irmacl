@@ -62,7 +62,7 @@ EICAR_RESULTS = [
      },
     {"status": 1,
      "name": "Comodo Antivirus (Linux)",
-     "results": "Malware",
+     "results": "ApplicUnwnt",
      "version": "1.1.268025.1",
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"

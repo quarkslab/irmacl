@@ -153,7 +153,7 @@ class IrmaApiClient(object):
                 data = json.loads(content)
                 if 'message' in data and data['message'] is not None:
                     reason += ": {0}".format(data['message'])
-            except:
+            except Exception:
                 pass
             raise IrmaError(reason)
 

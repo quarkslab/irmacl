@@ -309,6 +309,27 @@ class IrmaScansApi(object):
         data = self._apiclient.get_call(route, **extra_args)
         return self._results_schema.make_object(data)
 
+    def quick(self, filepath, payload=None):
+        route = '/scans/quick'
+        file_data = open(filepath, 'rb').read()
+        try:
+            if type(filepath) is unicode:
+                filepath = filepath.encode("utf8")
+        except NameError:
+            # Python3 strings are already unicode
+            pass
+        dec_filepath = quote(filepath)
+        json_data = {"submitter": self._apiclient.submitter}
+        if payload is not None:
+            json_data.update(payload)
+        data = {
+                "files": (dec_filepath, file_data, 'application/octet-stream'),
+                "json": (None, json.dumps(json_data),
+                         'application/json')}
+        res = self._apiclient.post_call(route,
+                                        files=data)
+        return self._scan_schema.make_object(res)
+
 
 class IrmaFilesApi(object):
     """ IrmaFiles Api

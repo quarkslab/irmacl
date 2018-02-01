@@ -235,7 +235,8 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_file_results_formatted(self):
         force = True
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
+        scan = scan_files(FILEPATHS, force, mimetype_filtering=False,
+                          probe=probes, blocking=True)
         for get_result in scan.results:
             self.assertTrue(self._validate_uuid(str(get_result.result_id)))
             res = scan_proberesults(get_result.result_id)
@@ -247,7 +248,8 @@ class IrmaAPIScanTests(IrmaAPITests):
     def test_file_results_not_formatted(self):
         force = True
         probes = probe_list()
-        scan = scan_files(FILEPATHS, force, probe=probes, blocking=True)
+        scan = scan_files(FILEPATHS, force, mimetype_filtering=False,
+                          probe=probes, blocking=True)
         for get_result in scan.results:
             self.assertTrue(self._validate_uuid(str(get_result.result_id)))
             res = scan_proberesults(get_result.result_id, formatted=False)

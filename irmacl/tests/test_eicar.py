@@ -214,6 +214,13 @@ EICAR_RESULTS = [
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
+    {"status": 1,
+     "name": "LIEF",
+     "results": NOT_CHECKED,
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "metadata"
+     },
 ]
 
 
@@ -418,6 +425,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_kaspersky_windows(self):
         self._scan_eicar('KasperskyWin')
+
+    def test_scan_lief(self):
+        self._scan_eicar('LIEF')
 
     def test_scan_mcafee(self):
         self._scan_eicar('McAfeeVSCL')

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (c) 2013-2018 Quarkslab.
 # This file is part of IRMA project.
 #
@@ -12,7 +14,6 @@
 # modified, propagated, or distributed except according to the
 # terms contained in the LICENSE file.
 
-# -*- coding: utf-8 -*-
 import unittest
 import os
 import time

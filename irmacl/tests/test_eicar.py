@@ -186,6 +186,14 @@ EICAR_RESULTS = {
         },
     "metadata":
         {
+            "LIEF":
+                {
+                    "status": 1,
+                    "results": NOT_CHECKED,
+                    "version": "0.8.3-18d5b75",
+                    "duration": MAXTIME_FAST_PROBE,
+                    "type": "metadata"
+                },
             "PEiD PE Packer Identifier":
                 {
                     "status": 0,
@@ -418,6 +426,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_kaspersky_windows(self):
         self._scan_eicar('KasperskyWin')
+
+    def test_scan_lief(self):
+        self._scan_eicar('LIEF')
 
     def test_scan_mcafee(self):
         self._scan_eicar('McAfeeVSCL')

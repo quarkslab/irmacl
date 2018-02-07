@@ -320,7 +320,7 @@ class IrmaFilesApi(object):
         return
 
     def download(self, sha256, dest_filepath):
-        route = '/files/{0}?alt=media'.format(sha256)
+        route = '/files/{0}/download'.format(sha256)
         with open(dest_filepath, 'wb') as handle:
             response = requests.get(self._apiclient.url + route,
                                     verify=self._apiclient.verify,

@@ -186,13 +186,19 @@ EICAR_RESULTS = {
         },
     "metadata":
         {
+            "Dummy":
+                {
+                    "status": 1,
+                    "results": EICAR_HASH,
+                    "version": None,
+                    "duration": MAXTIME_FAST_PROBE,
+                 },
             "LIEF":
                 {
                     "status": 1,
                     "results": NOT_CHECKED,
                     "version": "0.8.3-18d5b75",
                     "duration": MAXTIME_FAST_PROBE,
-                    "type": "metadata"
                 },
             "PEiD PE Packer Identifier":
                 {
@@ -405,6 +411,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_drweb(self):
         self._scan_eicar('DrWeb')
+
+    def test_scan_dummy(self):
+        self._scan_eicar('Dummy')
 
     def test_scan_emsisoft_windows(self):
         self._scan_eicar('ASquaredCmdWin')

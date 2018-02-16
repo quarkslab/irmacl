@@ -165,6 +165,13 @@ EICAR_RESULTS = [
      "duration": MAXTIME_NORMAL_PROBE,
      "type": "antivirus"
      },
+    {"status": 1,
+     "name": "Dummy",
+     "results": EICAR_HASH,
+     "version": None,
+     "duration": MAXTIME_FAST_PROBE,
+     "type": "metadata"
+     },
     {"status": 0,
      "name": "PE Static Analyzer",
      "results": "Not a PE file",
@@ -404,6 +411,9 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_drweb(self):
         self._scan_eicar('DrWeb')
+
+    def test_scan_dummy(self):
+        self._scan_eicar('Dummy')
 
     def test_scan_emsisoft_windows(self):
         self._scan_eicar('ASquaredCmdWin')

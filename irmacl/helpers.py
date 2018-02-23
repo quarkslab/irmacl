@@ -241,8 +241,8 @@ def data_upload(data, filename, verbose=False):
                         verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
-    fileweb = fileapi.add_data(data, filename)
-    return fileweb
+    file = fileapi.add_data(data, filename)
+    return file
 
 
 def file_upload(filepath, verbose=False):
@@ -254,14 +254,14 @@ def file_upload(filepath, verbose=False):
         (optional default:False)
     :type verbose: bool
     :return: return the updated scan object
-    :rtype: IrmaScan
+    :rtype: IrmaFileExt
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
-    fileweb = fileapi.create(filepath)
-    return fileweb
+    file = fileapi.create(filepath)
+    return file
 
 
 def scan_cancel(scan_id, verbose=False):
@@ -320,8 +320,8 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    file_ext = data_upload(data, filename, verbose=verbose)
-    scan = scan_launch([file_ext.id], force, probe=probe,
+    file = data_upload(data, filename, verbose=verbose)
+    scan = scan_launch([file.id], force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     if blocking:
@@ -366,12 +366,12 @@ def scan_files(filelist, force, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    file_ext_ids = []
+    file_ids = []
     for filepath in filelist:
-        file_ext = file_upload(filepath, verbose)
-        file_ext_ids.append(file_ext.id)
+        file = file_upload(filepath, verbose)
+        file_ids.append(file.id)
 
-    scan = scan_launch(file_ext_ids, force, probe=probe,
+    scan = scan_launch(file_ids, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files, verbose=verbose)
     total_timeout = blocking_timeout * len(filelist)
@@ -405,11 +405,11 @@ def scan_get(scan_id, verbose=False):
     return scan
 
 
-def scan_launch(file_list, force, probe=None, mimetype_filtering=None,
+def scan_launch(file_id_list, force, probe=None, mimetype_filtering=None,
                 resubmit_files=None, verbose=False):
     """Launch an existing scan
 
-    :param file_list: list of files_ext ids returned by upload_data or
+    :param file_id_list: list of files id returned by upload_data or
     upload_files
     :param force: if True force a new analysis of files
         if False use existing results
@@ -433,7 +433,7 @@ def scan_launch(file_list, force, probe=None, mimetype_filtering=None,
                         verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     scanapi = IrmaScansApi(cli)
-    scan = scanapi.launch(file_list, force, probe=probe,
+    scan = scanapi.launch(file_id_list, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,
                           resubmit_files=resubmit_files)
     return scan

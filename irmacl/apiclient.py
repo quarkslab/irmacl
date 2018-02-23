@@ -526,7 +526,7 @@ class IrmaFileExt(object):
 
     def __init__(self, status, probes_finished, probes_total,
                  scan_id, scan_date, name,
-                 file_sha256, parent_file_sha256, result_id,
+                 file_sha256, parent_file_sha256, id=None, result_id=None,
                  probe_results=None, file_infos=None, **kwargs):
         self.status = status
         self.probes_finished = probes_finished
@@ -536,8 +536,11 @@ class IrmaFileExt(object):
         self.name = name
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
-        self.id = self.result_id = result_id
-        if file_infos is not None:
+        if result_id is not None:
+            self.id = result_id
+        if id is not None:
+            self.id = id
+        if probe_results is not None:
             self.probe_results = probe_results
         if file_infos is not None:
             self.file_infos = IrmaFileInfoSchema().make_object(file_infos)
@@ -571,7 +574,7 @@ class IrmaFileExtSchema(Schema):
 
     class Meta:
         fields = ('status', 'probes_finished', 'probes_total', 'scan_id',
-                  'name', 'parent_file_sha256', 'result_id',
+                  'name', 'parent_file_sha256', 'id',
                   'file_sha256', 'scan_date', 'file_infos', 'probe_results')
 
     def make_object(self, data):

@@ -47,7 +47,7 @@ probe_results_sample = \
 
 results_summary_sample = \
     {
-        u"result_id": u"d3347ebf-8589-488d-a867-3861237aef7d",
+        u"id": u"d3347ebf-8589-488d-a867-3861237aef7d",
         u"status": 1,
         u"probes_finished": 1,
         u"scan_id": u"ae769a05-30a8-43f7-b97b-b97270916629",

@@ -34,7 +34,7 @@ class TestCornerCase(unittest.TestCase):
         force = False
         scan = scan_files(UTF8_PATHS, force, blocking=True)
         for get_result in scan.results:
-            res = scan_proberesults(get_result.result_id)
+            res = scan_proberesults(get_result.id)
             self.assertIn(res.name, UTF8_SAMPLES)
         for filename in UTF8_SAMPLES:
             (_, res) = file_search(filename, limit=1)

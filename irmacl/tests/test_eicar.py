@@ -263,14 +263,14 @@ class EicarTestCase(unittest.TestCase):
         # do the teardown
         pass
 
-    def _check_result(self, get_result, scanid, filelist,
+    def _check_result(self, result, scanid, filelist,
                       range_finished, range_total):
-        self.assertEqual(get_result.scan_id, scanid)
-        self.assertTrue(get_result.name in filelist)
-        self.assertIn(get_result.status, [0, 1])
-        self.assertIsNotNone(get_result.result_id)
-        self.assertIn(get_result.probes_total, range_total)
-        self.assertIn(get_result.probes_finished, range_finished)
+        self.assertEqual(result.scan_id, scanid)
+        self.assertTrue(result.name in filelist)
+        self.assertIn(result.status, [0, 1])
+        self.assertIsNotNone(result.id)
+        self.assertIn(result.probes_total, range_total)
+        self.assertIn(result.probes_finished, range_finished)
         return
 
     def _check_results(self, results, scanid, filelist,
@@ -278,13 +278,13 @@ class EicarTestCase(unittest.TestCase):
                        none_infos=False, none_results=False):
         resname_list = sorted([r.name for r in results])
         self.assertEqual(resname_list, sorted(filelist))
-        for get_result in results:
-            self._check_result(get_result, scanid, filelist,
+        for result in results:
+            self._check_result(result, scanid, filelist,
                                nb_finished, nb_total)
             if none_infos is True:
-                self.assertFalse(hasattr(get_result, 'file_infos'))
+                self.assertFalse(hasattr(result, 'file_infos'))
             if none_results is True:
-                self.assertFalse(hasattr(get_result, 'probe_results'))
+                self.assertFalse(hasattr(result, 'probe_results'))
         return
 
     def _check_probe_result(self, probe_results, ref_results):
@@ -367,8 +367,8 @@ class EicarTestCase(unittest.TestCase):
                             [scan.probes_total], [scan.probes_total],
                             True, True)
         res = {}
-        for get_result in scan.results:
-            file_result = scan_proberesults(get_result.result_id,
+        for result in scan.results:
+            file_result = scan_proberesults(result.id,
                                             formatted=True, verbose=DEBUG)
             self.assertIn(file_result.status, [-1, 0, 1])
             self.assertEqual(file_result.probes_finished,
@@ -376,7 +376,7 @@ class EicarTestCase(unittest.TestCase):
             results_cnt = sum(len(rs)
                               for rs in file_result.probe_results.values())
             self.assertEqual(results_cnt, file_result.probes_total)
-            res[get_result.name] = file_result.probe_results
+            res[result.name] = file_result.probe_results
         return res
 
     def assertListContains(self, list1, list2):

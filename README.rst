@@ -7,24 +7,39 @@ IRMA is an asynchronous and customizable analysis system for suspicious files.
 This repository is a subproject of IRMA and contains the source code for IRMA's
 API client.
 
-**This api client is only made for IRMA API version 1.1.**
+**This api client is only made for IRMA API version 2.**
 
 Installation
 ````````````
-.. code-block:: bash
+.. code-block:: console
 
    $ python setup.py install
 
 
-Configuration file contains the API endpoint (full url) and some optional paramters (max number and
+Configuration file contains the API endpoint (full url) and some optional parameters (max number and
 delay in second between retries)
 
-.. code-block::
+.. code-block:: console
 
    [Server]
-   api_endpoint=http://172.16.1.30/api/v1.1
+   api_endpoint=http://172.16.1.30/api/v2
    max_tries=3
    pause=1
+
+Optionnally you could add some SSL configuration, ``ca`` key unser ``Server`` section
+if you want to verify server's certificate, and ``Client`` section if you have enabled
+client certificates.
+
+.. code-block:: console
+
+   [Server]
+   api_endpoint=https://172.16.1.30/api/v2
+   max_tries=3
+   pause=1
+   ca=<path to ca.crt>
+   [Client]
+   cert=<path to client.crt>
+   key=<path to client.key>
 
 
 and is searched in these locations in following order:
@@ -59,66 +74,69 @@ Usage
 
    >>> from irmacl.helpers import *
    >>> probe_list()
-   [u'StaticAnalyzer', u'Unarchive', u'VirusBlokAda', u'VirusTotal']
+   [u'Comodo', u'TrID']
 
    >>>  tag_list()
    [Tag malware [1], Tag clean [2], Tag suspicious [3]]
 
    >>>  scan_files(["./irma/tests/samples/eicar.com"], force=True, blocking=True)
-   Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
+   Scanid: b91c348b-1bc7-43fc-8363-983ef2e613e6
    Status: finished
-   Options: Force [True] Mimetype [True] Resubmit [True]
    Probes finished: 2
    Probes Total: 2
-   Date: 2015-11-24 15:43:03
-   Results: [<irma.apiclient.IrmaResults object at 0x7f3f250df890>]
+   Date: 2018-03-13 11:42:01
+   Options: Force [True] Resubmit [True]
+   Mimetype [True]
+   Results: [<irmacl.apiclient.IrmaFileExt object at 0x7fc50e8ee2d0>]
 
    >>> scan = _
    >>> print scan.results[0]
+   id: 9098500f-6f06-4926-9558-c08608c3be23
    Status: 1
    Probes finished: 2
    Probes Total: 2
-   Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
-   Scan Date: 2015-12-22 14:36:21
-   Filename: eicar.com
-   Filepath: ./irmacl/tests/samples
+   Scanid: b91c348b-1bc7-43fc-8363-983ef2e613e6
+   Scan Date: 2018-03-13 11:42:01
+   Filename: eicar.txt
+   SHA256: 131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267
    ParentFile SHA256: None
-   Resultid: 572f9418-ca3c-4fdf-bb35-50c11629a7e7
-   FileInfo:
-   None
-   Results: None
 
-   >>> print scan_proberesults("572f9418-ca3c-4fdf-bb35-50c11629a7e7")
+   >>> print scan_proberesults("9098500f-6f06-4926-9558-c08608c3be23")
+   id: 9098500f-6f06-4926-9558-c08608c3be23
    Status: 1
    Probes finished: 2
    Probes Total: 2
-   Scanid: ca2e8af4-0f5b-4a55-a1b8-2b8dc9ead068
-   Scan Date: 2015-12-22 14:36:21
-   Filename: eicar.com
-   Filepath: ./irmacl/tests/samples
+   Scanid: b91c348b-1bc7-43fc-8363-983ef2e613e6
+   Scan Date: 2018-03-13 11:42:01
+   Filename: eicar.txt
+   SHA256: 131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267
    ParentFile SHA256: None
-   Resultid: 572f9418-ca3c-4fdf-bb35-50c11629a7e7
    FileInfo:
-   Size: 68
-   Sha1: 3395856ce81f2b7382dee72602f798b642f14140
-   Sha256: 275a021bbfb6489e54d471899f7db9d1663fc695ec2fe2a2c4538aabf651fd0f
-   Md5: 44d88612fea8a8f36de82e1278abb02fs
-   First Scan: 2015-11-24 14:54:12
-   Last Scan: 2015-12-22 14:36:21
-   Id: 3
+   Size: 69
+   Sha1: cf8bd9dfddff007f75adf4c2be48005cea317c62
+   Sha256: 131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267
+   Md5: 69630e4574ec6798239b091cda43dca0s
+   First Scan: 2018-03-13 11:42:00
+   Last Scan: 2018-03-13 11:42:04
    Mimetype: EICAR virus test files
    Tags: []
 
-   Results: [<irmacl.apiclient.IrmaProbeResult object at 0x7f3f250b9dd0>, <irmacl.apiclient.IrmaProbeResult object at 0x7f3f250b9850>]
+   Results: {u'antivirus':{u'Comodo Antivirus (Linux)': {u'status': 1, u'duration': 1.42, u'version': u'1.1.268025.1', u'results': u'Malware', u'virus_database_version': u'2018-03-13'}},
+             u'metadata': {u'TrID File Identifier': {u'status': 1, u'duration': 0.1, u'version': None, u'results': [{u'ext': u'.COM', u'ratio': u'100.0', u'desc': u'EICAR antivirus test file (7057/5)'}]}}}
 
-   >>> fr = _
-   >>> print fr.probe_results[0]
-   Status: 1
-   Name: VirusBlokAda (Console Scanner)
-   Category: antivirus
-   Version: 3.12.26.4
-   Duration: 1.91s
-   Results: EICAR-Test-File
+   >>> file_result = _
+   >>> print file_result.probe_results
+   {u'antivirus': {u'Comodo Antivirus (Linux)': {u'duration': 1.42,
+   u'results': u'Malware',
+   u'status': 1,
+   u'version': u'1.1.268025.1',
+   u'virus_database_version': u'2018-03-13'}},
+ u'metadata': {u'TrID File Identifier': {u'duration': 0.1,
+   u'results': [{u'desc': u'EICAR antivirus test file (7057/5)',
+     u'ext': u'.COM',
+     u'ratio': u'100.0'}],
+   u'status': 1,
+   u'version': None}}}
 
 
 Searching for scans
@@ -126,12 +144,20 @@ Searching for scans
 .. code-block:: python
 
    >>> scan_list()
-   (89, [Scanid: ef0b9466-3132-40b7-990a-415f08377f09
-     Status: finished
-     Options: Force [True] Mimetype [True] Resubmit [True]
-     Probes finished: 1
-     Probes Total: 1
-     Date: 2015-11-24 15:04:27
+   (2, [Scanid: bec16782-7cc1-4807-b83c-42e23ef483c4
+    Status: finished
+    Probes finished: 2
+    Probes Total: 2
+    Date: 2018-03-13 11:40:48
+    Options: Force [True] Resubmit [True]
+    Mimetype [True] Results: [<irmacl.apiclient.IrmaFileExt object at 0x7fc50ded6610>],
+    Scanid: b91c348b-1bc7-43fc-8363-983ef2e613e6
+    Status: finished
+    Probes finished: 2
+    Probes Total: 2
+    Date: 2018-03-13 11:42:01
+    Options: Force [True] Resubmit [True]
+    Mimetype [True] Results: [<irmacl.apiclient.IrmaFileExt object at 0x7fc50ded6490>]])
    [...]
 
 
@@ -148,552 +174,98 @@ Searching for files
    Probes finished: 1
    Probes Total: 1
    Scanid: 7ae6b759-b357-4680-8358-b134b564b1ca
-   Filename: eicar.com
+   Filename: eicar.txt
    [...]
 
-   >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140")
-   (7,
-    [<irmacl.apiclient.IrmaResults at 0x7f3f250b96d0>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f24fdc1d0>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f24fdca90>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f24fdcdd0>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f24fdc690>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f2504f390>,
-     <irmacl.apiclient.IrmaResults at 0x7f3f24fea350>])
+   >>> file_search(hash="131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267")
+   (1, [<irmacl.apiclient.IrmaFileExt at 0x7fc50df78d50>])
 
-   >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140", tags=[1,2])
+   >>> file_search(hash="131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267", tags=[1,2])
    (0, [])
 
    # looking for an unexisting tagid raise IrmaError
-   >>> file_search(hash="3395856ce81f2b7382dee72602f798b642f14140", tags=[100])
+   >>> file_search(hash="131f95c51cc819465fa1797f6ccacf9d494aaaff46fa3eac73ae63ffbdfd8267", tags=[100])
    IrmaError: Error 402
 
 
 Objects (apiclient.py)
 -------
 
-**class irmacl.apiclient.IrmaFileInfo(id, size, timestamp_first_scan, timestamp_last_scan, sha1, sha256, md5, mimetype, tags)**
-
-   Bases: "object"
-
-   IrmaFileInfo Description for class
-
-   Variables:
-      * **id** -- id
-
-      * **timestamp_first_scan** -- timestamp when file was first
-        scanned in IRMA
-
-      * **timestamp_last_scan** -- timestamp when file was last
-        scanned in IRMA
-
-      * **size** -- size in bytes
-
-      * **md5** -- md5 hexdigest
-
-      * **sha1** -- sha1 hexdigest
-
-      * **sha256** -- sha256 hexdigest
-
-      * **mimetype** -- mimetype (based on python magic)
-
-      * **tags** -- list of tags
-
-   pdate_first_scan -- property, humanized date of first scan
-
-   pdate_last_scan -- property, humanized date of last scan
-
-   raw()
-
-**class irmacl.apiclient.IrmaProbeResult(**kwargs)**
-
-   Bases: "object"
-
-   IrmaProbeResult Description for class
-
-   Variables:
-      * **status** -- int probe specific (usually -1 is error, 0
-        nothing found 1 something found)
-
-      * **name** -- probe name
-
-      * **type** -- one of IrmaProbeType ('antivirus', 'external',
-        'database', 'metadata'...)
-
-      * **version** -- probe version
-
-      * **duration** -- analysis duration in seconds
-
-      * **results** -- probe results (could be str, list, dict)
-
-      * **error** -- error string (only relevant in error case when
-        status == -1)
-
-      * **external_url** -- remote url if available (only relevant
-        when type == 'external')
-
-      * **database** -- antivirus database digest (need unformatted
-        results) (only relevant when type == 'antivirus')
-
-      * **platform** -- 'linux' or 'windows' (need unformatted
-        results)
-
-   to_json()
-
-
-**class irmacl.apiclient.IrmaResults(file_infos=None, probe_results=None, **kwargs)**
-
-   Bases: "object"
-
-   IrmaResults Description for class
-
-   Variables:
-      * **status** -- int (0 means clean 1 at least one AV report
-        this file as a virus)
-
-      * **probes_finished** -- number of finished probes analysis
-        for current file
-
-      * **probes_total** -- number of total probes analysis for
-        current file
-
-      * **scan_id** -- id of the scan
-
-      * **scan_date** -- date of the scan
-
-      * **name** -- file name
-
-      * **path** -- file path (as sent during upload or resubmit)
-
-      * **result_id** -- id of specific results for this file and
-        this scan used to fetch probe_results through file_results
-        helper function
-
-      * **file_infos** -- IrmaFileInfo object
-
-      * **probe_results** -- list of IrmaProbeResults objects
-
-   to_json()
-
-   pscan_date -- property, humanized date of scan date
-
-
-**class irmacl.apiclient.IrmaScan(id, status, probes_finished, probes_total, date, force, resubmit_files, mimetype_filtering, results=[])**
-
-   Bases: "object"
-
-   IrmaScan Description for class
-
-   Variables:
-      * **id** -- id of the scan
-
-      * **status** -- int (one of IrmaScanStatus)
-
-      * **probes_finished** -- number of finished probes analysis
-        for current scan
-
-      * **probes_total** -- number of total probes analysis for
-        current scan
-
-      * **date** -- scan creation date
-
-      * **force** -- force a new analysis or not
-
-      * **resubmit_files** -- files generated by the probes should
-        be analyzed or not
-
-      * **mimetype_filtering** -- probes list should be decided
-        based on files mimetype or not
-
-      * **results** -- list of IrmaResults objects
-
-   is_finished()
-
-   is_launched()
-
-   pdate  -- property, printable date
-
-   pstatus -- property, printable status
-
-**class irmacl.apiclient.IrmaTag(id, text)**
-
-   Bases: "object"
-
-   IrmaTag Description for class
-
-   Variables:
-      * **id** -- id of the tag
-
-      * **text** -- tag label
+IrmaFileInfo
+  IrmaFileInfo are the metadata information linked to a IrmaFile
+
+IrmaScan
+  IrmaScan keep tracks of the IrmaFileExt scanned together, probe list used and scan options.
+
+IrmaFileExt
+  IrmaFileExt object are scan results for a IrmaFile. One IrmaFileExt could be linked to only one IrmaScan.
+  If you submit multiple times the same file and scan it each time, you create only one IrmaFile
+  but create multiple IrmaFileExt all linked to the same IrmaFile.
+
+IrmaTag
+  Tag will be directly linked to IrmaFiles, each IrmaFileExt linked to this IrmaFile will
+  be tagged indirectly.
 
 
 Helpers (helpers.py)
 -------
+about(verbose=False)
+  Retrieves information about the application
 
-**irmacl.helpers.file_download(sha256, dest_filepath, verbose=False)**
-
+file_download(sha256, dest_filepath, verbose=False)
    Download file identified by sha256 to dest_filepath
 
-   Parameters:
-      * **sha256** (*str of 64 chars*) -- file sha256 hash value
-
-      * **dest_filepath** (*str*) -- destination path
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return tuple of total files and list of results for the given
-      file
-
-   Return type:
-      tuple(int, list of IrmaResults)
-
-**irmacl.helpers.file_results(sha256, limit=None, offset=None, verbose=False)**
-
+file_results(sha256, limit=None, offset=None, verbose=False)
    List all results for a given file identified by sha256
 
-   Parameters:
-      * **sha256** (*str of 64 chars*) -- file sha256 hash value
-
-      * **limit** (*int*) -- max number of files to receive
-        (optional default:25)
-
-      * **offset** (*int*) -- index of first result (optional
-        default:0)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      tuple(int, list of IrmaResults)
-
-**irmacl.helpers.file_search(name=None, hash=None, tags=None, limit=None, offset=None, verbose=False)**
-
+file_search(name=None, hash=None, tags=None, limit=None, offset=None, verbose=False)
    Search a file by name or hash value
 
-   Parameters:
-      * **name** (*str*) -- name of the file ('*name*' will be
-        searched)
-
-      * **hash** (*str of (64, 40 or 32 chars)*) -- one of sha1, md5
-        or sha256 full hash value
-
-      * **tags** (*list of int*) -- list of tagid
-
-      * **limit** (*int*) -- max number of files to receive
-        (optional default:25)
-
-      * **offset** (*int*) -- index of first result (optional
-        default:0)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return tuple of total files and list of matching files already
-      scanned
-
-   Return type:
-      tuple(int, list of IrmaResults)
-
-**irmacl.helpers.file_tag_add(sha256, tagid, verbose=False)**
-
+file_tag_add(sha256, tagid, verbose=False)
    Add a tag to a File
 
-   Parameters:
-      * **sha256** (*str of (64 chars)*) -- file sha256 hash
-
-      * **tagid** (*int*) -- tag id
-
-   Returns:
-      No return
-
-**irmacl.helpers.file_tag_remove(sha256, tagid, verbose=False)**
-
+file_tag_remove(sha256, tagid, verbose=False)
    Remove a tag to a File
 
-   Parameters:
-      * **sha256** (*str of (64 chars)*) -- file sha256 hash
-
-      * **tagid** (*int*) -- tag id
-
-   Returns:
-      No return
-
-**irmacl.helpers.probe_list(verbose=False)**
-
+probe_list(verbose=False)
    List availables probes
 
-   Parameters:
-      **verbose** (*bool*) -- enable verbose requests (optional
-      default:False)
+data_upload(data, filename, verbose=False)
+   Upload data, returns a fileext
 
-   Returns:
-      return probe list
+file_upload(filepath, verbose=False)
+   Upload file, returns a fileext
 
-   Return type:
-      list
-
-**irmacl.helpers.scan_add_data(scan_id, data, filename, post_max_size_M=100, verbose=False)**
-
-   Add files to an existing scan
-
-   Parameters:
-      * **scan_id** (*str*) -- the scan id
-
-      * **data** (*str*) -- data to scan
-
-      * **filename** (*str*) -- filename associated to data
-
-      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
-        api will be done if total size is more than this limit, note that if
-        one or more file is bigger than this limit it will raise an error)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the updated scan object
-
-   Return type:
-      IrmaScan
-
-
-**irmacl.helpers.scan_add_files(scan_id, filelist, post_max_size_M=100, verbose=False)**
-
-   Add files to an existing scan
-
-   Parameters:
-      * **scan_id** (*str*) -- the scan id
-
-      * **filelist** (*list*) -- list of full path qualified files
-
-      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
-        api will be done if total size is more than this limit, note that if
-        one or more file is bigger than this limit it will raise an error)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the updated scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_cancel(scan_id, verbose=False)**
-
+scan_cancel(scan_id, verbose=False)
    Cancel a scan
 
-   Parameters:
-      * **scan_id** (*str*) -- the scan id
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_data(data, filename, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)**
-
+scan_data(data, filename, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)
    Wrapper around scan_new / scan_add / scan_launch
 
-   Parameters:
-      * **data** (*str*) -- data to scan
-
-      * **filename** (*str*) -- filename associated to data
-
-      * **force** (*bool*) -- if True force a new analysis of files
-        if False use existing results
-
-      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
-        api will be done if total size is more than this limit, note that if
-        one or more file is bigger than this limit it will raise an error)
-
-      * **probe** (*list*) -- probe list to use (optional default:
-        None means all)
-
-      * **mimetype_filtering** (*bool*) -- enable probe selection
-        based on mimetype (optional default:True)
-
-      * **resubmit_files** (*bool*) -- reanalyze files produced by
-        probes (optional default:True)
-
-      * **blocking** (*bool*) -- wether or not the function call
-        should block until scan ended
-
-      * **blocking_timeout** (*int*) -- maximum amount of time
-        before timeout per file (only enabled while blocking is ON)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the scan object
-
-   Return type:
-      IrmaScan
-
-
-**irmacl.helpers.scan_files(filelist, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)**
-
+scan_files(filelist, force, post_max_size_M=100, probe=None, mimetype_filtering=None, resubmit_files=None, blocking=False,blocking_timeout=60, verbose=False)
    Wrapper around scan_new / scan_add / scan_launch
 
-   Parameters:
-      * **filelist** (*list*) -- list of full path qualified files
-
-      * **force** (*bool*) -- if True force a new analysis of files
-        if False use existing results
-
-      * **post_max_size_M** (*int*) -- POST data max size in Mb (multiple calls to the
-        api will be done if total size is more than this limit, note that if
-        one or more file is bigger than this limit it will raise an error)
-
-      * **probe** (*list*) -- probe list to use (optional default:
-        None means all)
-
-      * **mimetype_filtering** (*bool*) -- enable probe selection
-        based on mimetype (optional default:True)
-
-      * **resubmit_files** (*bool*) -- reanalyze files produced by
-        probes (optional default:True)
-
-      * **blocking** (*bool*) -- wether or not the function call
-        should block until scan ended
-
-      * **blocking_timeout** (*int*) -- maximum amount of time
-        before timeout per file (only enabled while blocking is ON)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_get(scan_id, verbose=False)**
-
+scan_get(scan_id, verbose=False)
    Fetch a scan (useful to track scan progress with scan.pstatus)
 
-   Parameters:
-      * **scan_id** (*str*) -- the scan id
+scan_launch(file_id_list, force, probe=None, mimetype_filtering=None, resubmit_files=None, verbose=False)
+   Launch an existing scan on Filext ids previously uploaded
 
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_launch(scan_id, force, probe=None, mimetype_filtering=None, resubmit_files=None, verbose=False)**
-
-   Launch an existing scan
-
-   Parameters:
-      * **scan_id** (*str*) -- the scan id
-
-      * **force** (*bool*) -- if True force a new analysis of files
-        if False use existing results
-
-      * **probe** (*list*) -- probe list to use (optional default
-        None means all)
-
-      * **mimetype_filtering** (*bool*) -- enable probe selection
-        based on mimetype (optional default:True)
-
-      * **resubmit_files** (*bool*) -- reanalyze files produced by
-        probes (optional default:True)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return the updated scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_list(limit=None, offset=None, verbose=False)**
-
+scan_list(limit=None, offset=None, verbose=False)
    List all scans
 
-   Parameters:
-      * **limit** (*int*) -- max number of files to receive
-        (optional default:25)
-
-      * **offset** (*int*) -- index of first result (optional
-        default:0)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return tuple of total scans and list of scans
-
-   Return type:
-      tuple(int, list of IrmaScan)
-
-**irmacl.helpers.scan_new(verbose=False)**
-
+scan_new(verbose=False)
    Create a new scan
 
-   Parameters:
-      **verbose** (*bool*) -- enable verbose requests (optional
-      default:False)
-
-   Returns:
-      return the new generated scan object
-
-   Return type:
-      IrmaScan
-
-**irmacl.helpers.scan_proberesults(result_idx, formatted=True, verbose=False)**
-
+scan_proberesults(fe_id, formatted=True, verbose=False)
    Fetch file probe results (for a given scan
-      one scan <-> one result_idx
+      one scan <-> one fileext_id
 
-   Parameters:
-      * **result_idx** (*str*) -- the result id
-
-      * **formatted** (*bool*) -- apply frontend formatters on
-        results (optional default:True)
-
-      * **verbose** (*bool*) -- enable verbose requests (optional
-        default:False)
-
-   Returns:
-      return a IrmaResult object
-
-   Return type:
-      IrmaResults
-
-**irmacl.helpers.tag_list(verbose=False)**
-
+tag_list(verbose=False)
    List all available tags
 
-   Returns:
-      list of existing tags
-
-   Return type:
-      list of IrmaTag
-
-**irmacl.helpers.tag_new(text, verbose=False)**
-
+tag_new(text, verbose=False)
    Create a new tag
-
-   Parameters:
-      **text** (*str*) -- tag label (utf8 encoded)
-
-   Returns:
-      None
 
 Documentation
 `````````````

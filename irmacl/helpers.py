@@ -86,7 +86,7 @@ except (NoOptionError, NoSectionError):
 
 
 def about(verbose=False):
-    """Retreives information about the application
+    """Retrieves information about the application
 
     :param verbose: enable verbose requests (optional default:False)
     :type verbose: bool
@@ -225,7 +225,7 @@ def probe_list(verbose=False):
 
 
 def data_upload(data, filename, verbose=False):
-    """Add data to an existing scan
+    """Upload data returns a fileext
 
     :param data: data to scan
     :type data: raw string

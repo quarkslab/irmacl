@@ -12,6 +12,7 @@
 # modified, propagated, or distributed except according to the
 # terms contained in the LICENSE file.
 
+
 from setuptools import setup
 
 
@@ -19,8 +20,9 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+
 setup(name='irmacl',
-      version='2.0.0',
+      version='2.0.1',
       description='Irma command line tool for API v2',
       long_description=readme(),
       url='https://github.com/quarkslab/irma-cli',

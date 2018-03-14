@@ -536,10 +536,7 @@ class IrmaFileExt(object):
         self.name = name
         self.file_sha256 = file_sha256
         self.parent_file_sha256 = parent_file_sha256
-        if result_id is not None:
-            self.id = result_id
-        if id is not None:
-            self.id = id
+        self.id = id or result_id
         if probe_results is not None:
             self.probe_results = probe_results
         if file_infos is not None:

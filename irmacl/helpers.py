@@ -14,6 +14,7 @@
 
 import os
 import time
+import warnings
 from irmacl.apiclient import IrmaApiClient, IrmaAboutApi, IrmaScansApi, \
     IrmaProbesApi, IrmaFilesApi, IrmaError, IrmaTagsApi
 try:
@@ -35,13 +36,6 @@ for loc in conf_location:
         config_file = conf_tmp
         break
 
-if config_file is None:
-    raise IrmaError("irma.conf config file not found")
-
-config = ConfigParser()
-config.read(config_file)
-api_endpoint = config.get("Server", "api_endpoint")
-
 # Optional values in the config file
 # Here are the defaults values
 max_tries = 1
@@ -51,35 +45,44 @@ cert = None
 key = None
 ca = None
 
-try:
-    max_tries = config.getint("Server", "max_tries")
-except NoOptionError:
-    pass
+if config_file is None:
+    warnings.warn("irma.conf config file not found, make sure to set "
+                  "required parameters manually!", Warning)
+else:
+    config = ConfigParser()
+    config.read(config_file)
+    api_endpoint = config.get("Server", "api_endpoint")
 
-try:
-    pause = config.getint("Server", "pause")
-except NoOptionError:
-    pass
+    try:
+        max_tries = config.getint("Server", "max_tries")
+    except NoOptionError:
+        pass
 
-try:
-    verify = config.getboolean("Server", "verify")
-except NoOptionError:
-    pass
+    try:
+        pause = config.getint("Server", "pause")
+    except NoOptionError:
+        pass
 
-try:
-    ca = config.get("Server", "ca")
-except NoOptionError:
-    pass
+    try:
+        verify = config.getboolean("Server", "verify")
+    except NoOptionError:
+        pass
 
-try:
-    cert = config.get("Client", "cert")
-except (NoOptionError, NoSectionError):
-    pass
+    try:
+        ca = config.get("Server", "ca")
+    except NoOptionError:
+        pass
 
-try:
-    key = config.get("Client", "key")
-except (NoOptionError, NoSectionError):
-    pass
+    try:
+        cert = config.get("Client", "cert")
+    except (NoOptionError, NoSectionError):
+        pass
+
+    try:
+        key = config.get("Client", "key")
+    except (NoOptionError, NoSectionError):
+        pass
+
 # =========
 #  Helpers
 # =========

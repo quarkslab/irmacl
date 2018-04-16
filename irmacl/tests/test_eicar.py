@@ -247,23 +247,23 @@ class EicarTestCase(unittest.TestCase):
         # do the teardown
         pass
 
-    def _check_result(self, get_result, scanid, filelist,
+    def _check_result(self, get_result, scanid, filelist, statuses,
                       range_finished, range_total):
         self.assertEqual(get_result.scan_id, scanid)
         self.assertTrue(get_result.name in filelist)
-        self.assertIn(get_result.status, [0, 1])
+        self.assertIn(get_result.status, statuses)
         self.assertIsNotNone(get_result.result_id)
         self.assertIn(get_result.probes_total, range_total)
         self.assertIn(get_result.probes_finished, range_finished)
         return
 
-    def _check_results(self, results, scanid, filelist,
+    def _check_results(self, results, scanid, filelist, statuses,
                        nb_finished, nb_total,
                        none_infos=False, none_results=False):
         resname_list = sorted([r.name for r in results])
         self.assertEqual(resname_list, sorted(filelist))
         for get_result in results:
-            self._check_result(get_result, scanid, filelist,
+            self._check_result(get_result, scanid, filelist, statuses,
                                nb_finished, nb_total)
             if none_infos is True:
                 self.assertFalse(hasattr(get_result, 'file_infos'))
@@ -340,7 +340,7 @@ class EicarTestCase(unittest.TestCase):
         self.assertEqual(len(scan.results), 0)
 
         scan = scan_add_files(scan.id, filelist, verbose=DEBUG)
-        self._check_results(scan.results, scanid, filenames, [0], [0],
+        self._check_results(scan.results, scanid, filenames, [None], [0], [0],
                             True, True)
 
         scan = scan_launch(scan.id, force=force, probe=probelist,
@@ -349,7 +349,7 @@ class EicarTestCase(unittest.TestCase):
                            verbose=DEBUG)
         start = time.time()
         while not scan.is_finished():
-            self._check_results(scan.results, scanid, filenames,
+            self._check_results(scan.results, scanid, filenames, [None, 0, 1],
                                 range(nb_probes + 1), range(nb_jobs + 1),
                                 True, True)
             time.sleep(BEFORE_NEXT_PROGRESS)
@@ -358,14 +358,18 @@ class EicarTestCase(unittest.TestCase):
             scan = scan_get(scan.id)
 
         # Scan finished
-        self._check_results(scan.results, scanid, filenames,
+        # if no probe is has been run then status should be None
+        statuses = [0, 1] if scan.probes_total > 0 else [None]
+        self._check_results(scan.results, scan.id, filenames, statuses,
                             [scan.probes_total], [scan.probes_total],
                             True, True)
         res = {}
         for get_result in scan.results:
             file_result = scan_proberesults(get_result.result_id,
                                             formatted=True, verbose=DEBUG)
-            self.assertIn(file_result.status, [-1, 0, 1])
+            # if no probe is has been run then status should be None
+            statuses = [-1, 0, 1] if file_result.probes_total else [None]
+            self.assertIn(file_result.status, statuses)
             self.assertEqual(file_result.probes_finished,
                              file_result.probes_total)
             self.assertEqual(len(file_result.probe_results),

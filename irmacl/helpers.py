@@ -92,7 +92,7 @@ else:
 # =========
 
 
-def about(verbose=False):
+def about(verbose=False, session=None):
     """Retrieves information about the application
 
     :param verbose: enable verbose requests (optional default:False)
@@ -102,12 +102,12 @@ def about(verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     aboutapi = IrmaAboutApi(cli)
     return aboutapi.get()
 
 
-def file_download(sha256, dest_filepath, verbose=False):
+def file_download(sha256, dest_filepath, verbose=False, session=None):
     """Download file identified by sha256 to dest_filepath
 
     :param sha256: file sha256 hash value
@@ -121,13 +121,13 @@ def file_download(sha256, dest_filepath, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     fileapi.download(sha256, dest_filepath)
     return
 
 
-def file_results(sha256, limit=None, offset=None, verbose=False):
+def file_results(sha256, limit=None, offset=None, verbose=False, session=None):
     """List all results for a given file identified by sha256
 
     :param sha256: file sha256 hash value
@@ -144,14 +144,14 @@ def file_results(sha256, limit=None, offset=None, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
     return (total, files_list)
 
 
 def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
-                verbose=False):
+                verbose=False, session=None):
     """Search a file by name or hash value
 
     :param name: name of the file ('*name*' will be searched)
@@ -174,14 +174,14 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
                                          limit=limit, offset=offset)
     return (total, files_list)
 
 
-def file_tag_add(sha256, tagid, verbose=False):
+def file_tag_add(sha256, tagid, verbose=False, session=None):
     """Add a tag to a File
 
     :param sha256: file sha256 hash
@@ -193,13 +193,13 @@ def file_tag_add(sha256, tagid, verbose=False):
     cli = IrmaApiClient(api_endpoint, submitter=submitter,
                         max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_add(sha256, tagid)
     return
 
 
-def file_tag_remove(sha256, tagid, verbose=False):
+def file_tag_remove(sha256, tagid, verbose=False, session=None):
     """Remove a tag to a File
 
     :param sha256: file sha256 hash
@@ -210,13 +210,13 @@ def file_tag_remove(sha256, tagid, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_remove(sha256, tagid)
     return
 
 
-def probe_list(verbose=False):
+def probe_list(verbose=False, session=None):
     """List availables probes
 
     :param verbose: enable verbose requests (optional default:False)
@@ -226,13 +226,13 @@ def probe_list(verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
     return probelist
 
 
-def data_upload(data, filename, verbose=False):
+def data_upload(data, filename, verbose=False, session=None):
     """Upload data returns a fileext
 
     :param data: data to scan
@@ -247,13 +247,13 @@ def data_upload(data, filename, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     file = fileapi.add_data(data, filename)
     return file
 
 
-def file_upload(filepath, verbose=False):
+def file_upload(filepath, verbose=False, session=None):
     """Upload file to IRMA server
 
     :param filepath: full path qualified file
@@ -266,13 +266,13 @@ def file_upload(filepath, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     fileapi = IrmaFilesApi(cli)
     file = fileapi.create(filepath)
     return file
 
 
-def scan_cancel(scan_id, verbose=False):
+def scan_cancel(scan_id, verbose=False, session=None):
     """Cancel a scan
 
     :param scan_id: the scan id
@@ -285,7 +285,7 @@ def scan_cancel(scan_id, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
                         pause=pause, verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        verbose=verbose, session=session)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
     return scan
@@ -293,7 +293,8 @@ def scan_cancel(scan_id, verbose=False):
 
 def scan_data(data, filename, force, post_max_size_M=100, probe=None,
               mimetype_filtering=None, resubmit_files=None,
-              blocking=False, blocking_timeout=60, verbose=False):
+              blocking=False, blocking_timeout=60,
+              verbose=False, session=None):
     """Wrapper around scan_new / scan_add_data / scan_launch
 
     :param data: data to scan
@@ -328,11 +329,11 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     :return: return the scan object
     :rtype: IrmaScan
     """
-    file = data_upload(data, filename, verbose=verbose)
+    file = data_upload(data, filename, verbose=verbose, session=session)
     scan = scan_launch([file.id], force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files,
-                       verbose=verbose)
+                       verbose=verbose, session=session)
     if blocking:
         start = time.time()
         while not scan.is_finished():
@@ -340,13 +341,14 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
             if now > (start + blocking_timeout):
                 raise IrmaError("Timeout waiting for scan to finish")
             time.sleep(1)
-            scan = scan_get(scan.id, verbose=verbose)
+            scan = scan_get(scan.id, verbose=verbose, session=session)
     return scan
 
 
 def scan_files(filelist, force, probe=None,
                mimetype_filtering=None, resubmit_files=None,
-               blocking=False, blocking_timeout=60, verbose=False):
+               blocking=False, blocking_timeout=60,
+               verbose=False, session=None):
     """Wrapper around file_upload / scan_launch
 
     :param filelist: list of full path qualified files
@@ -377,13 +379,13 @@ def scan_files(filelist, force, probe=None,
     """
     file_ids = []
     for filepath in filelist:
-        file = file_upload(filepath, verbose)
+        file = file_upload(filepath, verbose, session)
         file_ids.append(file.id)
 
     scan = scan_launch(file_ids, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
                        resubmit_files=resubmit_files,
-                       verbose=verbose)
+                       verbose=verbose, session=session)
     total_timeout = blocking_timeout * len(filelist)
     if blocking:
         start = time.time()
@@ -392,11 +394,11 @@ def scan_files(filelist, force, probe=None,
             if now > (start + total_timeout):
                 raise IrmaError("Timeout waiting for scan to finish")
             time.sleep(1)
-            scan = scan_get(scan.id, verbose=verbose)
+            scan = scan_get(scan.id, verbose=verbose, session=session)
     return scan
 
 
-def scan_get(scan_id, verbose=False):
+def scan_get(scan_id, verbose=False, session=None):
     """Fetch a scan (useful to track scan progress with scan.pstatus)
 
     :param scan_id: the scan id
@@ -409,14 +411,14 @@ def scan_get(scan_id, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
     return scan
 
 
 def scan_launch(file_id_list, force, probe=None, mimetype_filtering=None,
-                resubmit_files=None, verbose=False):
+                resubmit_files=None, verbose=False, session=None):
     """Launch an existing scan
 
     :param file_id_list: list of files id returned by upload_data or
@@ -441,7 +443,7 @@ def scan_launch(file_id_list, force, probe=None, mimetype_filtering=None,
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.launch(file_id_list, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,
@@ -449,7 +451,7 @@ def scan_launch(file_id_list, force, probe=None, mimetype_filtering=None,
     return scan
 
 
-def scan_list(limit=None, offset=None, verbose=False):
+def scan_list(limit=None, offset=None, verbose=False, session=None):
     """List all scans
 
     :param limit: max number of files to receive
@@ -466,13 +468,13 @@ def scan_list(limit=None, offset=None, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
     return (total, scan_list)
 
 
-def scan_proberesults(fe_id, formatted=True, verbose=False):
+def scan_proberesults(fe_id, formatted=True, verbose=False, session=None):
     """Fetch file probe results (for a given scan
         one scan <-> one fe_id
 
@@ -489,14 +491,14 @@ def scan_proberesults(fe_id, formatted=True, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     scanapi = IrmaScansApi(cli)
     proberesults = scanapi.probe_results(fe_id,
                                          formatted=formatted)
     return proberesults
 
 
-def tag_list(verbose=False):
+def tag_list(verbose=False, session=None):
     """List all available tags
 
     :return: list of existing tags
@@ -504,13 +506,13 @@ def tag_list(verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
 
 
-def tag_new(text, verbose=False):
+def tag_new(text, verbose=False, session=None):
     """Create a new tag
 
     :param text: tag label (utf8 encoded)
@@ -519,6 +521,6 @@ def tag_new(text, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        submitter=submitter, verbose=verbose)
+                        submitter=submitter, verbose=verbose, session=session)
     tagapi = IrmaTagsApi(cli)
     return tagapi.new(text)

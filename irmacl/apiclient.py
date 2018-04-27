@@ -88,7 +88,7 @@ class IrmaApiClient(object):
     def __init__(self, url, submitter="cli",
                  max_tries=1, pause=3, verify=True,
                  cert=None, key=None, ca=None,
-                 verbose=False):
+                 verbose=False, session=None):
         self.url = url
         self.submitter = submitter
         self.verbose = verbose
@@ -102,6 +102,7 @@ class IrmaApiClient(object):
         self.key = key
         if verify is True and ca is not None:
             self.verify = ca
+        self.session = session if session is not None else requests.Session()
 
     def get_call(self, route, **extra_args):
         nb_try = 0
@@ -121,9 +122,9 @@ class IrmaApiClient(object):
                         # so just pass
                         dec_extra_args[k] = v
                 args = urlencode(dec_extra_args)
-                resp = requests.get(self.url + route + "?" + args,
-                                    verify=self.verify,
-                                    cert=(self.cert, self.key))
+                resp = self.session.get(self.url + route + "?" + args,
+                                        verify=self.verify,
+                                        cert=(self.cert, self.key))
 
                 return self._handle_resp(resp)
             except (IrmaError, RequestException) as e:
@@ -141,9 +142,9 @@ class IrmaApiClient(object):
         while nb_try < self.max_tries:
             nb_try += 1
             try:
-                resp = requests.post(self.url + route, verify=self.verify,
-                                     cert=(self.cert, self.key),
-                                     **extra_args)
+                resp = self.session.post(self.url + route, verify=self.verify,
+                                         cert=(self.cert, self.key),
+                                         **extra_args)
                 return self._handle_resp(resp)
             except (IrmaError, RequestException) as e:
                 if nb_try < self.max_tries:
@@ -322,14 +323,14 @@ class IrmaFilesApi(object):
     def download(self, sha256, dest_filepath):
         route = '/files/{0}/download'.format(sha256)
         with open(dest_filepath, 'wb') as handle:
-            response = requests.get(self._apiclient.url + route,
-                                    verify=self._apiclient.verify,
-                                    cert=(self._apiclient.cert,
-                                          self._apiclient.key),
-                                    stream=True)
-            if not response.ok:
+            res = self._apiclient.session.get(self._apiclient.url + route,
+                                              verify=self._apiclient.verify,
+                                              cert=(self._apiclient.cert,
+                                                    self._apiclient.key),
+                                              stream=True)
+            if not res.ok:
                 raise IrmaError("Error Downloading file")
-            for block in response.iter_content(1024):
+            for block in res.iter_content(1024):
                 handle.write(block)
         return
 

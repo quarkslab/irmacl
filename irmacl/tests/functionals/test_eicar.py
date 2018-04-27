@@ -19,6 +19,7 @@ from irmacl.helpers import probe_list, file_upload, scan_get, \
     scan_launch, scan_proberesults, scan_files
 import time
 import logging
+import requests
 
 logging.getLogger("requests").setLevel(logging.WARNING)
 SCAN_TIMEOUT_SEC = 3000
@@ -32,6 +33,7 @@ MAXTIME_NORMAL_PROBE = 30
 MAXTIME_FAST_PROBE = 10
 NOT_CHECKED = "This value is not checked"
 MAXTIME_FAST_PROBE = 10
+SESSION = requests.Session()
 EICAR_RESULTS = {
     "antivirus":
         {
@@ -256,7 +258,7 @@ class EicarTestCase(unittest.TestCase):
         cwd = os.path.abspath(os.path.dirname(__file__))
         self.filepath = os.path.join(cwd, EICAR_FILE)
         self.filename = os.path.basename(self.filepath)
-        self.probelist = probe_list(verbose=DEBUG)
+        self.probelist = probe_list(verbose=DEBUG, session=SESSION)
         assert os.path.exists(self.filepath)
 
     def tearDown(self):
@@ -351,7 +353,7 @@ class EicarTestCase(unittest.TestCase):
         scan = scan_files(filelist, force=force, probe=probelist,
                           mimetype_filtering=mimetype_filtering,
                           resubmit_files=resubmit_files,
-                          verbose=DEBUG)
+                          verbose=DEBUG, session=SESSION)
         start = time.time()
         while not scan.is_finished():
             self._check_results(scan.results, scan.id, filenames, [None, 0, 1],
@@ -360,7 +362,7 @@ class EicarTestCase(unittest.TestCase):
             time.sleep(BEFORE_NEXT_PROGRESS)
             now = time.time()
             self.assertLessEqual(now, start + timeout, "Results Timeout")
-            scan = scan_get(scan.id)
+            scan = scan_get(scan.id, session=SESSION)
 
         # Scan finished
         # if no probe is has been run then status should be None
@@ -371,7 +373,9 @@ class EicarTestCase(unittest.TestCase):
         res = {}
         for result in scan.results:
             file_result = scan_proberesults(result.id,
-                                            formatted=True, verbose=DEBUG)
+                                            formatted=True,
+                                            verbose=DEBUG,
+                                            session=SESSION)
             # if no probe is has been run then status should be None
             statuses = [-1, 0, 1] if file_result.probes_total else [None]
             self.assertIn(file_result.status, statuses)
@@ -486,7 +490,7 @@ class IrmaEicarTest(EicarTestCase):
 
     def test_scan_all_probes(self):
         filelist = [self.filepath]
-        probelist = probe_list()
+        probelist = probe_list(session=SESSION)
         # remove Virustotal from grouped scan as public API is limited
         # to 4 requests per minute
         try:

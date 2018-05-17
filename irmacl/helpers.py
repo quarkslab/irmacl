@@ -44,43 +44,48 @@ pause = 3
 cert = None
 key = None
 ca = None
+submitter = "cli"
 
 if config_file is None:
     warnings.warn("irma.conf config file not found, make sure to set required parameters manually!", Warning)
 else:
-  config = ConfigParser()
-  config.read(config_file)
-  api_endpoint = config.get("Server", "api_endpoint")
+    config = ConfigParser()
+    config.read(config_file)
+    api_endpoint = config.get("Server", "api_endpoint")
+    try:
+        max_tries = config.getint("Server", "max_tries")
+    except NoOptionError:
+        pass
 
-  try:
-      max_tries = config.getint("Server", "max_tries")
-  except NoOptionError:
-      pass
+    try:
+        pause = config.getint("Server", "pause")
+    except NoOptionError:
+        pass
 
-  try:
-      pause = config.getint("Server", "pause")
-  except NoOptionError:
-      pass
+    try:
+        verify = config.getboolean("Server", "verify")
+    except NoOptionError:
+        pass
 
-  try:
-      verify = config.getboolean("Server", "verify")
-  except NoOptionError:
-      pass
+    try:
+        ca = config.get("Server", "ca")
+    except NoOptionError:
+        pass
 
-  try:
-      ca = config.get("Server", "ca")
-  except NoOptionError:
-      pass
+    try:
+        cert = config.get("Client", "cert")
+    except (NoOptionError, NoSectionError):
+        pass
 
-  try:
-      cert = config.get("Client", "cert")
-  except (NoOptionError, NoSectionError):
-      pass
+    try:
+        key = config.get("Client", "key")
+    except (NoOptionError, NoSectionError):
+        pass
 
-  try:
-      key = config.get("Client", "key")
-  except (NoOptionError, NoSectionError):
-      pass
+    try:
+        submitter = config.get("Client", "submitter")
+    except (NoOptionError, NoSectionError):
+        pass
 # =========
 #  Helpers
 # =========
@@ -94,8 +99,8 @@ def about(verbose=False):
     :return: return dictionary of information about the applcation
     :rtype: bool
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     aboutapi = IrmaAboutApi(cli)
     return aboutapi.get()
@@ -113,8 +118,8 @@ def file_download(sha256, dest_filepath, verbose=False):
     :return: return tuple of total files and list of results for the given file
     :rtype: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.download(sha256, dest_filepath)
@@ -136,8 +141,8 @@ def file_results(sha256, limit=None, offset=None, verbose=False):
     :type verbose: bool
     :return: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.results(sha256, limit=limit, offset=offset)
@@ -166,8 +171,8 @@ def file_search(name=None, hash=None, tags=None, limit=None, offset=None,
         scanned
     :rtype: tuple(int, list of IrmaResults)
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     (total, files_list) = fileapi.search(name=name, hash=hash, tags=tags,
@@ -184,7 +189,8 @@ def file_tag_add(sha256, tagid, verbose=False):
     :type tagid: int
     :return: No return
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter,
+                        max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
@@ -201,8 +207,8 @@ def file_tag_remove(sha256, tagid, verbose=False):
     :type tagid: int
     :return: No return
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     fileapi.tag_remove(sha256, tagid)
@@ -217,8 +223,8 @@ def probe_list(verbose=False):
     :return: return probe list
     :rtype: list
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     probesapi = IrmaProbesApi(cli)
     probelist = probesapi.list()
@@ -238,8 +244,8 @@ def data_upload(data, filename, verbose=False):
     :return: return the created file object
     :rtype: IrmaFile
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     file = fileapi.add_data(data, filename)
@@ -257,8 +263,8 @@ def file_upload(filepath, verbose=False):
     :return: return the updated scan object
     :rtype: IrmaFileExt
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     fileapi = IrmaFilesApi(cli)
     file = fileapi.create(filepath)
@@ -276,8 +282,8 @@ def scan_cancel(scan_id, verbose=False):
     :return: return the scan object
     :rtype: IrmaScan
     """
-    cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
-                        verify=verify, cert=cert, key=key, ca=ca,
+    cli = IrmaApiClient(api_endpoint, submitter=submitter, max_tries=max_tries,
+                        pause=pause, verify=verify, cert=cert, key=key, ca=ca,
                         verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.cancel(scan_id)
@@ -324,7 +330,8 @@ def scan_data(data, filename, force, post_max_size_M=100, probe=None,
     file = data_upload(data, filename, verbose=verbose)
     scan = scan_launch([file.id], force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
-                       resubmit_files=resubmit_files, verbose=verbose)
+                       resubmit_files=resubmit_files,
+                       verbose=verbose)
     if blocking:
         start = time.time()
         while not scan.is_finished():
@@ -374,7 +381,8 @@ def scan_files(filelist, force, probe=None,
 
     scan = scan_launch(file_ids, force, probe=probe,
                        mimetype_filtering=mimetype_filtering,
-                       resubmit_files=resubmit_files, verbose=verbose)
+                       resubmit_files=resubmit_files,
+                       verbose=verbose)
     total_timeout = blocking_timeout * len(filelist)
     if blocking:
         start = time.time()
@@ -400,7 +408,7 @@ def scan_get(scan_id, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.get(scan_id)
     return scan
@@ -432,7 +440,7 @@ def scan_launch(file_id_list, force, probe=None, mimetype_filtering=None,
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     scan = scanapi.launch(file_id_list, force, probe=probe,
                           mimetype_filtering=mimetype_filtering,
@@ -457,7 +465,7 @@ def scan_list(limit=None, offset=None, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     (total, scan_list) = scanapi.list(limit=limit, offset=offset)
     return (total, scan_list)
@@ -480,7 +488,7 @@ def scan_proberesults(fe_id, formatted=True, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     scanapi = IrmaScansApi(cli)
     proberesults = scanapi.probe_results(fe_id,
                                          formatted=formatted)
@@ -495,7 +503,7 @@ def tag_list(verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     taglist = tagapi.list()
     return taglist
@@ -510,6 +518,6 @@ def tag_new(text, verbose=False):
     """
     cli = IrmaApiClient(api_endpoint, max_tries=max_tries, pause=pause,
                         verify=verify, cert=cert, key=key, ca=ca,
-                        verbose=verbose)
+                        submitter=submitter, verbose=verbose)
     tagapi = IrmaTagsApi(cli)
     return tagapi.new(text)

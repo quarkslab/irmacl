@@ -22,7 +22,7 @@ def readme():
 
 
 setup(name='irmacl',
-      version='2.0.4',
+      version='2.0.5',
       description='Irma command line tool for API v2',
       long_description=readme(),
       url='https://github.com/quarkslab/irma-cli',

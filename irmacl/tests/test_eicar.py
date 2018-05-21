@@ -281,7 +281,7 @@ class EicarTestCase(unittest.TestCase):
                                   ref_res["status"],
                                   probe_result.status)
                                  )
-                if (probe_result.version != ref_res["version"]):
+                if probe_result.version != ref_res["version"]:
                     logging.warning("Outdated version of %s: latest %s got %s"
                                     % (probe_result.name,
                                        ref_res["version"],

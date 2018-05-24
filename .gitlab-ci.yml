@@ -1,0 +1,26 @@
+stages:
+  - lint
+  - unit_test
+
+
+# This is NOT a job and will be ignored by GitLab-CI
+.init_env_pycodestyle_unittest: &init_env  # This is an anchor
+  before_script:
+    - apt update
+    - apt install -y python3 python-virtualenv
+    - virtualenv --python=python3 venv
+    - source venv/bin/activate
+    - pip install --quiet pycodestyle nosexcover pylint
+    - pip install -r requirements.txt
+
+pycodestyle:
+  <<: *init_env
+  stage: lint
+  script:
+    - pycodestyle irmacl  --exclude=irmacl/tests
+
+tests:
+  <<: *init_env
+  stage: unit_test
+  script:
+    - nosetests --with-coverage  --cover-package=irmacl --with-xunit --cover-erase  irmacl/tests/unittests/

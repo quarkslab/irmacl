@@ -47,7 +47,8 @@ ca = None
 submitter = "cli"
 
 if config_file is None:
-    warnings.warn("irma.conf config file not found, make sure to set required parameters manually!", Warning)
+    warnings.warn("irma.conf config file not found, make sure to set "
+                  "required parameters manually!", Warning)
 else:
     config = ConfigParser()
     config.read(config_file)

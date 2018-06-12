@@ -71,7 +71,7 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_new()
         self.assertTrue(self._validate_uuid(scan.id))
         self._check_scan(scan, scan.id, ["empty"], [], [0], [0], scan.date,
-                         False, False, False)
+                         True, True, True)
 
     def test_scan_add_files(self):
         scan = scan_new()
@@ -80,10 +80,10 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_add_files(scan.id, FILEPATHS)
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], FILENAMES, [0], [0], date,
-                         False, False, False)
+                         True, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"], FILENAMES, [0], [0],
-                         date, False, False, False)
+                         date, True, True, True)
 
     def test_scan_add_0len_file(self):
         filename = "empty_file"
@@ -94,10 +94,10 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_add_files(scan.id, [filepath])
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], [filename], [0], [0], date,
-                         False, False, False)
+                         True, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"], [filename], [0], [0],
-                         date, False, False, False)
+                         date, True, True, True)
 
     def test_scan_add_data(self):
         scan = scan_new()
@@ -108,10 +108,10 @@ class IrmaAPIScanTests(IrmaAPITests):
         scan = scan_add_data(scan.id, data, FILENAMES[0])
         self.assertEqual(scan.pstatus, "ready")
         self._check_scan(scan, scanid, ["ready"], [FILENAMES[0]], [0], [0],
-                         date, False, False, False)
+                         date, True, True, True)
         scan = scan_cancel(scan.id)
         self._check_scan(scan, scanid, ["cancelled"], [FILENAMES[0]], [0], [0],
-                         date, False, False, False)
+                         date, True, True, True)
 
     def test_scan_launch(self):
         scan = scan_new()

@@ -85,12 +85,13 @@ class IrmaApiClient(object):
     """ Basic Api class that just deals with get and post requests
     """
 
-    def __init__(self, url, submitter="cli",
+    def __init__(self, url, submitter="cli", submitter_id=None,
                  max_tries=1, pause=3, verify=True,
                  cert=None, key=None, ca=None,
                  verbose=False, session=None):
         self.url = url
         self.submitter = submitter
+        self.submitter_id = submitter_id
         self.verbose = verbose
         self.max_tries = max_tries
         self.pause = pause
@@ -322,6 +323,8 @@ class IrmaScansApi(object):
         json_data = {"submitter": self._apiclient.submitter}
         if payload is not None:
             json_data.update(payload)
+        if self._apiclient.submitter_id is not None:
+            json_data.update({"submitter_id": self._apiclient.submitter_id})
         data = {
                 "files": (dec_filepath, file_data, 'application/octet-stream'),
                 "json": (None, json.dumps(json_data),
@@ -419,6 +422,8 @@ class IrmaFilesApi(object):
             pass
         dec_filepath = quote(filepath)
         json_data = {"submitter": self._apiclient.submitter}
+        if self._apiclient.submitter_id is not None:
+            json_data.update({"submitter_id": self._apiclient.submitter_id})
         if payload is not None:
             json_data.update(payload)
         data = {
@@ -430,6 +435,43 @@ class IrmaFilesApi(object):
                                         files=data)
         return self._results_schema.make_object(res)
 
+
+class IrmaTokensApi(object):
+
+    def __init__(self, apiclient):
+        self._apiclient = apiclient
+        return
+
+    def new(self, scan_id):
+        route = '/tokens'
+        data = dict()
+        data['scan_id'] = scan_id
+        res = self._apiclient.post_call(route, data=data)
+        return res
+
+    def get(self, token_id):
+        route = '/tokens/{}'.format(token_id)
+        res = self._apiclient.get_call(route)
+        return res
+
+    def get_file(self, token_id, file_id, session=None):
+        route = '/tokens/{}/files_ext/{}'.format(token_id, file_id)
+        res = self._apiclient.get_call(route)
+        return res
+
+    def download_file(self, token_id, file_id, dest_filepath):
+        route = '/tokens/{}/files_ext/{}/download'.format(token_id, file_id)
+        with open(dest_filepath, 'wb') as handle:
+            res = self._apiclient.session.get(self._apiclient.url + route,
+                                              verify=self._apiclient.verify,
+                                              cert=(self._apiclient.cert,
+                                                    self._apiclient.key),
+                                              stream=True)
+            if not res.ok:
+                raise IrmaError("Error Downloading file")
+            for block in res.iter_content(1024):
+                handle.write(block)
+        return
 
 # =============
 #  Deserialize

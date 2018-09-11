@@ -33,6 +33,7 @@ SESSION = requests.Session()
 class IrmaAPITokensTests(unittest.TestCase):
 
     def setUp(self):
+        self.skipTest("Waiting for core API support")
         api_client = IrmaApiClient(api_endpoint, submitter=submitter,
                                    max_tries=max_tries, pause=pause,
                                    verify=verify, cert=cert, key=key, ca=ca)

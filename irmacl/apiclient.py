@@ -436,31 +436,33 @@ class IrmaFilesApi(object):
         return self._results_schema.make_object(res)
 
 
-class IrmaTokensApi(object):
+class IrmaSRCodesApi(object):
 
     def __init__(self, apiclient):
         self._apiclient = apiclient
         return
 
     def new(self, scan_id):
-        route = '/tokens'
+        route = '/scan_retrieval_codes'
         data = dict()
         data['scan_id'] = scan_id
         res = self._apiclient.post_call(route, data=data)
         return res
 
-    def get(self, token_id):
-        route = '/tokens/{}'.format(token_id)
+    def get(self, srcode_id):
+        route = '/scan_retrieval_codes/{}'.format(srcode_id)
         res = self._apiclient.get_call(route)
         return res
 
-    def get_file(self, token_id, file_id, session=None):
-        route = '/tokens/{}/files_ext/{}'.format(token_id, file_id)
+    def get_file(self, srcode_id, file_id, session=None):
+        route = '/scan_retrieval_codes/{}/files_ext/{}'.\
+            format(srcode_id, file_id)
         res = self._apiclient.get_call(route)
         return res
 
-    def download_file(self, token_id, file_id, dest_filepath):
-        route = '/tokens/{}/files_ext/{}/download'.format(token_id, file_id)
+    def download_file(self, srcode_id, file_id, dest_filepath):
+        route = '/scan_retrieval_codes/{}/files_ext/{}/download'.\
+            format(srcode_id, file_id)
         with open(dest_filepath, 'wb') as handle:
             res = self._apiclient.session.get(self._apiclient.url + route,
                                               verify=self._apiclient.verify,

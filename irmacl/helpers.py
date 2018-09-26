@@ -16,7 +16,7 @@ import os
 import time
 import warnings
 from irmacl.apiclient import IrmaApiClient, IrmaAboutApi, IrmaScansApi, \
-    IrmaProbesApi, IrmaFilesApi, IrmaError, IrmaTagsApi, IrmaTokensApi
+    IrmaProbesApi, IrmaFilesApi, IrmaError, IrmaTagsApi, IrmaSRCodesApi
 try:
     # Python 2 import
     from ConfigParser import ConfigParser, NoOptionError, NoSectionError
@@ -509,13 +509,13 @@ def tag_new(text, verbose=False, session=None):
     return tagapi.new(text)
 
 
-def token_new(scan_id, verbose=False, session=None):
-    """Create a new token
+def srcode_new(scan_id, verbose=False, session=None):
+    """Create a new Scan Retrieval Code
 
     :param scan_id: scan id
     :type text: str uuid
     :return: None
     """
     cli = get_cli(verbose, session)
-    tokenapi = IrmaTokensApi(cli)
-    return tokenapi.new(scan_id)
+    srcodeapi = IrmaSRCodesApi(cli)
+    return srcodeapi.new(scan_id)

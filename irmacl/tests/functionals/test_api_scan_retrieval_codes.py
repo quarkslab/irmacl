@@ -16,7 +16,7 @@ import unittest
 import os
 import hashlib
 import tempfile
-from irmacl.apiclient import IrmaScanStatus, IrmaTokensApi
+from irmacl.apiclient import IrmaScanStatus, IrmaSRCodesApi
 from irmacl.helpers import *
 
 import requests
@@ -30,45 +30,45 @@ HASH = "7cddf3fa0f8563d49d0e272208290fe8fdc627e5cae0083d4b7ecf901b2ab6c8"
 SESSION = requests.Session()
 
 
-class IrmaAPITokensTests(unittest.TestCase):
+class IrmaAPISRCodesTests(unittest.TestCase):
 
     def setUp(self):
         self.skipTest("Waiting for core API support")
         api_client = IrmaApiClient(api_endpoint, submitter=submitter,
                                    max_tries=max_tries, pause=pause,
                                    verify=verify, cert=cert, key=key, ca=ca)
-        self.cli = IrmaTokensApi(api_client)
+        self.cli = IrmaSRCodesApi(api_client)
 
-    def test_token_new(self):
+    def test_srcode_new(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token = res["id"]
-        self.assertEqual(len(token), 10)
+        srcode = res["id"]
+        self.assertEqual(len(srcode), 10)
 
-    def test_token_get(self):
+    def test_srcode_get(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token = res["id"]
-        res = self.cli.get(token)
+        srcode = res["id"]
+        res = self.cli.get(srcode)
         self.assertEqual(len(res["results"]), len(FILENAMES))
 
-    def test_token_get_file(self):
+    def test_srcode_get_file(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token = res["id"]
-        res = self.cli.get(token)
+        srcode = res["id"]
+        res = self.cli.get(srcode)
         results = res["results"]
         for r in results:
             if r["name"] == "eicar.com":
@@ -78,21 +78,21 @@ class IrmaAPITokensTests(unittest.TestCase):
         self.assertEqual(virus_file["status"], 1)
         self.assertEqual(clean_file["status"], 0)
 
-    def test_token_download_clean_file(self):
+    def test_srcode_download_clean_file(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token = res["id"]
-        res = self.cli.get(token)
+        srcode = res["id"]
+        res = self.cli.get(srcode)
         results = res["results"]
         for r in results:
             if r["name"] == "fish":
                 clean_file = r
         dst = tempfile.NamedTemporaryFile(delete=False)
-        self.cli.download_file(token, clean_file["result_id"],
+        self.cli.download_file(srcode, clean_file["result_id"],
                                dst.name)
         h = hashlib.sha256()
         with open(dst.name, "rb") as f:
@@ -101,45 +101,45 @@ class IrmaAPITokensTests(unittest.TestCase):
         hashval = h.hexdigest()
         self.assertEqual(hashval, HASH)
 
-    def test_token_download_virus_file(self):
+    def test_srcode_download_virus_file(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token = res["id"]
-        res = self.cli.get(token)
+        srcode = res["id"]
+        res = self.cli.get(srcode)
         results = res["results"]
         for r in results:
             if r["name"] == "eicar.com":
                 virus_file = r
         dst = tempfile.NamedTemporaryFile(delete=False)
         with self.assertRaises(IrmaError):
-            self.cli.download_file(token, virus_file["result_id"],
+            self.cli.download_file(srcode, virus_file["result_id"],
                                    dst.name)
 
-    def test_token_download_clean_file_wrong_token(self):
+    def test_srcode_download_clean_file_wrong_srcode(self):
         probes = probe_list(session=SESSION)
         force = False
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token1 = res["id"]
+        srcode1 = res["id"]
         scan = scan_files(FILEPATHS, force, blocking=True, probe=probes,
                           session=SESSION)
         self.assertEqual(scan.status, IrmaScanStatus.finished)
         res = self.cli.new(scan.id)
-        token2 = res["id"]
-        res = self.cli.get(token2)
+        srcode2 = res["id"]
+        res = self.cli.get(srcode2)
         results = res["results"]
         for r in results:
             if r["name"] == "fish":
                 clean_file = r
         dst = tempfile.NamedTemporaryFile(delete=False)
         with self.assertRaises(IrmaError):
-            self.cli.download_file(token1, clean_file["result_id"],
+            self.cli.download_file(srcode1, clean_file["result_id"],
                                    dst.name)
 
 
